@@ -36,8 +36,15 @@ namespace EcosystemSim
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
             ResolutionSize(1280, 720);
+            worldCam = new Camera(new Vector2(gfxManager.PreferredBackBufferWidth / 2, gfxManager.PreferredBackBufferHeight / 2), true);
+            uiCam = new Camera(Vector2.Zero, false);
+            
+            GlobalTextures.LoadContent();
+
+            GenerateScenes();
+            currentScene = scenes[Scenes.GameScene];
+            currentScene.Initialize();
 
             base.Initialize();
         }
@@ -45,25 +52,43 @@ namespace EcosystemSim
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(gfxDevice);
-
         }
 
         protected override void Update(GameTime gameTime)
         {
             this.gameTime = gameTime;
-            
-
-
+            currentScene.Update();
+            InputManager.HandleInput();
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
             gfxDevice.Clear(Color.Beige);
+            //Draw in world objects
+            spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack, BlendState.AlphaBlend,
+                SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise,
+                transformMatrix: worldCam.GetMatrix());
+
+            currentScene.DrawInWorld();
+            spriteBatch.End();
+
+            //Draw on screen objects
+            spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack, BlendState.AlphaBlend,
+                SamplerState.PointClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise,
+                transformMatrix: uiCam.GetMatrix());
+
+            currentScene.DrawOnScreen();
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
 
+        private void GenerateScenes()
+        {
+            scenes = new Dictionary<Scenes, Scene>();
+            scenes[Scenes.GameScene] = new TestScene();
+        }
 
         public void ResolutionSize(int width, int height)
         {

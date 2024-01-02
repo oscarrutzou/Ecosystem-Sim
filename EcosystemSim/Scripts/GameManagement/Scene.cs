@@ -43,6 +43,7 @@ namespace EcosystemSim
                 if (gameObject.isRemoved)
                 {
                     gameObjects.Remove(gameObject);
+                    RemoveFromCategory(gameObject);
                 }
                 else
                 {
@@ -52,6 +53,39 @@ namespace EcosystemSim
             }
 
             SceneData.gameObjects = new List<GameObject>(gameObjects);
+            SortIntoCategories();
+        }
+
+        private void RemoveFromCategory(GameObject gameObject)
+        {
+            switch (gameObject)
+            {
+                case Tile tile:
+                    SceneData.tiles.Remove(tile);
+                    break;
+                default:
+                    SceneData.defaults.Remove(gameObject);
+                    break;
+            }
+        }
+
+        public void AddGameObject(GameObject gameObject)
+        {
+            SceneData.gameObjects.Add(gameObject);
+            AddToCategory(gameObject);
+        }
+
+        private void AddToCategory(GameObject gameObject)
+        {
+            switch (gameObject)
+            {
+                case Tile tile:
+                    SceneData.tiles.Add(tile);
+                    break;
+                default:
+                    SceneData.defaults.Add(gameObject);
+                    break;
+            }
         }
 
         public virtual void DrawInWorld()
@@ -66,6 +100,8 @@ namespace EcosystemSim
                 gameObject.Draw();
                 //}
             }
+
+            
         }
 
         public virtual void DrawOnScreen()
@@ -76,49 +112,32 @@ namespace EcosystemSim
             //    guiGameObject.Draw();
             //}
             //DrawCursor();
+            if (InputManager.debugStats) DebugVariables.DrawDebug();
         }
 
-
-
-        #region Instantiate and Object LayerDepths
-        public void Instantiate(GameObject gameObject)
-        {
-            SceneData.gameObjects.Add(gameObject);
-
-        }
-
-        #endregion
 
         #region Sort Objects
 
 
-        private void RemoveObjectsFromList()
-        {
-            SceneData.defaults.RemoveAll(defultsObj => defultsObj.isRemoved);
-        }
 
         /// <summary>
-        /// Add all lists to the the gameObjects list that contains all gameObjects on the scene
+        /// Sorts the gameObjects and adds them to the correct lists
         /// </summary>
-        private void AddObjectsToList()
+        private void SortIntoCategories()
         {
-
-            SceneData.gameObjects.AddRange(SceneData.defaults);
-        }
-
-        ///// <summary>
-        ///// Sorts the gameObjects and adds them to the correct lists
-        ///// </summary>
-        ///// <param name="gameObjectsToAdd"></param>
-        private void SortIntoCategories(GameObject gameObj)
-        {
-            switch (gameObj)
+            foreach (GameObject gameObject in SceneData.gameObjects)
             {
-
-                default:
-                    SceneData.defaults.Add(gameObj);
-                    break;
+                switch (gameObject)
+                {
+                    case Tile tile:
+                        SceneData.tiles.Add(tile);
+                        break;
+                    default:
+                        SceneData.defaults.Add(gameObject);
+                        break;
+                }
             }
+
         }
         #endregion
         //private void DrawSceenColor()

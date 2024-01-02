@@ -17,7 +17,7 @@ namespace EcosystemSim
         public static bool mouseClicked;
         public static bool mouseRightClicked;
 
-
+        public static bool debugStats;
         #endregion
 
         /// <summary>
@@ -48,10 +48,12 @@ namespace EcosystemSim
                 //}
             }
 
-            //if (mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton == ButtonState.Released)
-            //{
-            //    CheckButtons();
-            //}
+            if (keyboardState.IsKeyDown(Keys.Q) && !previousKeyboardState.IsKeyDown(Keys.Q))
+            {
+                debugStats = !debugStats;
+                
+            }
+
 
             //PlayerInput();
 

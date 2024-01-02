@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EcosystemSim
 {
-    internal class Agent
+    public abstract class Agent
     {
     }
 }

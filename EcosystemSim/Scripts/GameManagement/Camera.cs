@@ -8,13 +8,14 @@ namespace EcosystemSim
         public Vector2 origin;
         private float zoom;                // The zoom level of the camera.
         private Matrix transformMatrix;    // A transformation matrix used for rendering.
-        public bool followPlayer;
+        public bool moveable;
 
-        public Camera(Vector2 origin)
+        public Camera(Vector2 origin, bool moveable)
         {
             position = Vector2.Zero;   // Initialize the camera's position at the origin.
             zoom = 1.0f;               // Initialize the camera's zoom level to 1.0
             this.origin = origin;
+            this.moveable = moveable;
         }
 
         public Matrix GetMatrix()
