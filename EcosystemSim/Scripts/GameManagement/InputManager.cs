@@ -17,7 +17,8 @@ namespace EcosystemSim
         public static bool mouseClicked;
         public static bool mouseRightClicked;
 
-        public static bool debugStats;
+        public static bool mouseOutOfBounds;
+        public static bool debugStats = true;
         #endregion
 
         /// <summary>
@@ -64,6 +65,23 @@ namespace EcosystemSim
             previousKeyboardState = keyboardState;
         }
 
+        private static Vector2 GetMousePositionInWorld()
+        {
+            Vector2 pos = new Vector2(mouseState.X, mouseState.Y);
+            Matrix invMatrix = Matrix.Invert(GameWorld.Instance.worldCam.GetMatrix());
+            return Vector2.Transform(pos, invMatrix);
+        }
+
+        private static Vector2 GetMousePositionOnUI()
+        {
+            Vector2 pos = new Vector2(mouseState.X, mouseState.Y);
+            Matrix invMatrix = Matrix.Invert(GameWorld.Instance.uiCam.GetMatrix());
+            Vector2 returnValue = Vector2.Transform(pos, invMatrix);
+            mouseOutOfBounds = (returnValue.X < 0 || returnValue.Y < 0 || returnValue.X > GameWorld.Instance.gfxManager.PreferredBackBufferWidth || returnValue.Y > GameWorld.Instance.gfxManager.PreferredBackBufferHeight);
+            return returnValue;
+        }
+
+
         //public static void PlayerInput()
         //{
         //    if (Global.currentScene.isPaused) return;
@@ -106,19 +124,6 @@ namespace EcosystemSim
 
         //        anyMoveKeyPressed = keyboardState.IsKeyDown(Keys.W) || keyboardState.IsKeyDown(Keys.A) || keyboardState.IsKeyDown(Keys.S) || keyboardState.IsKeyDown(Keys.D);
         //    }
-        private static Vector2 GetMousePositionInWorld()
-        {
-            Vector2 pos = new Vector2(mouseState.X, mouseState.Y);
-            Matrix invMatrix = Matrix.Invert(GameWorld.Instance.worldCam.GetMatrix());
-            return Vector2.Transform(pos, invMatrix);
-        }
-
-        private static Vector2 GetMousePositionOnUI()
-        {
-            Vector2 pos = new Vector2(mouseState.X, mouseState.Y);
-            Matrix invMatrix = Matrix.Invert(GameWorld.Instance.uiCam.GetMatrix());
-            return Vector2.Transform(pos, invMatrix);
-        }
 
     }
 }

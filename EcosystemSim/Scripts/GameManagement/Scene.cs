@@ -36,6 +36,8 @@ namespace EcosystemSim
         /// </summary>
         public virtual void Update()
         {
+            AddNewGameObjects();
+
             LinkedList<GameObject> gameObjects = new LinkedList<GameObject>(SceneData.gameObjects);
 
             foreach (var gameObject in gameObjects)
@@ -47,32 +49,23 @@ namespace EcosystemSim
                 }
                 else
                 {
-                    //gameObject.animation?.AnimationUpdate();
+                    if (InputManager.mouseOutOfBounds) break;
+                    gameObject.animation?.AnimationUpdate();
                     gameObject.Update();
                 }
             }
 
             SceneData.gameObjects = new List<GameObject>(gameObjects);
-            SortIntoCategories();
         }
-
-        private void RemoveFromCategory(GameObject gameObject)
+        private void AddNewGameObjects()
         {
-            switch (gameObject)
+            foreach (GameObject objectToAdd in SceneData.gameObjectsToAdd)
             {
-                case Tile tile:
-                    SceneData.tiles.Remove(tile);
-                    break;
-                default:
-                    SceneData.defaults.Remove(gameObject);
-                    break;
+                SceneData.gameObjects.Add(objectToAdd);
+                AddToCategory(objectToAdd);
             }
-        }
 
-        public void AddGameObject(GameObject gameObject)
-        {
-            SceneData.gameObjects.Add(gameObject);
-            AddToCategory(gameObject);
+            SceneData.gameObjectsToAdd.Clear();
         }
 
         private void AddToCategory(GameObject gameObject)
@@ -84,6 +77,19 @@ namespace EcosystemSim
                     break;
                 default:
                     SceneData.defaults.Add(gameObject);
+                    break;
+            }
+        }
+
+        private void RemoveFromCategory(GameObject gameObject)
+        {
+            switch (gameObject)
+            {
+                case Tile tile:
+                    SceneData.tiles.Remove(tile);
+                    break;
+                default:
+                    SceneData.defaults.Remove(gameObject);
                     break;
             }
         }
@@ -100,8 +106,6 @@ namespace EcosystemSim
                 gameObject.Draw();
                 //}
             }
-
-            
         }
 
         public virtual void DrawOnScreen()
@@ -112,34 +116,9 @@ namespace EcosystemSim
             //    guiGameObject.Draw();
             //}
             //DrawCursor();
-            if (InputManager.debugStats) DebugVariables.DrawDebug();
-        }
-
-
-        #region Sort Objects
-
-
-
-        /// <summary>
-        /// Sorts the gameObjects and adds them to the correct lists
-        /// </summary>
-        private void SortIntoCategories()
-        {
-            foreach (GameObject gameObject in SceneData.gameObjects)
-            {
-                switch (gameObject)
-                {
-                    case Tile tile:
-                        SceneData.tiles.Add(tile);
-                        break;
-                    default:
-                        SceneData.defaults.Add(gameObject);
-                        break;
-                }
-            }
 
         }
-        #endregion
+
         //private void DrawSceenColor()
         //{
         //    if (Global.currentScene == Global.world.scenes[Scenes.MainMenu]

@@ -19,7 +19,7 @@ namespace EcosystemSim
         public GraphicsDeviceManager gfxManager;
         public GraphicsDevice gfxDevice => GraphicsDevice;
 
-
+        
         public static GameWorld Instance;
         #endregion
 
@@ -57,8 +57,9 @@ namespace EcosystemSim
         protected override void Update(GameTime gameTime)
         {
             this.gameTime = gameTime;
-            currentScene.Update();
             InputManager.HandleInput();
+            currentScene.Update();
+
             base.Update(gameTime);
         }
 
