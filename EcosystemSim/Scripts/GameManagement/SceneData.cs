@@ -13,6 +13,8 @@ namespace EcosystemSim
         public static List<GameObject> gameObjectsToAdd = new List<GameObject>();
 
         public static List<Tile> tiles = new List<Tile>();
+        public static List<Herbivore> herbivores = new List<Herbivore>();
+        public static List<Predator> predators = new List<Predator>();
         public static List<GameObject> defaults = new List<GameObject>();
     }
 }

@@ -12,7 +12,7 @@ namespace EcosystemSim
         public int gridSizeDem = 16;
         private Vector2 scale = new Vector2(3, 3);
         public Tile tiles;
-        public int[] gridSize = new int[] { 15,10};
+        public int[] gridSize = new int[] { 5,5};
         public Tile hoverOverTile;
         public int[] hoverGridPos;
         public Vector2 startPosPx;

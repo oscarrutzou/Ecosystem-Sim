@@ -75,6 +75,12 @@ namespace EcosystemSim
                 case Tile tile:
                     SceneData.tiles.Add(tile);
                     break;
+                case Herbivore herbivore:
+                    SceneData.herbivores.Add(herbivore);
+                    break;
+                case Predator predator:
+                    SceneData.predators.Add(predator);
+                    break;
                 default:
                     SceneData.defaults.Add(gameObject);
                     break;
@@ -87,6 +93,12 @@ namespace EcosystemSim
             {
                 case Tile tile:
                     SceneData.tiles.Remove(tile);
+                    break;
+                case Herbivore herbivore:
+                    SceneData.herbivores.Remove(herbivore);
+                    break;
+                case Predator predator:
+                    SceneData.predators.Remove(predator);
                     break;
                 default:
                     SceneData.defaults.Remove(gameObject);
@@ -118,30 +130,6 @@ namespace EcosystemSim
             //DrawCursor();
 
         }
-
-        //private void DrawSceenColor()
-        //{
-        //    if (Global.currentScene == Global.world.scenes[Scenes.MainMenu]
-        //        || Global.currentScene == Global.world.scenes[Scenes.LoadingScreen]
-        //        || Global.currentScene == Global.world.scenes[Scenes.EndMenu])
-        //    {
-        //        Global.graphics.GraphicsDevice.Clear(Color.DarkRed);
-        //    }
-        //    else if (Global.currentScene == Global.world.scenes[Scenes.ElevatorMenu])
-        //    {
-        //        Global.graphics.GraphicsDevice.Clear(Color.Silver);
-        //    }
-        //    else
-        //    {
-        //        Global.graphics.GraphicsDevice.Clear(Color.Black);
-        //    }
-        //}
-
-        //private void DrawCursor()
-        //{
-        //    Vector2 pos = new Vector2(InputManager.mousePositionOnScreen.X - GlobalTextures.textures[TextureNames.CrossHair].Width / 2, InputManager.mousePositionOnScreen.Y - GlobalTextures.textures[TextureNames.CrossHair].Height / 2);
-        //    Global.spriteBatch.Draw(GlobalTextures.textures[TextureNames.CrossHair], pos, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
-        //}
 
 
     }

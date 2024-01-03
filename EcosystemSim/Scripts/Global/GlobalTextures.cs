@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.VisualBasic.ApplicationServices;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -10,8 +11,10 @@ namespace EcosystemSim
 {
     public enum TextureNames
     {
-        TestTile
-
+        TestTile,
+        Fox,
+        Bunny,
+        UISearchRad100,
     }
 
     // Dictionary of all textures
@@ -28,6 +31,9 @@ namespace EcosystemSim
             textures = new Dictionary<TextureNames, Texture2D>
             {
                 {TextureNames.TestTile, content.Load<Texture2D>("World\\TestTile") },
+                {TextureNames.Fox, content.Load<Texture2D>("Agents\\tile_fox") },
+                {TextureNames.Bunny, content.Load<Texture2D>("Agents\\tile_bunny") },
+                {TextureNames.UISearchRad100, content.Load<Texture2D>("UI\\AgentUI\\SearchRad100") },
             };
 
             // Load all fonts

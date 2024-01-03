@@ -20,7 +20,6 @@ namespace EcosystemSim
             this.position = position;
             this.type = type;
             this.texture = texture;
-            scale = 3;
         }
 
     }

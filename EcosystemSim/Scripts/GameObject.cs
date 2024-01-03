@@ -17,14 +17,14 @@ namespace EcosystemSim
         public SpriteEffects spriteEffects = SpriteEffects.None;
         public Texture2D texture;
         public Animation animation;
-        public int scale = 1;
-        private float layerDepth = 0;
+        public int scale = 3;
+        internal float layerDepth = 0;
         
         public bool isRemoved;
         public bool isVisible = true;
 
         public Vector2 origin;
-        public bool centerOrigin;
+        public bool isCentered;
 
         private int collisionBoxWidth;
         private int collisionBoxHeight;
@@ -42,12 +42,12 @@ namespace EcosystemSim
                 int width = collisionBoxWidth > 0 ? collisionBoxWidth : drawTexture.Width;
                 int height = collisionBoxHeight > 0 ? collisionBoxHeight : drawTexture.Height;
 
-                origin = centerOrigin ? new Vector2(width / 2, height / 2) : Vector2.Zero;
+                origin = isCentered ? new Vector2(width / 2, height / 2) : Vector2.Zero;
                 return new Rectangle(
                     (int)(position.X + offset.X - origin.X * scale),
                     (int)(position.Y + offset.Y - origin.Y * scale),
-                    (int)(width * scale),
-                    (int)(height * scale)
+                    (width * scale),
+                    (height * scale)
                 );
             }
             set { }
@@ -63,7 +63,7 @@ namespace EcosystemSim
             //Check if the drawTexture is null in the collisionBox, so there is no need to do it here too.
 
             //If the bool is true, choose the option on the left, if not then it chooses the right
-            origin = centerOrigin ? new Vector2(drawTexture.Width / 2, drawTexture.Height / 2) : Vector2.Zero;
+            origin = isCentered ? new Vector2(drawTexture.Width / 2, drawTexture.Height / 2) : Vector2.Zero;
 
             //Draw the animation texture or the staic texture 
             if (animation != null)
@@ -72,7 +72,7 @@ namespace EcosystemSim
             else if (texture != null)
                 GameWorld.Instance.spriteBatch.Draw(texture, position, null, color, rotation, origin, scale, spriteEffects, layerDepth);
 
-            DrawDebugCollisionBox(Color.White);
+            //DrawDebugCollisionBox(Color.White);
         }
 
         public void SetCollisionBox(int width, int height)

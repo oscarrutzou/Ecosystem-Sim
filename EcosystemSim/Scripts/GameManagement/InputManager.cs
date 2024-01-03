@@ -19,6 +19,8 @@ namespace EcosystemSim
 
         public static bool mouseOutOfBounds;
         public static bool debugStats = true;
+
+        public static Tile tileOnHover;
         #endregion
 
         /// <summary>
@@ -26,6 +28,7 @@ namespace EcosystemSim
         /// </summary>
         public static void HandleInput()
         {
+            GameWorld gameWorld = GameWorld.Instance;
             keyboardState = Keyboard.GetState();
             mouseState = Mouse.GetState();
 
@@ -36,27 +39,23 @@ namespace EcosystemSim
             // Check if the player presses the escape key
             if (keyboardState.IsKeyDown(Keys.Escape) && !previousKeyboardState.IsKeyDown(Keys.Escape))
             {
-                GameWorld.Instance.Exit();
-                //Global.currentScene.isPaused = !Global.currentScene.isPaused;
-
-                //if (Global.currentScene.isPaused)
-                //{
-                //    Global.world.pauseScreen.ShowPauseMenu();
-                //}
-                //else
-                //{
-                //    Global.world.pauseScreen.HidePauseMenu();
-                //}
+                gameWorld.Exit();
             }
 
             if (keyboardState.IsKeyDown(Keys.Q) && !previousKeyboardState.IsKeyDown(Keys.Q))
             {
                 debugStats = !debugStats;
-                
             }
 
 
-            //PlayerInput();
+            MoveCam();
+            
+            if (gameWorld.currentScene is TestScene scene && scene.bgGrid != null)
+            {
+                tileOnHover = GridManager.GetTileAtPos(mousePositionInWorld);
+            }
+
+
 
             mouseClicked = (Mouse.GetState().LeftButton == ButtonState.Pressed) && (previousMouseState.LeftButton == ButtonState.Released);
             mouseRightClicked = (Mouse.GetState().RightButton == ButtonState.Pressed) && (previousMouseState.RightButton == ButtonState.Released);
@@ -82,48 +81,21 @@ namespace EcosystemSim
         }
 
 
-        //public static void PlayerInput()
-        //{
-        //    if (Global.currentScene.isPaused) return;
+        private static void MoveCam()
+        {
+            // Handle camera movement based on keyboard input //-- look at
+            Vector2 moveDirection = Vector2.Zero;
+            if (keyboardState.IsKeyDown(Keys.W))
+                moveDirection.Y = -1;
+            if (keyboardState.IsKeyDown(Keys.S))
+                moveDirection.Y = 1;
+            if (keyboardState.IsKeyDown(Keys.A))
+                moveDirection.X = -1;
+            if (keyboardState.IsKeyDown(Keys.D))
+                moveDirection.X = 1;
 
-        //    if (Global.player != null)
-        //    {
-        //        Vector2 dir = mousePositionInWorld - Global.player.position;
-        //        dir.Normalize();
-
-        //        // Calculate the offset vector perpendicular to the direction vector
-        //        Vector2 offset = new Vector2(-dir.Y, dir.X) * -Global.player.textureOffset; // 50 is the offset distance in px
-        //        Vector2 tempPosition = Global.player.position; // Store the current position
-
-        //        Global.player.RotateTowardsTargetWithOffset(mousePositionInWorld, offset);
-
-        //        if (keyboardState.IsKeyDown(Keys.A))
-        //        {
-        //            Global.player.position.X -= Global.player.playerSpeed;
-        //        }
-        //        if (keyboardState.IsKeyDown(Keys.D))
-        //        {
-        //            Global.player.position.X += Global.player.playerSpeed;
-        //        }
-        //        if (keyboardState.IsKeyDown(Keys.W))
-        //        {
-        //            Global.player.position.Y -= Global.player.playerSpeed;
-        //        }
-        //        if (keyboardState.IsKeyDown(Keys.S))
-        //        {
-        //            Global.player.position.Y += Global.player.playerSpeed;
-        //        }
-
-        //        // Toggle no clip
-        //        if (keyboardState.IsKeyDown(Keys.N) && previousKeyboardState.IsKeyDown(Keys.N))
-        //        {
-        //            noClip = !noClip;
-        //        }
-
-        //        CheckPlayerMoveColRoom(tempPosition);
-
-        //        anyMoveKeyPressed = keyboardState.IsKeyDown(Keys.W) || keyboardState.IsKeyDown(Keys.A) || keyboardState.IsKeyDown(Keys.S) || keyboardState.IsKeyDown(Keys.D);
-        //    }
+            GameWorld.Instance.worldCam.Move(moveDirection * 5); // Control camera speed //-- look at
+        }
 
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 
 namespace EcosystemSim
@@ -14,6 +15,7 @@ namespace EcosystemSim
         public Camera worldCam { get; private set; }
         public Camera uiCam { get; private set; } //Static on the ui
         public GameTime gameTime { get; private set; }
+        public Random random { get; private set; }
 
         public SpriteBatch spriteBatch;
         public GraphicsDeviceManager gfxManager;
@@ -28,7 +30,7 @@ namespace EcosystemSim
             if (Instance == null) Instance = this;
 
             gfxManager = new GraphicsDeviceManager(this);
-
+            random = new Random();
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
             Window.Title = "Ecosystem Simulation";

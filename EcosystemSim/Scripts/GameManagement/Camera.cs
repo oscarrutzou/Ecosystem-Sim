@@ -18,6 +18,12 @@ namespace EcosystemSim
             this.moveable = moveable;
         }
 
+        public void Move(Vector2 delta)
+        {
+            // Update the camera's position by adding a delta vector.
+            position += delta;
+        }
+
         public Matrix GetMatrix()
         {
             // Create a transformation matrix that represents the camera's view.

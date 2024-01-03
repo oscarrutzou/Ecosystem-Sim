@@ -8,21 +8,36 @@ namespace EcosystemSim
     public class TestScene : Scene
     {
 
-        public Grid grid;
+        public Grid bgGrid;
 
 
         public override void Initialize()
         {
-            grid = new Grid();
-            //Vector2 startPos = Vector2.Zero;
-            grid.InitGrid(Vector2.Zero, true);
+            bgGrid = new Grid();
+            GridManager.grids.Add(bgGrid);
+            bgGrid.InitGrid(Vector2.Zero, false);
+            SceneData.gameObjectsToAdd.Add(new Predator(Vector2.Zero));
+
         }
         public override void DrawOnScreen()
         {
             base.DrawOnScreen();
 
-            if (InputManager.debugStats) DebugVariables.DrawDebug(this);
+            if (InputManager.debugStats) DebugVariables.DrawDebug();
 
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (SceneData.gameObjects.Count > 0)
+            {
+
+            }
+            if (SceneData.tiles.Count > 0)
+            {
+
+            }
         }
     }
 }
