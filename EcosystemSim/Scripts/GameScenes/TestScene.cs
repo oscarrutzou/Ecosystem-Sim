@@ -14,8 +14,8 @@ namespace EcosystemSim
         public override void Initialize()
         {
             grid = new Grid();
-            Vector2 startPos = new Vector2(0 - grid.gridSizeDem * (grid.gridSize[0] / 2), 0 - grid.gridSizeDem * (grid.gridSize[1] / 2));
-            grid.InitGrid(startPos);
+            //Vector2 startPos = Vector2.Zero;
+            grid.InitGrid(Vector2.Zero, true);
         }
         public override void DrawOnScreen()
         {
