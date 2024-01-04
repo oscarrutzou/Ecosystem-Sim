@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SharpDX.MediaFoundation;
 
 namespace EcosystemSim
 {
@@ -72,7 +67,7 @@ namespace EcosystemSim
             else if (texture != null)
                 GameWorld.Instance.spriteBatch.Draw(texture, position, null, color, rotation, origin, scale, spriteEffects, layerDepth);
 
-            //DrawDebugCollisionBox(Color.White);
+            //DrawDebugCollisionBox(Color.Black);
         }
 
         public void SetCollisionBox(int width, int height)

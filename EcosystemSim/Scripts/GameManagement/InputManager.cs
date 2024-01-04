@@ -52,10 +52,9 @@ namespace EcosystemSim
             
             if (gameWorld.currentScene is TestScene scene && scene.bgGrid != null)
             {
-                tileOnHover = GridManager.GetTileAtPos(mousePositionInWorld);
+                //tileOnHover = GridManager.GetTileAtPos(mousePositionInWorld);
+                tileOnHover = scene.bgGrid.GetTile(mousePositionInWorld);
             }
-
-
 
             mouseClicked = (Mouse.GetState().LeftButton == ButtonState.Pressed) && (previousMouseState.LeftButton == ButtonState.Released);
             mouseRightClicked = (Mouse.GetState().RightButton == ButtonState.Pressed) && (previousMouseState.RightButton == ButtonState.Released);

@@ -17,11 +17,12 @@ namespace EcosystemSim
         private Vector2 direction;
 
 
-
-        public Agent() {
+        private TestScene testScene;
+        public Agent(TestScene testScene) {
             layerDepth = 0.2f;
             health = maxHealth;
             isCentered = true;
+            this.testScene = testScene;
         }
 
         public override void Draw()
@@ -106,7 +107,8 @@ namespace EcosystemSim
         private bool IsPositionWalkable(Vector2 pos)
         {
             // Get the tile at the position
-            Tile tile = GridManager.GetTileAtPos(pos);
+            //Tile tile = GridManager.GetTileAtPos(pos);
+            Tile tile = testScene?.bgGrid.GetTile(pos);
 
             // If there is no tile at the position or the tile is not walkable, return false
             if (tile == null || !tile.isWalkable)

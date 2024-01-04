@@ -9,7 +9,7 @@ namespace EcosystemSim
 {
     public class Predator: Agent
     {
-        public Predator(Vector2 pos) {
+        public Predator(Vector2 pos, TestScene test): base(test) {
             position = pos;
             texture = GlobalTextures.textures[TextureNames.Fox];
         }

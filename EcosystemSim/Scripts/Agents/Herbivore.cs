@@ -7,11 +7,14 @@ using System.Threading.Tasks;
 
 namespace EcosystemSim
 {
-    public class Herbivore: Agent
+    public class Herbivore : Agent
     {
-        public Herbivore(Vector2 pos) {
-            position = pos;
-            texture = GlobalTextures.textures[TextureNames.Bunny];
+        //public Herbivore(Vector2 pos) {
+        //    position = pos;
+        //    texture = GlobalTextures.textures[TextureNames.Bunny];
+        //}
+        public Herbivore(TestScene testScene) : base(testScene)
+        {
         }
     }
 }

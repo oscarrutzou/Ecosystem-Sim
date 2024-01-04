@@ -16,10 +16,11 @@ namespace EcosystemSim
             DrawString($"Mouse in world: {InputManager.mousePositionInWorld}");
             DrawString($"Mouse on UI: {InputManager.mousePositionOnScreen}");
             DrawString($"Mouse out of bounds: {InputManager.mouseOutOfBounds}");
-            DrawString($"Grid: {GridManager.grids[0]?.startPosPx}");
+            //DrawString($"Grid: {GridManager.grids[0]?.startPosPx}");
 
 
             Tile tile = InputManager.tileOnHover;
+            //Tile tile = scene.bgGrid.GetTileAtPos(InputManager.mousePositionInWorld);
             if (tile != null)
             {
                 DrawString($"Hover tile type: {tile.type}");

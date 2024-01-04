@@ -1,9 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using SharpDX.Direct3D9;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EcosystemSim
 {
@@ -11,14 +8,14 @@ namespace EcosystemSim
     {
         public int gridSizeDem = 16;
         private Vector2 scale = new Vector2(3, 3);
-        public Tile tiles;
-        public int[] gridSize = new int[] { 5,5};
-        public Tile hoverOverTile;
-        public int[] hoverGridPos;
+        public Tile[,] tiles;
+        public int[] gridSize = new int[] { 5, 5 };
         public Vector2 startPosPx;
+
         public Grid()
         {
             gridSizeDem *= (int)scale.X;
+            tiles = new Tile[gridSize[0], gridSize[1]]; // Initialize the 2D array
         }
 
         public void InitGrid(Vector2 startPosPx, bool isCentered)
@@ -36,8 +33,8 @@ namespace EcosystemSim
                 for (int x = 0; x < gridSize[0]; x++)
                 {
                     Tile tempTile = new Tile(true, new int[] { x, y }, curPos, TileType.TestTile, GlobalTextures.textures[TextureNames.TestTile]);
+                    tiles[x, y] = tempTile;
                     SceneData.gameObjectsToAdd.Add(tempTile);
-
                     curPos.X += gridSizeDem;
                 }
                 curPos.X = this.startPosPx.X;
@@ -45,23 +42,29 @@ namespace EcosystemSim
             }
         }
 
-
-        public Tile GetTileAtPos(Vector2 pos)
+        public Tile GetTile(Vector2 pos)
         {
+            if (pos.X < startPosPx.X || pos.Y < startPosPx.Y)
+            {
+                return null; // Position is negative, otherwise it will make a invisable tile in the debug, since it cast to int, then it gets rounded to 0 and results in row and column
+            }
+
             int gridX = (int)((pos.X - startPosPx.X) / gridSizeDem);
             int gridY = (int)((pos.Y - startPosPx.Y) / gridSizeDem);
+
             if (0 <= gridX && gridX < gridSize[0] && 0 <= gridY && gridY < gridSize[1])
             {
-                foreach (Tile tile in SceneData.tiles)
-                {
-                    if (tile.gridPos[0] == gridX && tile.gridPos[1] == gridY)
-                    {
-                        hoverGridPos = new int[] { gridX, gridY };
-                        return tile;
-                    }
-                }
+                return tiles[gridX, gridY];
             }
-            return null;
+
+            return null; // Position is out of bounds
         }
+
     }
+
+
+
+    /*
+     *         
+     */
 }
