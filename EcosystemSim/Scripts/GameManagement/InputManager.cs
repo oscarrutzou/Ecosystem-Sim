@@ -66,6 +66,24 @@ namespace EcosystemSim
                 {
                     tileOnHover.ChangeTile(TileType.TestTile);
                 }
+
+                if (keyboardState.IsKeyDown(Keys.E) && !previousKeyboardState.IsKeyDown(Keys.E))
+                {
+                    SaveLoad.SaveGrid(scene.bgGrid);
+                }
+
+                if (keyboardState.IsKeyDown(Keys.R) && !previousKeyboardState.IsKeyDown(Keys.R))
+                {
+                    foreach (Tile tile1 in scene.bgGrid.tiles)
+                    {
+                        tile1.isRemoved = true;  
+                    }
+                }
+
+                if (keyboardState.IsKeyDown(Keys.T) && !previousKeyboardState.IsKeyDown(Keys.T))
+                {
+                    scene.bgGrid = SaveLoad.LoadGrid();
+                }
             }
 
             previousMouseState = mouseState;

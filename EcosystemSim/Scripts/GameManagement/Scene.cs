@@ -37,15 +37,14 @@ namespace EcosystemSim
         public virtual void Update()
         {
             AddNewGameObjects();
-
             LinkedList<GameObject> gameObjects = new LinkedList<GameObject>(SceneData.gameObjects);
+            List<GameObject> objectsToRemove = new List<GameObject>(); // List to hold objects to remove
 
             foreach (var gameObject in gameObjects)
             {
                 if (gameObject.isRemoved)
                 {
-                    gameObjects.Remove(gameObject);
-                    RemoveFromCategory(gameObject);
+                    objectsToRemove.Add(gameObject); // Add to remove list instead of removing immediately
                 }
                 else
                 {
@@ -54,9 +53,16 @@ namespace EcosystemSim
                     gameObject.Update();
                 }
             }
-
+            
+            foreach (var gameObject in objectsToRemove)
+            { // Iterate over objects to remove
+                gameObjects.Remove(gameObject);
+                RemoveFromCategory(gameObject);
+            }
+            
             SceneData.gameObjects = new List<GameObject>(gameObjects);
         }
+
         private void AddNewGameObjects()
         {
             foreach (GameObject objectToAdd in SceneData.gameObjectsToAdd)
