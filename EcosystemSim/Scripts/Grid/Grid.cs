@@ -13,7 +13,8 @@ namespace EcosystemSim
         public int width, height;
         public Vector2 startPosPx;
         public bool isCentered;
-        public Grid(Vector2 startPosPx, int width, int height, bool isCentered)
+        public string gridName;
+        public Grid(Vector2 startPosPx, int width, int height, bool isCentered, string name)
         {
             gridSizeDem *= (int)scale.X;
             this.startPosPx = startPosPx;
@@ -21,9 +22,10 @@ namespace EcosystemSim
             this.height = height;
             this.isCentered = isCentered;
             tiles = new Tile[width, height]; // Initialize the 2D array
+            gridName = name;
         }
 
-        public void InitGrid(TileType type)
+        public void InitGrid()
         {
             Vector2 curPos = startPosPx;
 
@@ -37,9 +39,9 @@ namespace EcosystemSim
             {
                 for (int x = 0; x < width; x++)
                 {
-                    Tile tempTile = new Tile(new int[] { x, y }, curPos, type);
+                    Tile tempTile = new Tile(new int[] { x, y }, curPos, TileType.Empty);
                     tiles[x, y] = tempTile;
-                    if (type != TileType.Empty) SceneData.gameObjectsToAdd.Add(tempTile);
+                    //if (type != TileType.Empty) SceneData.gameObjectsToAdd.Add(tempTile);
 
                     curPos.X += gridSizeDem;
                 }

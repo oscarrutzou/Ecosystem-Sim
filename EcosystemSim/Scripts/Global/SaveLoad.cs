@@ -7,12 +7,13 @@ namespace EcosystemSim
 {
     public static class SaveLoad
     {
-        public static void SaveGrid(Grid grid)
+        public static void SaveGrid(Grid grid, int index, string description)
         {
+            string gridName = $"grid{index}_{description}";
             string appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string folder = Path.Combine(appdataPath, "EcoSystemSimData");
             Directory.CreateDirectory(folder);
-            string path = Path.Combine(folder, "gridData.txt");
+            string path = Path.Combine(folder, $"{gridName}.txt"); // Use the grid name in the file name
             FileStream stream = File.Open(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             try
             {
@@ -35,11 +36,12 @@ namespace EcosystemSim
             }
         }
 
-    public static Grid LoadGrid()
+        public static Grid LoadGrid(int index, string description)
         {
+            string gridName = $"grid{index}_{description}";
             string appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string folder = Path.Combine(appdataPath, "EcoSystemSimData");
-            string path = Path.Combine(folder, "gridData.txt");
+            string path = Path.Combine(folder, $"{gridName}.txt"); // Use the grid name in the file name
             if (!File.Exists(path))
             {
                 return null;
@@ -48,17 +50,18 @@ namespace EcosystemSim
             try
             {
                 StreamReader reader = new StreamReader(stream);
-                string[] firstLineSizeParts = reader.ReadLine().Split(','); //Read first line, e.g read other generel info here
-                int width = int.Parse(firstLineSizeParts[0]); 
+                
+                //string name = reader.ReadLine();
+                string[] firstLineSizeParts = reader.ReadLine().Split(',');
+                int width = int.Parse(firstLineSizeParts[0]);
                 int height = int.Parse(firstLineSizeParts[1]);
+
                 List<Tile> tiles = new List<Tile>();
                 string line;
-
                 foreach (Tile tile in SceneData.tiles)
                 {
                     tile.isRemoved = true;
                 }
-
                 while ((line = reader.ReadLine()) != null)
                 {
                     string[] parts = line.Split(',');
@@ -70,9 +73,10 @@ namespace EcosystemSim
                     if (type != TileType.Empty)
                     {
                         SceneData.gameObjectsToAdd.Add(tempTile); // Add the tile to your game objects list
-                    } 
+                    }
                 }
-                Grid grid = new Grid(tiles[0].position, width, height, false);
+
+                Grid grid = new Grid(tiles[0].position, width, height, false, description);
                 for (int y = 0; y < height; y++)
                 {
                     for (int x = 0; x < width; x++)
@@ -87,6 +91,7 @@ namespace EcosystemSim
                 stream.Close();
             }
         }
+
 
     }
 

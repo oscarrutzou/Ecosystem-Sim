@@ -8,14 +8,11 @@ namespace EcosystemSim
     public class TestScene : Scene
     {
 
-        public Grid bgGrid;
 
 
         public override void Initialize()
         {
-            bgGrid = new Grid(Vector2.Zero, 5, 5, true);
-            //GridManager.grids.Add(bgGrid);
-            bgGrid.InitGrid(TileType.Empty);
+            GridManager.InitStartGrids();
             SceneData.gameObjectsToAdd.Add(new Predator(Vector2.Zero, this));
 
         }
@@ -30,14 +27,11 @@ namespace EcosystemSim
         public override void Update()
         {
             base.Update();
-            if (SceneData.gameObjects.Count > 0)
+            if (GridManager.grids.Count > 0)
             {
 
             }
-            if (SceneData.tiles.Count > 0)
-            {
 
-            }
         }
     }
 }

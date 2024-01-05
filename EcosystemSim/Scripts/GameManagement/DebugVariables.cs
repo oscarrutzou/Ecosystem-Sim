@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace EcosystemSim
 {
@@ -12,12 +13,17 @@ namespace EcosystemSim
         {
             pos = new Vector2(10, 10);
             DrawString($"Selected tile type: {InputManager.selectedTileType}");
-            DrawString($"Amount of Herbivores: {SceneData.herbivores.Count}");
-            DrawString($"Amount of Predators: {SceneData.predators.Count}");
-            DrawString($"Mouse in world: {InputManager.mousePositionInWorld}");
-            DrawString($"Mouse on UI: {InputManager.mousePositionOnScreen}");
-            DrawString($"Mouse out of bounds: {InputManager.mouseOutOfBounds}");
-            //DrawString($"Grid: {GridManager.grids[0]?.startPosPx}");
+            DrawString($"Selected grid: {GridManager.selectedGrid.gridName}");
+            for (int i = 0; i < GridManager.grids.Count; i++)
+            {
+                int nonEmptyTilesCount = GridManager.grids[i].tiles.Cast<Tile>().Count(tile => tile.tileType != TileType.Empty);
+                DrawString($"Grid{i}_{GridManager.grids[i].gridName} non-empty tiles count: {nonEmptyTilesCount}");
+            }
+            //DrawString($"Amount of Herbivores: {SceneData.herbivores.Count}");
+            //DrawString($"Amount of Predators: {SceneData.predators.Count}");
+            //DrawString($"Mouse in world: {InputManager.mousePositionInWorld}");
+            //DrawString($"Mouse on UI: {InputManager.mousePositionOnScreen}");
+            //DrawString($"Mouse out of bounds: {InputManager.mouseOutOfBounds}");
 
 
             Tile tile = InputManager.tileOnHover;

@@ -5,35 +5,31 @@ using Microsoft.Xna.Framework;
 
 namespace EcosystemSim
 {
+
     public static class GridManager
     {
         public static List<Grid> grids = new List<Grid>();
+        public static Grid selectedGrid;
+        public static int gridIndex;
 
-        //public static Tile GetTileAtPos(Vector2 pos)
-        //{
-        //    foreach (Grid grid in grids)
-        //    {
-        //        Tile tile = grid.GetTile(pos);
-        //        if (tile != null && tile.isWalkable)
-        //        {
-        //            return tile;
-        //        }
-        //    }
-        //    return null;
-        //}
+        //Gen 3 grids
+        //Change grids with keyboard,
+        public static void InitStartGrids()
+        {
+            grids.Add(new Grid(Vector2.Zero, 2, 2, true, "Bottom"));
+            grids.Add(new Grid(Vector2.Zero, 2, 2, true, "Middle"));
+            grids.Add(new Grid(Vector2.Zero, 2, 2, true, "Top"));
+            foreach (Grid grid in grids) { 
+                grid.InitGrid();
+            }
 
-        //public static Grid GetGridAtPos(Vector2 pos)
-        //{
-        //    foreach (Grid grid in grids)
-        //    {
-        //        Vector2 gridDimensions = new Vector2(grid.gridSize[0] * grid.gridSizeDem, grid.gridSize[1] * grid.gridSizeDem);
-        //        if (pos.X >= grid.startPosPx.X && pos.Y >= grid.startPosPx.Y && pos.X < grid.startPosPx.X + gridDimensions.X && pos.Y < grid.startPosPx.Y + gridDimensions.Y)
-        //        {
-        //            return grid;
-        //        }
-        //    }
-        //    return null;
-        //}
+            selectedGrid = grids[0];
+        }
+
+        public static Tile GetTileAtPos(Vector2 pos)
+        {
+            return selectedGrid.GetTile(pos);
+        }
 
     }
 }

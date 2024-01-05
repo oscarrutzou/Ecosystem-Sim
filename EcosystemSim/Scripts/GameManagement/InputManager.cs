@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace EcosystemSim
 {
@@ -66,24 +68,31 @@ namespace EcosystemSim
             MoveCam();
             ChangeSelectedTile();
 
-            if (GameWorld.Instance.currentScene is TestScene scene && scene.bgGrid != null)
+            if (GridManager.grids.Count != 0)
             {
                 if (keyboardState.IsKeyDown(Keys.E) && !previousKeyboardState.IsKeyDown(Keys.E))
                 {
-                    SaveLoad.SaveGrid(scene.bgGrid);
+                    for (int i = 0; i < GridManager.grids.Count; i++)
+                    {
+                        SaveLoad.SaveGrid(GridManager.grids[i], i, GridManager.grids[i].gridName);
+                    }
                 }
 
-                if (keyboardState.IsKeyDown(Keys.R) && !previousKeyboardState.IsKeyDown(Keys.R))
+                if (keyboardState.IsKeyDown(Keys.R) && !previousKeyboardState.IsKeyDown(Keys.R) && keyboardState.IsKeyDown(Keys.LeftShift))
                 {
-                    foreach (Tile tile1 in scene.bgGrid.tiles)
+                    foreach (Grid grid in GridManager.grids)
                     {
-                        tile1.ChangeTile(TileType.Empty);
+                        foreach(Tile tile in grid.tiles)
+                        {
+                            tile.ChangeTile(TileType.Empty);
+                        }
                     }
                 }
 
                 if (keyboardState.IsKeyDown(Keys.T) && !previousKeyboardState.IsKeyDown(Keys.T))
                 {
-                    scene.bgGrid = SaveLoad.LoadGrid();
+                    GridManager.grids[GridManager.gridIndex] = GridManager.selectedGrid = SaveLoad.LoadGrid(GridManager.gridIndex, GridManager.selectedGrid.gridName);
+                    
                 }
             }
         }
@@ -93,9 +102,12 @@ namespace EcosystemSim
             mouseClicked = (Mouse.GetState().LeftButton == ButtonState.Pressed) && (previousMouseState.LeftButton == ButtonState.Released);
             mouseRightClicked = (Mouse.GetState().RightButton == ButtonState.Pressed) && (previousMouseState.RightButton == ButtonState.Released);
 
-            if (GameWorld.Instance.currentScene is TestScene scene && scene.bgGrid != null)
+            if (GridManager.grids.Count != 0)
             {
-                tileOnHover = scene.bgGrid.GetTile(mousePositionInWorld);
+                //tileOnHover = scene.bgGrid.GetTile(mousePositionInWorld);
+
+                tileOnHover = GridManager.GetTileAtPos(mousePositionInWorld);
+
                 if (Mouse.GetState().LeftButton == ButtonState.Pressed && tileOnHover != null)
                 {
                     tileOnHover.ChangeTile(selectedTileType);
