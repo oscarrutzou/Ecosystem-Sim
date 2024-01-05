@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace EcosystemSim
 {
@@ -21,6 +22,13 @@ namespace EcosystemSim
         public static bool debugStats = true;
 
         public static Tile tileOnHover;
+        public static TileType selectedTileType = TileType.TestTile;
+
+        private static Dictionary<Keys, TileType> keyTileTypeMap = new Dictionary<Keys, TileType>
+        {
+            { Keys.D1, TileType.TestTile },
+            { Keys.D2, TileType.TestTileNonWalk }
+        };
         #endregion
 
         /// <summary>
@@ -28,7 +36,6 @@ namespace EcosystemSim
         /// </summary>
         public static void HandleInput()
         {
-            GameWorld gameWorld = GameWorld.Instance;
             keyboardState = Keyboard.GetState();
             mouseState = Mouse.GetState();
 
@@ -36,10 +43,19 @@ namespace EcosystemSim
             mousePositionOnScreen = GetMousePositionOnUI();
             mousePositionInWorld = GetMousePositionInWorld();
 
+            HandleKeyboardInput();
+            HandleMouseInput();
+
+            previousMouseState = mouseState;
+            previousKeyboardState = keyboardState;
+        }
+
+        private static void HandleKeyboardInput()
+        {
             // Check if the player presses the escape key
             if (keyboardState.IsKeyDown(Keys.Escape) && !previousKeyboardState.IsKeyDown(Keys.Escape))
             {
-                gameWorld.Exit();
+                GameWorld.Instance.Exit();
             }
 
             if (keyboardState.IsKeyDown(Keys.Q) && !previousKeyboardState.IsKeyDown(Keys.Q))
@@ -47,26 +63,11 @@ namespace EcosystemSim
                 debugStats = !debugStats;
             }
 
-
             MoveCam();
-            
+            ChangeSelectedTile();
 
-            mouseClicked = (Mouse.GetState().LeftButton == ButtonState.Pressed) && (previousMouseState.LeftButton == ButtonState.Released);
-            mouseRightClicked = (Mouse.GetState().RightButton == ButtonState.Pressed) && (previousMouseState.RightButton == ButtonState.Released);
-            
-            if (gameWorld.currentScene is TestScene scene && scene.bgGrid != null)
+            if (GameWorld.Instance.currentScene is TestScene scene && scene.bgGrid != null)
             {
-                //tileOnHover = GridManager.GetTileAtPos(mousePositionInWorld);
-                tileOnHover = scene.bgGrid.GetTile(mousePositionInWorld);
-                if (Mouse.GetState().LeftButton == ButtonState.Pressed && tileOnHover != null)
-                {
-                    tileOnHover.ChangeTile(TileType.TestTileNonWalk);
-                }
-                if (Mouse.GetState().RightButton == ButtonState.Pressed && tileOnHover != null)
-                {
-                    tileOnHover.ChangeTile(TileType.TestTile);
-                }
-
                 if (keyboardState.IsKeyDown(Keys.E) && !previousKeyboardState.IsKeyDown(Keys.E))
                 {
                     SaveLoad.SaveGrid(scene.bgGrid);
@@ -76,20 +77,46 @@ namespace EcosystemSim
                 {
                     foreach (Tile tile1 in scene.bgGrid.tiles)
                     {
-                        tile1.isRemoved = true;
                         tile1.ChangeTile(TileType.Empty);
                     }
                 }
-
 
                 if (keyboardState.IsKeyDown(Keys.T) && !previousKeyboardState.IsKeyDown(Keys.T))
                 {
                     scene.bgGrid = SaveLoad.LoadGrid();
                 }
             }
+        }
 
-            previousMouseState = mouseState;
-            previousKeyboardState = keyboardState;
+        private static void HandleMouseInput()
+        {
+            mouseClicked = (Mouse.GetState().LeftButton == ButtonState.Pressed) && (previousMouseState.LeftButton == ButtonState.Released);
+            mouseRightClicked = (Mouse.GetState().RightButton == ButtonState.Pressed) && (previousMouseState.RightButton == ButtonState.Released);
+
+            if (GameWorld.Instance.currentScene is TestScene scene && scene.bgGrid != null)
+            {
+                tileOnHover = scene.bgGrid.GetTile(mousePositionInWorld);
+                if (Mouse.GetState().LeftButton == ButtonState.Pressed && tileOnHover != null)
+                {
+                    tileOnHover.ChangeTile(selectedTileType);
+                }
+                if (Mouse.GetState().RightButton == ButtonState.Pressed && tileOnHover != null)
+                {
+                    tileOnHover.ChangeTile(TileType.Empty);
+                }
+            }
+        }
+
+        private static void ChangeSelectedTile()
+        {
+            foreach (var mapping in keyTileTypeMap)
+            {
+                if (keyboardState.IsKeyDown(mapping.Key) && !previousKeyboardState.IsKeyDown(mapping.Key))
+                {
+                    selectedTileType = mapping.Value;
+                    break;
+                }
+            }
         }
 
         private static Vector2 GetMousePositionInWorld()

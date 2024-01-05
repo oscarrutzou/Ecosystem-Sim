@@ -23,7 +23,7 @@ namespace EcosystemSim
             tiles = new Tile[width, height]; // Initialize the 2D array
         }
 
-        public void InitGrid()
+        public void InitGrid(TileType type)
         {
             Vector2 curPos = startPosPx;
 
@@ -37,9 +37,10 @@ namespace EcosystemSim
             {
                 for (int x = 0; x < width; x++)
                 {
-                    Tile tempTile = new Tile(new int[] { x, y }, curPos, TileType.TestTile);
+                    Tile tempTile = new Tile(new int[] { x, y }, curPos, type);
                     tiles[x, y] = tempTile;
-                    SceneData.gameObjectsToAdd.Add(tempTile);
+                    if (type != TileType.Empty) SceneData.gameObjectsToAdd.Add(tempTile);
+
                     curPos.X += gridSizeDem;
                 }
                 curPos.X = this.startPosPx.X;

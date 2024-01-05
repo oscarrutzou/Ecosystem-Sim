@@ -11,6 +11,7 @@ namespace EcosystemSim
         public static void DrawDebug()
         {
             pos = new Vector2(10, 10);
+            DrawString($"Selected tile type: {InputManager.selectedTileType}");
             DrawString($"Amount of Herbivores: {SceneData.herbivores.Count}");
             DrawString($"Amount of Predators: {SceneData.predators.Count}");
             DrawString($"Mouse in world: {InputManager.mousePositionInWorld}");

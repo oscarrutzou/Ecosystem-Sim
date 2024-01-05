@@ -44,11 +44,20 @@ namespace EcosystemSim
 
         public void ChangeTile(TileType newType)
         {
+            if (tileType == newType) return;
+
             ChangeTileTexture(newType);
+
+            if (tileType != TileType.Empty && newType == TileType.Empty)
+            {
+                isRemoved = true;
+            }
+
             // Check if the tile is changing from Empty to another type
             if (tileType == TileType.Empty && newType != TileType.Empty)
             {
                 // Add the tile to the game objects list
+                isRemoved = false;
                 SceneData.gameObjectsToAdd.Add(this);
             }
 

@@ -67,7 +67,10 @@ namespace EcosystemSim
                     TileType type = (TileType)Enum.Parse(typeof(TileType), parts[4]);
                     Tile tempTile = new Tile(gridPos, position, type);
                     tiles.Add(tempTile);
-                    SceneData.gameObjectsToAdd.Add(tempTile); // Add the tile to your game objects list
+                    if (type != TileType.Empty)
+                    {
+                        SceneData.gameObjectsToAdd.Add(tempTile); // Add the tile to your game objects list
+                    } 
                 }
                 Grid grid = new Grid(tiles[0].position, width, height, false);
                 for (int y = 0; y < height; y++)
