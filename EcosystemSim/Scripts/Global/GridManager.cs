@@ -9,7 +9,7 @@ namespace EcosystemSim
     public static class GridManager
     {
         public static List<Grid> grids = new List<Grid>();
-        public static Grid selectedGrid;
+        public static Grid selectedGrid {  get; private set; }
         public static int gridIndex;
 
         //Gen 3 grids
@@ -23,12 +23,14 @@ namespace EcosystemSim
                 grid.InitGrid();
             }
 
-            selectedGrid = grids[0];
+            UpdateGridToIndex();
         }
 
-        public static Tile GetTileAtPos(Vector2 pos)
+        public static Tile GetTileAtPos(Vector2 pos) => selectedGrid.GetTile(pos);
+
+        public static void UpdateGridToIndex()
         {
-            return selectedGrid.GetTile(pos);
+            selectedGrid = grids[gridIndex];
         }
 
     }

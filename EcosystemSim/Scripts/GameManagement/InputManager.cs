@@ -91,7 +91,7 @@ namespace EcosystemSim
 
                 if (keyboardState.IsKeyDown(Keys.T) && !previousKeyboardState.IsKeyDown(Keys.T))
                 {
-                    GridManager.grids[GridManager.gridIndex] = GridManager.selectedGrid = SaveLoad.LoadGrid(GridManager.gridIndex, GridManager.selectedGrid.gridName);
+                    GridManager.grids[GridManager.gridIndex] = SaveLoad.LoadGrid(GridManager.gridIndex, GridManager.selectedGrid.gridName);
                     
                 }
             }

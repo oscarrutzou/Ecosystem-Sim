@@ -27,11 +27,8 @@ namespace EcosystemSim
         public override void Update()
         {
             base.Update();
-            if (GridManager.grids.Count > 0)
-            {
 
-            }
-
+            
         }
     }
 }
