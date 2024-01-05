@@ -13,10 +13,9 @@ namespace EcosystemSim
 
         public override void Initialize()
         {
-            bgGrid = new Grid();
-            //bgGrid.InitGrid(Vector2.Zero, 5, 5, false);
+            bgGrid = new Grid(Vector2.Zero, 10, 10, true);
             //GridManager.grids.Add(bgGrid);
-            bgGrid.InitGrid(Vector2.Zero, true);
+            bgGrid.InitGrid();
             SceneData.gameObjectsToAdd.Add(new Predator(Vector2.Zero, this));
 
         }

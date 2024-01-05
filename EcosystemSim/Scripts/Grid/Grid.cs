@@ -9,30 +9,35 @@ namespace EcosystemSim
         public int gridSizeDem = 16;
         private Vector2 scale = new Vector2(3, 3);
         public Tile[,] tiles;
-        public int[] gridSize = new int[] { 5, 5 };
+        //public int[] gridSize = new int[] { 5, 5 };
+        public int width, height;
         public Vector2 startPosPx;
-
-        public Grid()
+        public bool isCentered;
+        public Grid(Vector2 startPosPx, int width, int height, bool isCentered)
         {
             gridSizeDem *= (int)scale.X;
-            tiles = new Tile[gridSize[0], gridSize[1]]; // Initialize the 2D array
+            this.startPosPx = startPosPx;
+            this.width = width;
+            this.height = height;
+            this.isCentered = isCentered;
+            tiles = new Tile[width, height]; // Initialize the 2D array
         }
 
-        public void InitGrid(Vector2 startPosPx, bool isCentered)
+        public void InitGrid()
         {
             Vector2 curPos = startPosPx;
 
             if (isCentered)
             {
-                curPos = new Vector2(curPos.X - gridSize[0] * gridSizeDem / 2, curPos.Y - gridSize[1] * gridSizeDem / 2);
+                curPos = new Vector2(curPos.X - width * gridSizeDem / 2, curPos.Y - height * gridSizeDem / 2);
             }
             this.startPosPx = curPos;
 
-            for (int y = 0; y < gridSize[1]; y++)
+            for (int y = 0; y < height; y++)
             {
-                for (int x = 0; x < gridSize[0]; x++)
+                for (int x = 0; x < width; x++)
                 {
-                    Tile tempTile = new Tile(true, new int[] { x, y }, curPos, TileType.TestTile, GlobalTextures.textures[TextureNames.TestTile]);
+                    Tile tempTile = new Tile(new int[] { x, y }, curPos, TileType.TestTile);
                     tiles[x, y] = tempTile;
                     SceneData.gameObjectsToAdd.Add(tempTile);
                     curPos.X += gridSizeDem;
@@ -52,7 +57,7 @@ namespace EcosystemSim
             int gridX = (int)((pos.X - startPosPx.X) / gridSizeDem);
             int gridY = (int)((pos.Y - startPosPx.Y) / gridSizeDem);
 
-            if (0 <= gridX && gridX < gridSize[0] && 0 <= gridY && gridY < gridSize[1])
+            if (0 <= gridX && gridX < width && 0 <= gridY && gridY < height)
             {
                 return tiles[gridX, gridY];
             }

@@ -50,14 +50,23 @@ namespace EcosystemSim
 
             MoveCam();
             
+
+            mouseClicked = (Mouse.GetState().LeftButton == ButtonState.Pressed) && (previousMouseState.LeftButton == ButtonState.Released);
+            mouseRightClicked = (Mouse.GetState().RightButton == ButtonState.Pressed) && (previousMouseState.RightButton == ButtonState.Released);
+            
             if (gameWorld.currentScene is TestScene scene && scene.bgGrid != null)
             {
                 //tileOnHover = GridManager.GetTileAtPos(mousePositionInWorld);
                 tileOnHover = scene.bgGrid.GetTile(mousePositionInWorld);
+                if (Mouse.GetState().LeftButton == ButtonState.Pressed && tileOnHover != null)
+                {
+                    tileOnHover.ChangeTile(TileType.TestTileNonWalk);
+                }
+                if (Mouse.GetState().RightButton == ButtonState.Pressed && tileOnHover != null)
+                {
+                    tileOnHover.ChangeTile(TileType.TestTile);
+                }
             }
-
-            mouseClicked = (Mouse.GetState().LeftButton == ButtonState.Pressed) && (previousMouseState.LeftButton == ButtonState.Released);
-            mouseRightClicked = (Mouse.GetState().RightButton == ButtonState.Pressed) && (previousMouseState.RightButton == ButtonState.Released);
 
             previousMouseState = mouseState;
             previousKeyboardState = keyboardState;

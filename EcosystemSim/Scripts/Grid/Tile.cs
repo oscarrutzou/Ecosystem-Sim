@@ -7,20 +7,39 @@ namespace EcosystemSim
     public enum TileType
     {
         TestTile,
+        TestTileNonWalk,
     }
     public class Tile: GameObject
     {
         public bool isWalkable;
         public int[] gridPos;
         public TileType type;
-        public Tile(bool isWalkable, int[] gridPos, Vector2 position, TileType type, Texture2D texture)
+        public Tile(int[] gridPos, Vector2 position, TileType type)
         {
-            this.isWalkable = isWalkable;
             this.gridPos = gridPos;
             this.position = position;
             this.type = type;
-            this.texture = texture;
+            ChangeTileTexture();
+        }
+        private void ChangeTileTexture()
+        {
+            switch (type)
+            {
+                case TileType.TestTile:
+                    texture = GlobalTextures.textures[TextureNames.TestTile];
+                    isWalkable = true;
+                    break;
+                case TileType.TestTileNonWalk:
+                    texture = GlobalTextures.textures[TextureNames.TestTileNonWalk];
+                    isWalkable = false;
+                    break;
+            }
         }
 
+        public void ChangeTile(TileType type)
+        {
+            this.type = type;
+            ChangeTileTexture();
+        }
     }
 }

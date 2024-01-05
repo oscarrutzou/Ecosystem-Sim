@@ -12,6 +12,7 @@ namespace EcosystemSim
     public enum TextureNames
     {
         TestTile,
+        TestTileNonWalk,
         Fox,
         Bunny,
         UISearchRad100,
@@ -31,6 +32,7 @@ namespace EcosystemSim
             textures = new Dictionary<TextureNames, Texture2D>
             {
                 {TextureNames.TestTile, content.Load<Texture2D>("World\\TestTile") },
+                {TextureNames.TestTileNonWalk, content.Load<Texture2D>("World\\TestTileNonWalkable") },
                 {TextureNames.Fox, content.Load<Texture2D>("Agents\\tile_fox") },
                 {TextureNames.Bunny, content.Load<Texture2D>("Agents\\tile_bunny") },
                 {TextureNames.UISearchRad100, content.Load<Texture2D>("UI\\AgentUI\\SearchRad100") },
