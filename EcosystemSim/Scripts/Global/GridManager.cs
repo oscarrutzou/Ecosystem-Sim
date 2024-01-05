@@ -11,17 +11,14 @@ namespace EcosystemSim
         public static List<Grid> grids = new List<Grid>();
         public static Grid selectedGrid {  get; private set; }
         public static int gridIndex;
-
+        
         //Gen 3 grids
         //Change grids with keyboard,
         public static void InitStartGrids()
         {
-            grids.Add(new Grid(Vector2.Zero, 2, 2, true, "Bottom"));
-            grids.Add(new Grid(Vector2.Zero, 2, 2, true, "Middle"));
-            grids.Add(new Grid(Vector2.Zero, 2, 2, true, "Top"));
-            foreach (Grid grid in grids) { 
-                grid.InitGrid();
-            }
+            grids.Add(new Grid(TileType.TestTile, "Bottom"));
+            grids.Add(new Grid("Middle"));
+            grids.Add(new Grid("Top"));
 
             UpdateGridToIndex();
         }
@@ -31,6 +28,13 @@ namespace EcosystemSim
         public static void UpdateGridToIndex()
         {
             selectedGrid = grids[gridIndex];
+        }
+
+
+        public static void ChangeGrid(Grid newGrid)
+        {
+            selectedGrid = newGrid;
+
         }
 
     }

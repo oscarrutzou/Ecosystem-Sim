@@ -13,7 +13,7 @@ namespace EcosystemSim
         public override void Initialize()
         {
             GridManager.InitStartGrids();
-            SceneData.gameObjectsToAdd.Add(new Predator(Vector2.Zero, this));
+            SceneData.gameObjectsToAdd.Add(new Predator(Vector2.Zero));
 
         }
         public override void DrawOnScreen()
@@ -28,7 +28,7 @@ namespace EcosystemSim
         {
             base.Update();
 
-            
+            GridManager.UpdateGridToIndex();
         }
     }
 }

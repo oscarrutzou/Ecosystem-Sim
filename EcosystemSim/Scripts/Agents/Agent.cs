@@ -16,13 +16,10 @@ namespace EcosystemSim
         private double changeDirectionTimer = 0;
         private Vector2 direction;
 
-
-        private TestScene testScene;
-        public Agent(TestScene testScene) {
+        public Agent() {
             layerDepth = 0.2f;
             health = maxHealth;
             isCentered = true;
-            this.testScene = testScene;
         }
 
         public override void Draw()

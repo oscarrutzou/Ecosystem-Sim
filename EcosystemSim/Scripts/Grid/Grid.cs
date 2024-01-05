@@ -14,6 +14,35 @@ namespace EcosystemSim
         public Vector2 startPosPx;
         public bool isCentered;
         public string gridName;
+        private TileType basicTileType;
+
+        public Grid(string name)
+        {
+            gridSizeDem *= (int)scale.X;
+            this.startPosPx = Vector2.Zero;
+            this.width = 10;
+            this.height = 10;
+            this.isCentered = true;
+            this.basicTileType = TileType.Empty;
+            tiles = new Tile[width, height]; // Initialize the 2D array
+            gridName = name;
+
+            InitGrid();
+        }
+        public Grid(TileType basicTileType, string name)
+        {
+            gridSizeDem *= (int)scale.X;
+            this.startPosPx = Vector2.Zero;
+            this.width = 10;
+            this.height = 10;
+            this.isCentered = true;
+            this.basicTileType = basicTileType;
+            tiles = new Tile[width, height]; // Initialize the 2D array
+            gridName = name;
+
+            InitGrid();
+        }
+
         public Grid(Vector2 startPosPx, int width, int height, bool isCentered, string name)
         {
             gridSizeDem *= (int)scale.X;
@@ -21,11 +50,28 @@ namespace EcosystemSim
             this.width = width;
             this.height = height;
             this.isCentered = isCentered;
+            this.basicTileType = TileType.Empty;
             tiles = new Tile[width, height]; // Initialize the 2D array
             gridName = name;
+
+            InitGrid();
+
+        }
+        public Grid(Vector2 startPosPx, int width, int height, bool isCentered, TileType basicTileType, string name)
+        {
+            gridSizeDem *= (int)scale.X;
+            this.startPosPx = startPosPx;
+            this.width = width;
+            this.height = height;
+            this.isCentered = isCentered;
+            this.basicTileType = basicTileType;
+            tiles = new Tile[width, height]; // Initialize the 2D array
+            gridName = name;
+
+            InitGrid();
         }
 
-        public void InitGrid()
+        private void InitGrid()
         {
             Vector2 curPos = startPosPx;
 
@@ -39,9 +85,9 @@ namespace EcosystemSim
             {
                 for (int x = 0; x < width; x++)
                 {
-                    Tile tempTile = new Tile(new int[] { x, y }, curPos, TileType.Empty);
+                    Tile tempTile = new Tile(new int[] { x, y }, curPos, basicTileType);
                     tiles[x, y] = tempTile;
-                    //if (type != TileType.Empty) SceneData.gameObjectsToAdd.Add(tempTile);
+                    if (basicTileType != TileType.Empty) SceneData.gameObjectsToAdd.Add(tempTile);
 
                     curPos.X += gridSizeDem;
                 }

@@ -24,6 +24,7 @@ namespace EcosystemSim
         public static bool debugStats = true;
 
         public static Tile tileOnHover;
+        public static Grid selectedGrid;
         public static TileType selectedTileType = TileType.TestTile;
 
         private static Dictionary<Keys, TileType> keyTileTypeMap = new Dictionary<Keys, TileType>
@@ -40,6 +41,7 @@ namespace EcosystemSim
         {
             keyboardState = Keyboard.GetState();
             mouseState = Mouse.GetState();
+            selectedGrid = GridManager.selectedGrid;
 
             //Sets the mouse position
             mousePositionOnScreen = GetMousePositionOnUI();
@@ -68,6 +70,11 @@ namespace EcosystemSim
             MoveCam();
             ChangeSelectedTile();
 
+            if (keyboardState.IsKeyDown(Keys.I) && !previousKeyboardState.IsKeyDown(Keys.I))
+            {
+                GridManager.grids.Add(new Grid(TileType.TestTileNonWalk, "Unga"));
+            }
+
             if (GridManager.grids.Count != 0)
             {
                 if (keyboardState.IsKeyDown(Keys.E) && !previousKeyboardState.IsKeyDown(Keys.E))
@@ -94,6 +101,17 @@ namespace EcosystemSim
                     GridManager.grids[GridManager.gridIndex] = SaveLoad.LoadGrid(GridManager.gridIndex, GridManager.selectedGrid.gridName);
                     
                 }
+
+                if (keyboardState.IsKeyDown(Keys.Z) && !previousKeyboardState.IsKeyDown(Keys.Z))
+                {
+                    if (GridManager.gridIndex > 0) GridManager.gridIndex--;
+                }
+
+                if (keyboardState.IsKeyDown(Keys.X) && !previousKeyboardState.IsKeyDown(Keys.X))
+                {
+                    if (GridManager.gridIndex < GridManager.grids.Count - 1) GridManager.gridIndex++;
+                }
+
             }
         }
 

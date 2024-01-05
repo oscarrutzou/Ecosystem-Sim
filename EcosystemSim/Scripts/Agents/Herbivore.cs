@@ -13,8 +13,6 @@ namespace EcosystemSim
         //    position = pos;
         //    texture = GlobalTextures.textures[TextureNames.Bunny];
         //}
-        public Herbivore(TestScene testScene) : base(testScene)
-        {
-        }
+
     }
 }

@@ -13,9 +13,11 @@ namespace EcosystemSim
         {
             pos = new Vector2(10, 10);
             DrawString($"Selected tile type: {InputManager.selectedTileType}");
+            DrawString($"Selected gridIndex: {GridManager.gridIndex}");
             DrawString($"Selected grid: {GridManager.selectedGrid.gridName}");
             for (int i = 0; i < GridManager.grids.Count; i++)
             {
+                //if (GridManager.grids[i].tiles[0,0] == null) break;
                 int nonEmptyTilesCount = GridManager.grids[i].tiles.Cast<Tile>().Count(tile => tile.tileType != TileType.Empty);
                 DrawString($"Grid{i}_{GridManager.grids[i].gridName} non-empty tiles count: {nonEmptyTilesCount}");
             }
