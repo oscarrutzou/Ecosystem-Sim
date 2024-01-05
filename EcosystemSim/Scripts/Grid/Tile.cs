@@ -6,25 +6,31 @@ namespace EcosystemSim
 {
     public enum TileType
     {
+        Empty,
         TestTile,
         TestTileNonWalk,
     }
+
     public class Tile: GameObject
     {
         public bool isWalkable;
         public int[] gridPos;
-        public TileType type;
+        public TileType tileType;
         public Tile(int[] gridPos, Vector2 position, TileType type)
         {
             this.gridPos = gridPos;
             this.position = position;
-            this.type = type;
-            ChangeTileTexture();
+            tileType = type;
+            ChangeTileTexture(type);
         }
-        private void ChangeTileTexture()
+        private void ChangeTileTexture(TileType type)
         {
             switch (type)
             {
+                case TileType.Empty: 
+                    texture = null;
+                    isWalkable = false;
+                    break;
                 case TileType.TestTile:
                     texture = GlobalTextures.textures[TextureNames.TestTile];
                     isWalkable = true;
@@ -36,10 +42,19 @@ namespace EcosystemSim
             }
         }
 
-        public void ChangeTile(TileType type)
+        public void ChangeTile(TileType newType)
         {
-            this.type = type;
-            ChangeTileTexture();
+            ChangeTileTexture(newType);
+            // Check if the tile is changing from Empty to another type
+            if (tileType == TileType.Empty && newType != TileType.Empty)
+            {
+                // Add the tile to the game objects list
+                SceneData.gameObjectsToAdd.Add(this);
+            }
+
+            // Change the tile type
+            tileType = newType;
         }
+
     }
 }

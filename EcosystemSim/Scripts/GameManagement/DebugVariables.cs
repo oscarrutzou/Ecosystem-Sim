@@ -23,7 +23,7 @@ namespace EcosystemSim
             //Tile tile = scene.bgGrid.GetTileAtPos(InputManager.mousePositionInWorld);
             if (tile != null)
             {
-                DrawString($"Hover tile type: {tile.type}");
+                DrawString($"Hover tile type: {tile.tileType}");
                 DrawString($"Hover tile grid pos: ({tile.gridPos[0]}, {tile.gridPos[1]})");
                 DrawString($"Hover tile grid pos: {tile.position}");
             }

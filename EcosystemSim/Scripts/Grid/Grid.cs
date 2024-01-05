@@ -66,10 +66,4 @@ namespace EcosystemSim
         }
 
     }
-
-
-
-    /*
-     *         
-     */
 }

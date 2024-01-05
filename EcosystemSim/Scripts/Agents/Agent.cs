@@ -111,7 +111,7 @@ namespace EcosystemSim
             Tile tile = testScene?.bgGrid.GetTile(pos);
 
             // If there is no tile at the position or the tile is not walkable, return false
-            if (tile == null || !tile.isWalkable)
+            if (tile == null || !tile.isWalkable || tile.tileType == TileType.Empty)
             {
                 return false;
             }

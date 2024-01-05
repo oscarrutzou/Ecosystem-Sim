@@ -76,9 +76,11 @@ namespace EcosystemSim
                 {
                     foreach (Tile tile1 in scene.bgGrid.tiles)
                     {
-                        tile1.isRemoved = true;  
+                        tile1.isRemoved = true;
+                        tile1.ChangeTile(TileType.Empty);
                     }
                 }
+
 
                 if (keyboardState.IsKeyDown(Keys.T) && !previousKeyboardState.IsKeyDown(Keys.T))
                 {

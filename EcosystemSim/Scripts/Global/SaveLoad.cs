@@ -24,7 +24,7 @@ namespace EcosystemSim
                     for (int x = 0; x < grid.width; x++)
                     {
                         Tile tile = grid.tiles[x, y];
-                        writer.WriteLine($"{tile.gridPos[0]},{tile.gridPos[1]},{tile.position.X},{tile.position.Y},{tile.type}");
+                        writer.WriteLine($"{tile.gridPos[0]},{tile.gridPos[1]},{tile.position.X},{tile.position.Y},{tile.tileType}");
                     }
                 }
                 writer.Flush();
@@ -35,7 +35,7 @@ namespace EcosystemSim
             }
         }
 
-        public static Grid LoadGrid()
+    public static Grid LoadGrid()
         {
             string appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string folder = Path.Combine(appdataPath, "EcoSystemSimData");
@@ -48,11 +48,17 @@ namespace EcosystemSim
             try
             {
                 StreamReader reader = new StreamReader(stream);
-                string[] sizeParts = reader.ReadLine().Split(',');
-                int width = int.Parse(sizeParts[0]);
-                int height = int.Parse(sizeParts[1]);
+                string[] firstLineSizeParts = reader.ReadLine().Split(','); //Read first line, e.g read other generel info here
+                int width = int.Parse(firstLineSizeParts[0]); 
+                int height = int.Parse(firstLineSizeParts[1]);
                 List<Tile> tiles = new List<Tile>();
                 string line;
+
+                foreach (Tile tile in SceneData.tiles)
+                {
+                    tile.isRemoved = true;
+                }
+
                 while ((line = reader.ReadLine()) != null)
                 {
                     string[] parts = line.Split(',');
