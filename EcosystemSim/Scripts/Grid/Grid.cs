@@ -15,10 +15,11 @@ namespace EcosystemSim
         public bool isCentered;
         public string gridName;
         private TileType basicTileType;
+        
+        public float layerDepth;
 
         public Grid(string name)
         {
-            gridSizeDem *= (int)scale.X;
             this.startPosPx = Vector2.Zero;
             this.width = 10;
             this.height = 10;
@@ -31,7 +32,6 @@ namespace EcosystemSim
         }
         public Grid(TileType basicTileType, string name)
         {
-            gridSizeDem *= (int)scale.X;
             this.startPosPx = Vector2.Zero;
             this.width = 10;
             this.height = 10;
@@ -45,7 +45,6 @@ namespace EcosystemSim
 
         public Grid(Vector2 startPosPx, int width, int height, bool isCentered, string name)
         {
-            gridSizeDem *= (int)scale.X;
             this.startPosPx = startPosPx;
             this.width = width;
             this.height = height;
@@ -59,7 +58,7 @@ namespace EcosystemSim
         }
         public Grid(Vector2 startPosPx, int width, int height, bool isCentered, TileType basicTileType, string name)
         {
-            gridSizeDem *= (int)scale.X;
+
             this.startPosPx = startPosPx;
             this.width = width;
             this.height = height;
@@ -73,6 +72,8 @@ namespace EcosystemSim
 
         private void InitGrid()
         {
+            gridSizeDem *= (int)scale.X;
+
             Vector2 curPos = startPosPx;
 
             if (isCentered)
@@ -113,6 +114,15 @@ namespace EcosystemSim
 
             return null; // Position is out of bounds
         }
+
+        public void UpdateTileLayerDepths()
+        {
+            foreach (Tile tile in tiles)
+            {
+                tile.layerDepth = layerDepth;
+            }
+        }
+
 
     }
 }

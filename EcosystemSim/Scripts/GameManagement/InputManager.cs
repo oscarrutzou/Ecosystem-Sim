@@ -72,7 +72,7 @@ namespace EcosystemSim
 
             if (keyboardState.IsKeyDown(Keys.I) && !previousKeyboardState.IsKeyDown(Keys.I))
             {
-                GridManager.grids.Add(new Grid(TileType.TestTileNonWalk, "Unga"));
+                GridManager.grids.Add(new Grid(TileType.Empty, "NewGrid"));
             }
 
             if (GridManager.grids.Count != 0)
@@ -98,8 +98,8 @@ namespace EcosystemSim
 
                 if (keyboardState.IsKeyDown(Keys.T) && !previousKeyboardState.IsKeyDown(Keys.T))
                 {
-                    GridManager.grids[GridManager.gridIndex] = SaveLoad.LoadGrid(GridManager.gridIndex, GridManager.selectedGrid.gridName);
-                    
+                    //GridManager.grids[GridManager.gridIndex] = SaveLoad.LoadGrid(GridManager.gridIndex, GridManager.selectedGrid.gridName);
+                    SaveLoad.LoadGrids();
                 }
 
                 if (keyboardState.IsKeyDown(Keys.Z) && !previousKeyboardState.IsKeyDown(Keys.Z))

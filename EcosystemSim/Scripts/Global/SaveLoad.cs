@@ -36,7 +36,20 @@ namespace EcosystemSim
             }
         }
 
-        public static Grid LoadGrid(int index, string description)
+        public static void LoadGrids()
+        {
+            foreach (Tile tile in SceneData.tiles)
+            {
+                tile.isRemoved = true;
+            }
+
+            for (int i = 0; i < GridManager.grids.Count; i++)
+            {
+                GridManager.grids[i] = SaveLoad.LoadGrid(i, GridManager.grids[i].gridName);
+            }
+        }
+
+        private static Grid LoadGrid(int index, string description)
         {
             string gridName = $"grid{index}_{description}";
             string appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
@@ -50,18 +63,13 @@ namespace EcosystemSim
             try
             {
                 StreamReader reader = new StreamReader(stream);
-                
-                //string name = reader.ReadLine();
                 string[] firstLineSizeParts = reader.ReadLine().Split(',');
                 int width = int.Parse(firstLineSizeParts[0]);
                 int height = int.Parse(firstLineSizeParts[1]);
 
                 List<Tile> tiles = new List<Tile>();
                 string line;
-                foreach (Tile tile in SceneData.tiles)
-                {
-                    tile.isRemoved = true;
-                }
+
                 while ((line = reader.ReadLine()) != null)
                 {
                     string[] parts = line.Split(',');

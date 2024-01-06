@@ -15,6 +15,7 @@ namespace EcosystemSim
             DrawString($"Selected tile type: {InputManager.selectedTileType}");
             DrawString($"Selected gridIndex: {GridManager.gridIndex}");
             DrawString($"Selected grid: {GridManager.selectedGrid.gridName}");
+            DrawString($"Selected grid layerDepth: {GridManager.selectedGrid.layerDepth}");
             for (int i = 0; i < GridManager.grids.Count; i++)
             {
                 //if (GridManager.grids[i].tiles[0,0] == null) break;
@@ -29,14 +30,13 @@ namespace EcosystemSim
 
 
             Tile tile = InputManager.tileOnHover;
-            //Tile tile = scene.bgGrid.GetTileAtPos(InputManager.mousePositionInWorld);
             if (tile != null)
             {
                 DrawString($"Hover tile type: {tile.tileType}");
                 DrawString($"Hover tile grid pos: ({tile.gridPos[0]}, {tile.gridPos[1]})");
-                DrawString($"Hover tile grid pos: {tile.position}");
+                DrawString($"Hover tile pos: {tile.position}");
+                DrawString($"Hover tile layerDepth: {tile.layerDepth}");
             }
-
         }
 
         private static void DrawString(string text)
