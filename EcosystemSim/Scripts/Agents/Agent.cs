@@ -61,7 +61,7 @@ namespace EcosystemSim
                 ChangeDirection();
             }
         }
-
+        
 
         private void ChangeDirection()
         {
@@ -91,15 +91,26 @@ namespace EcosystemSim
             Vector2 bottomLeft = nextPos + new Vector2(-texture.Width / 2 * scale, texture.Height / 2 * scale);
             Vector2 bottomRight = nextPos + new Vector2(texture.Width / 2 * scale, texture.Height / 2 * scale);
 
-            // Check if any of the corners would be in a non-walkable tile
-            if (!IsPositionWalkable(topLeft) || !IsPositionWalkable(topRight) || !IsPositionWalkable(bottomLeft) || !IsPositionWalkable(bottomRight))
+            // Calculate the number of points to check on each edge of the bounding box
+            int numPointsToCheck = Math.Max(texture.Width / 2, texture.Height / 2);
+
+            // Check if any point on the bounding box is in a non-walkable tile
+            for (int i = 0; i <= numPointsToCheck; i++)
             {
-                return false;
+                float t = (float)i / numPointsToCheck;
+                if (!IsPositionWalkable(Vector2.Lerp(topLeft, topRight, t)) ||
+                    !IsPositionWalkable(Vector2.Lerp(topLeft, bottomLeft, t)) ||
+                    !IsPositionWalkable(Vector2.Lerp(topRight, bottomRight, t)) ||
+                    !IsPositionWalkable(Vector2.Lerp(bottomLeft, bottomRight, t)))
+                {
+                    return false;
+                }
             }
 
-            // Otherwise, return true
+            // If no non-walkable tile was found, return true
             return true;
         }
+
 
         private bool IsPositionWalkable(Vector2 pos)
         {

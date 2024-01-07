@@ -8,8 +8,6 @@ namespace EcosystemSim
     public class TestScene : Scene
     {
 
-
-
         public override void Initialize()
         {
             GridManager.InitStartGrids();
@@ -24,11 +22,5 @@ namespace EcosystemSim
 
         }
 
-        public override void Update()
-        {
-            base.Update();
-
-            GridManager.UpdateGridToIndex();
-        }
     }
 }

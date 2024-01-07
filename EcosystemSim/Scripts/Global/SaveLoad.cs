@@ -9,7 +9,15 @@ namespace EcosystemSim
     {
         public static void SaveGrid(Grid grid, int index, string description)
         {
-            string gridName = $"grid{index}_{description}";
+            // Check if the description already starts with "grid" + index
+            string prefix = "grid" + index;
+            if (!description.StartsWith(prefix))
+            {
+                // If not, add the prefix to the description
+                description = prefix + "_" + description;
+            }
+
+            string gridName = description;
             string appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string folder = Path.Combine(appdataPath, "EcoSystemSimData");
             Directory.CreateDirectory(folder);
@@ -43,15 +51,47 @@ namespace EcosystemSim
                 tile.isRemoved = true;
             }
 
-            for (int i = 0; i < GridManager.grids.Count; i++)
+            string appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string folder = Path.Combine(appdataPath, "EcoSystemSimData");
+
+            // Get all files that start with "grid"
+            string[] files = Directory.GetFiles(folder, "grid*.txt");
+
+            // Sort the files by the number after "grid"
+            Array.Sort(files, (x, y) => int.Parse(Path.GetFileNameWithoutExtension(x).Split('_')[0].Substring(4)) - int.Parse(Path.GetFileNameWithoutExtension(y).Split('_')[0].Substring(4)));
+
+            // If there are too many grids, remove the extra ones
+            while (GridManager.grids.Count > files.Length)
             {
-                GridManager.grids[i] = SaveLoad.LoadGrid(i, GridManager.grids[i].gridName);
+                GridManager.grids.RemoveAt(GridManager.grids.Count - 1);
             }
+
+            // If there are not enough grids, add new ones
+            while (GridManager.grids.Count < files.Length)
+            {
+                GridManager.grids.Add(new Grid("Empty"));
+            }
+
+            for (int i = 0; i < files.Length; i++)
+            {
+                // Extract the grid name from the file name
+                string gridName = Path.GetFileNameWithoutExtension(files[i]);
+
+                // Load the grid
+                Grid loadedGrid = SaveLoad.LoadGrid(i, gridName);
+
+                // Replace the existing grid with the loaded one
+                GridManager.grids[i] = loadedGrid;
+            }
+
+            GridManager.OnGridIndexChanged();
         }
+
+
 
         private static Grid LoadGrid(int index, string description)
         {
-            string gridName = $"grid{index}_{description}";
+            string gridName = description;
             string appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string folder = Path.Combine(appdataPath, "EcoSystemSimData");
             string path = Path.Combine(folder, $"{gridName}.txt"); // Use the grid name in the file name

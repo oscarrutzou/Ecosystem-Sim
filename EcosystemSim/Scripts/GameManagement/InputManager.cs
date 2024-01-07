@@ -104,12 +104,12 @@ namespace EcosystemSim
 
                 if (keyboardState.IsKeyDown(Keys.Z) && !previousKeyboardState.IsKeyDown(Keys.Z))
                 {
-                    if (GridManager.gridIndex > 0) GridManager.gridIndex--;
+                    if (GridManager.GridIndex > 0) GridManager.GridIndex--;
                 }
 
                 if (keyboardState.IsKeyDown(Keys.X) && !previousKeyboardState.IsKeyDown(Keys.X))
                 {
-                    if (GridManager.gridIndex < GridManager.grids.Count - 1) GridManager.gridIndex++;
+                    if (GridManager.GridIndex < GridManager.grids.Count - 1) GridManager.GridIndex++;
                 }
 
             }

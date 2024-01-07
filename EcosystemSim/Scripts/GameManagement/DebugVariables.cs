@@ -13,7 +13,9 @@ namespace EcosystemSim
         {
             pos = new Vector2(10, 10);
             DrawString($"Selected tile type: {InputManager.selectedTileType}");
-            DrawString($"Selected gridIndex: {GridManager.gridIndex}");
+            DrawString($"Selected gridIndex: {GridManager.GridIndex}");
+
+            if (GridManager.selectedGrid == null) return;
             DrawString($"Selected grid: {GridManager.selectedGrid.gridName}");
             DrawString($"Selected grid layerDepth: {GridManager.selectedGrid.layerDepth}");
             for (int i = 0; i < GridManager.grids.Count; i++)

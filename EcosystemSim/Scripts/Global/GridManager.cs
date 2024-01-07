@@ -11,11 +11,22 @@ namespace EcosystemSim
     {
         public static List<Grid> grids = new List<Grid>();
         public static Grid selectedGrid {  get; private set; }
-        
-        public static int gridIndex;
+
+        private static int _gridIndex;
+        public static int GridIndex
+        {
+            get { return _gridIndex; }
+            set
+            {
+                if (_gridIndex != value)
+                {
+                    _gridIndex = value;
+                    OnGridIndexChanged();
+                }
+            }
+        }
         private static float maxLayerDepth = 0.8f;
-
-
+        private static Color tintColor = Color.Gray;
 
         //Gen 3 grids
         //Change grids with keyboard,
@@ -25,10 +36,10 @@ namespace EcosystemSim
             grids.Add(new Grid("Middle"));
             grids.Add(new Grid("Top"));
 
-            UpdateGridToIndex();
+            OnGridIndexChanged();
         }
 
-        public static Tile GetTileAtPos(Vector2 pos) => selectedGrid.GetTile(pos);
+        public static Tile GetTileAtPos(Vector2 pos) => selectedGrid?.GetTile(pos);
 
 
         public static bool IsWalkable(Vector2 pos)
@@ -38,6 +49,10 @@ namespace EcosystemSim
 
             foreach (Grid grid in grids)
             {
+                if (grid == null)
+                {
+                    continue;
+                }
                 Tile tile = grid.GetTile(pos);
                 // If the tile is not null and not 'Empty', add it to the list
                 if (tile != null && tile.tileType != TileType.Empty)
@@ -46,18 +61,22 @@ namespace EcosystemSim
                 }
             }
 
-            // If there's any tile in the list that is not walkable, return false
             foreach (Tile tile in nonEmptyTiles)
             {
-                if (!tile.isWalkable)
+                // Check if the position is within the collision box of the tile
+                if (tile.collisionBox.Contains((int)pos.X, (int)pos.Y))
                 {
-                    return false;
+                    // If the tile is not walkable, return false
+                    if (!tile.isWalkable)
+                    {
+                        return false;
+                    }
                 }
             }
+
             //Since there is that if there is none, it would be the border or a TileType.Empty.
             if (nonEmptyTiles.Count > 0) { return true; } else return false;            
         }
-
 
         public static Tile GetTileAtPosTest(Vector2 pos)
         {
@@ -70,28 +89,40 @@ namespace EcosystemSim
         }
 
 
-        public static void UpdateGridToIndex()
+        public static void Update()
         {
-            selectedGrid = grids[gridIndex];
+
+        }
+
+        public static void OnGridIndexChanged()
+        {
+            if (selectedGrid != null) ChangeTileTing(selectedGrid.tiles, Color.White);
+
+            selectedGrid = grids[GridIndex];
+
+            ChangeTileTing(selectedGrid.tiles, tintColor);
 
             float depthIncrement = maxLayerDepth / grids.Count; // Calculate depth increment
 
             for (int i = 0; i < grids.Count; i++)
             {
+                if (grids[i] == null) continue;
                 grids[i].layerDepth = i * depthIncrement; // Assign layer depth
             }
 
             foreach (Grid grid in grids)
             {
+                if (grid == null) continue;
                 grid.UpdateTileLayerDepths();
             }
         }
 
-
-        public static void ChangeGrid(Grid newGrid)
+        private static void ChangeTileTing(Tile[,] tiles, Color tint)
         {
-            selectedGrid = newGrid;
-
+            foreach (Tile tile in tiles)
+            {
+                tile.color = tint;
+            }
         }
 
     }

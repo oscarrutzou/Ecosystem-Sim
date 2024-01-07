@@ -23,6 +23,7 @@ namespace EcosystemSim
             tileType = type;
             ChangeTileTexture(type);
         }
+
         private void ChangeTileTexture(TileType type)
         {
             switch (type)
@@ -37,6 +38,7 @@ namespace EcosystemSim
                     break;
                 case TileType.TestTileNonWalk:
                     texture = GlobalTextures.textures[TextureNames.TestTileNonWalk];
+                    SetCollisionBox(16,5);
                     isWalkable = false;
                     break;
             }
@@ -65,5 +67,13 @@ namespace EcosystemSim
             tileType = newType;
         }
 
+        public override void Draw()
+        {
+            base.Draw();
+            if (tileType == TileType.TestTileNonWalk)
+            {
+                DrawDebugCollisionBox(Color.Black);
+            }
+        }
     }
 }
