@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SharpDX.Direct2D1.Effects;
+using System;
 
 namespace EcosystemSim
 {
@@ -9,13 +10,20 @@ namespace EcosystemSim
         Empty,
         TestTile,
         TestTileNonWalk,
+        Grass,
     }
 
     public class Tile: GameObject
     {
         public bool isWalkable;
+        public bool canGrowPlants;
+        public bool hasPlant;
         public int[] gridPos;
         public TileType tileType;
+
+        private float plantTimer;
+        private float plantTimeToGrow = 1f;
+        private Plant selectedPlant;
         public Tile(int[] gridPos, Vector2 position, TileType type)
         {
             this.gridPos = gridPos;
@@ -26,21 +34,46 @@ namespace EcosystemSim
 
         private void ChangeTileTexture(TileType type)
         {
+            isWalkable = false;
+
+            plantTimer = 0;
+            canGrowPlants = false;
+            hasPlant = false;
+
             switch (type)
             {
                 case TileType.Empty: 
                     texture = null;
-                    isWalkable = false;
                     break;
+
+                #region TestTiles
                 case TileType.TestTile:
                     texture = GlobalTextures.textures[TextureNames.TestTile];
                     isWalkable = true;
+                    canGrowPlants = true;
                     break;
                 case TileType.TestTileNonWalk:
                     texture = GlobalTextures.textures[TextureNames.TestTileNonWalk];
                     SetCollisionBox(16,5);
-                    isWalkable = false;
                     break;
+                #endregion
+
+                case TileType.Grass:
+                    texture = GlobalTextures.textures[TextureNames.TestTile];
+                    isWalkable = true;
+                    canGrowPlants = true;
+                    break;
+            }
+
+            if (canGrowPlants)
+            {
+                Random rnd = new Random();
+                int rndNmb = rnd.Next(0, 5);
+                if (rndNmb != 0) canGrowPlants = false;
+                else
+                {
+                    selectedPlant = new Plant(this, GlobalTextures.textures[TextureNames.GreensMushroom]);
+                }
             }
         }
 
@@ -67,12 +100,18 @@ namespace EcosystemSim
             tileType = newType;
         }
 
-        public override void Draw()
+        public override void Update()
         {
-            base.Draw();
-            if (tileType == TileType.TestTileNonWalk)
+            if (!canGrowPlants || hasPlant) return;
+            //if (tileType != TileType.TestTile || hasPlant) return;
+
+            plantTimer += (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (plantTimer >= plantTimeToGrow)
             {
-                DrawDebugCollisionBox(Color.Black);
+                plantTimer = 0;
+                hasPlant = true;
+                SceneData.gameObjectsToAdd.Add(selectedPlant);
             }
         }
     }

@@ -7,6 +7,7 @@ namespace EcosystemSim
     public class Grid
     {
         public int gridSizeDem = 16;
+        public int maxAmountOfGreens;
         private Vector2 scale = new Vector2(3, 3);
         public Tile[,] tiles;
         //public int[] gridSize = new int[] { 5, 5 };
@@ -73,6 +74,7 @@ namespace EcosystemSim
         private void InitGrid()
         {
             gridSizeDem *= (int)scale.X;
+            maxAmountOfGreens = Math.Max(width, width * height / 5);
 
             Vector2 curPos = startPosPx;
 
