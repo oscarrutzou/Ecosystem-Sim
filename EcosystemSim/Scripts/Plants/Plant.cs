@@ -22,7 +22,7 @@ namespace EcosystemSim
 
         public override void Update()
         {
-            if (!parentTile.canGrowPlants) isRemoved = true;
+            if (!parentTile.hasPlant) isRemoved = true;
         }
     }
 }

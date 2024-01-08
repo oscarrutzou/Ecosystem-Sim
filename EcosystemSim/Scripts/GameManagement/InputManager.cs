@@ -98,7 +98,6 @@ namespace EcosystemSim
 
                 if (keyboardState.IsKeyDown(Keys.T) && !previousKeyboardState.IsKeyDown(Keys.T))
                 {
-                    //GridManager.grids[GridManager.gridIndex] = SaveLoad.LoadGrid(GridManager.gridIndex, GridManager.selectedGrid.gridName);
                     SaveLoad.LoadGrids();
                 }
 
@@ -122,8 +121,6 @@ namespace EcosystemSim
 
             if (GridManager.grids.Count != 0)
             {
-                //tileOnHover = scene.bgGrid.GetTile(mousePositionInWorld);
-
                 tileOnHover = GridManager.GetTileAtPos(mousePositionInWorld);
 
                 if (Mouse.GetState().LeftButton == ButtonState.Pressed && tileOnHover != null)

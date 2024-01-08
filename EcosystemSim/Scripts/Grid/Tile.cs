@@ -15,6 +15,7 @@ namespace EcosystemSim
 
     public class Tile: GameObject
     {
+        public Grid parentGrid;
         public bool isWalkable;
         public bool canGrowPlants;
         public bool hasPlant;
@@ -22,19 +23,25 @@ namespace EcosystemSim
         public TileType tileType;
 
         private float plantTimer;
-        private float plantTimeToGrow = 1f;
-        private Plant selectedPlant;
-        public Tile(int[] gridPos, Vector2 position, TileType type)
+        private float plantTimeToGrow;
+        public Plant selectedPlant;
+        public Tile(Grid parentGrid,int[] gridPos, Vector2 position, TileType type)
         {
+            this.parentGrid = parentGrid;
             this.gridPos = gridPos;
             this.position = position;
             tileType = type;
             ChangeTileTexture(type);
+
+            Random random = new Random();
+            plantTimeToGrow = random.Next(1, 4);
         }
 
         private void ChangeTileTexture(TileType type)
         {
             isWalkable = false;
+
+            if (canGrowPlants) parentGrid.currentAmountOfPlants--;
 
             plantTimer = 0;
             canGrowPlants = false;
@@ -68,11 +75,12 @@ namespace EcosystemSim
             if (canGrowPlants)
             {
                 Random rnd = new Random();
-                int rndNmb = rnd.Next(0, 5);
-                if (rndNmb != 0) canGrowPlants = false;
+                int rndNmb = rnd.Next(0, 4);
+                if (rndNmb != 0 || parentGrid.currentAmountOfPlants >= parentGrid.maxAmountOfPlants) canGrowPlants = false;
                 else
                 {
                     selectedPlant = new Plant(this, GlobalTextures.textures[TextureNames.GreensMushroom]);
+                    parentGrid.currentAmountOfPlants++;
                 }
             }
         }

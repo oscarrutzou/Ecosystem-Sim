@@ -27,7 +27,9 @@ namespace EcosystemSim
             {
                 stream.SetLength(0);
                 StreamWriter writer = new StreamWriter(stream);
-                writer.WriteLine($"{grid.width},{grid.height}");
+                writer.WriteLine($"{grid.tiles[0,0].position.X}, {grid.tiles[0, 0].position.Y}"); //Start pos
+                writer.WriteLine($"{grid.width},{grid.height}"); //Width, height
+
                 for (int y = 0; y < grid.height; y++)
                 {
                     for (int x = 0; x < grid.width; x++)
@@ -103,10 +105,17 @@ namespace EcosystemSim
             try
             {
                 StreamReader reader = new StreamReader(stream);
+                
+                string[] gridPosStart = reader.ReadLine().Split(',');
+                Vector2 gridStartPos = new Vector2(int.Parse(gridPosStart[0]), int.Parse(gridPosStart[1]));
+
                 string[] firstLineSizeParts = reader.ReadLine().Split(',');
                 int width = int.Parse(firstLineSizeParts[0]);
                 int height = int.Parse(firstLineSizeParts[1]);
 
+                //Need to make it here so the tiles can use the grid
+                Grid grid = new Grid(gridStartPos, width, height, false, description);
+                
                 List<Tile> tiles = new List<Tile>();
                 string line;
 
@@ -116,7 +125,7 @@ namespace EcosystemSim
                     int[] gridPos = new int[] { int.Parse(parts[0]), int.Parse(parts[1]) };
                     Vector2 position = new Vector2(float.Parse(parts[2]), float.Parse(parts[3]));
                     TileType type = (TileType)Enum.Parse(typeof(TileType), parts[4]);
-                    Tile tempTile = new Tile(gridPos, position, type);
+                    Tile tempTile = new Tile(grid, gridPos, position, type);
                     tiles.Add(tempTile);
                     if (type != TileType.Empty)
                     {
@@ -124,7 +133,6 @@ namespace EcosystemSim
                     }
                 }
 
-                Grid grid = new Grid(tiles[0].position, width, height, false, description);
                 for (int y = 0; y < height; y++)
                 {
                     for (int x = 0; x < width; x++)

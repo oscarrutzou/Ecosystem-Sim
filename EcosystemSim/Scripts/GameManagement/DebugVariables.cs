@@ -22,7 +22,8 @@ namespace EcosystemSim
             {
                 //if (GridManager.grids[i].tiles[0,0] == null) break;
                 int nonEmptyTilesCount = GridManager.grids[i].tiles.Cast<Tile>().Count(tile => tile.tileType != TileType.Empty);
-                DrawString($"Grid{i}_{GridManager.grids[i].gridName} non-empty tiles count: {nonEmptyTilesCount}");
+                int plantTiles = GridManager.grids[i].tiles.Cast<Tile>().Count(tile => tile.canGrowPlants);
+                DrawString($"Grid{i}_{GridManager.grids[i].gridName}, tiles count: {nonEmptyTilesCount} + plant tiles: {plantTiles} / {GridManager.grids[i].maxAmountOfPlants}");
             }
             //DrawString($"Amount of Herbivores: {SceneData.herbivores.Count}");
             //DrawString($"Amount of Predators: {SceneData.predators.Count}");

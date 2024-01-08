@@ -122,6 +122,7 @@ namespace EcosystemSim
             foreach (Tile tile in tiles)
             {
                 tile.color = tint;
+                if (tile.hasPlant) tile.selectedPlant.color = tint;
             }
         }
 
