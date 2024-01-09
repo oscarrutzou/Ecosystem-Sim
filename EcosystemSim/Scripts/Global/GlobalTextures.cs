@@ -13,8 +13,12 @@ namespace EcosystemSim
     {
         TestTile,
         TestTileNonWalk,
-        TileGrass,
+        TileGrassy,
+        TilePlain,
+        GreensGrass,
         GreensMushroom,
+        GreensYellowFlower,
+        GreensRedFlower,
         Fox,
         Bunny,
         UISearchRad100,
@@ -35,7 +39,12 @@ namespace EcosystemSim
             {
                 {TextureNames.TestTile, content.Load<Texture2D>("World\\TestTile") },
                 {TextureNames.TestTileNonWalk, content.Load<Texture2D>("World\\TestTileNonWalkable") },
+                {TextureNames.TilePlain, content.Load<Texture2D>("World\\TilePlain") },
+                {TextureNames.TileGrassy, content.Load<Texture2D>("World\\TileGrassy") },
+                {TextureNames.GreensGrass, content.Load<Texture2D>("World\\GreensGrass") },
                 {TextureNames.GreensMushroom, content.Load<Texture2D>("World\\TestMushroom") },
+                {TextureNames.GreensYellowFlower, content.Load<Texture2D>("World\\YellowFlower") },
+                {TextureNames.GreensRedFlower, content.Load<Texture2D>("World\\RedFlower") },
 
                 {TextureNames.Fox, content.Load<Texture2D>("Agents\\tile_fox") },
                 {TextureNames.Bunny, content.Load<Texture2D>("Agents\\tile_bunny") },

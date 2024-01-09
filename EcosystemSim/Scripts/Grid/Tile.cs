@@ -8,7 +8,7 @@ namespace EcosystemSim
     public enum TileType
     {
         Empty,
-        TestTile,
+        //TestTile,
         TestTileNonWalk,
         Grass,
     }
@@ -56,10 +56,10 @@ namespace EcosystemSim
                     break;
 
                 #region TestTiles
-                case TileType.TestTile:
-                    texture = GlobalTextures.textures[TextureNames.TestTile];
-                    isWalkable = true;
-                    canGrowPlants = true;
+                //case TileType.TestTile:
+                //    texture = GlobalTextures.textures[TextureNames.TilePlain];
+                //    isWalkable = true;
+                //    canGrowPlants = true;
 
                     break;
                 case TileType.TestTileNonWalk:
@@ -69,7 +69,7 @@ namespace EcosystemSim
                 #endregion
 
                 case TileType.Grass:
-                    texture = GlobalTextures.textures[TextureNames.TestTile];
+                    texture = GlobalTextures.textures[TextureNames.TileGrassy];
                     isWalkable = true;
                     canGrowPlants = true;
                     break;

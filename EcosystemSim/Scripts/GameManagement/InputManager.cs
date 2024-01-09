@@ -25,11 +25,11 @@ namespace EcosystemSim
 
         public static Tile tileOnHover;
         public static Grid selectedGrid;
-        public static TileType selectedTileType = TileType.TestTile;
+        public static TileType selectedTileType = TileType.Grass;
 
         private static Dictionary<Keys, TileType> keyTileTypeMap = new Dictionary<Keys, TileType>
         {
-            { Keys.D1, TileType.TestTile },
+            { Keys.D1, TileType.Grass },
             { Keys.D2, TileType.TestTileNonWalk }
         };
         #endregion

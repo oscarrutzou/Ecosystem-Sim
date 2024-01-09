@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,14 @@ namespace EcosystemSim
         private TileType basicTileType;
         
         public float layerDepth;
+        private Random rnd = new Random();
+
+        private List<TextureNames> plantTextures = new List<TextureNames>() {
+            TextureNames.GreensGrass,
+            TextureNames.GreensMushroom,
+            TextureNames.GreensYellowFlower,
+            TextureNames.GreensRedFlower,
+        };
 
         public Grid(string name)
         {
@@ -142,13 +151,12 @@ namespace EcosystemSim
 
         public void UpdatePlantTiles()
         {
-            Random rnd = new Random();
             List<Tile> eligibleTiles = new List<Tile>();
 
             // Find all tiles that are of type TestTile and do not have a plant
             foreach (Tile tile in tiles)
             {
-                if (tile.tileType == TileType.TestTile && tile.selectedPlant == null)
+                if (tile.tileType == TileType.Grass && tile.selectedPlant == null)
                 {
                     eligibleTiles.Add(tile);
                 }
@@ -158,11 +166,24 @@ namespace EcosystemSim
             while (currentAmountOfPlants < maxAmountOfPlants && eligibleTiles.Count > 0)
             {
                 int index = rnd.Next(eligibleTiles.Count);
-                eligibleTiles[index].selectedPlant = new Plant(eligibleTiles[index], GlobalTextures.textures[TextureNames.GreensMushroom]);
+                eligibleTiles[index].selectedPlant = new Plant(eligibleTiles[index], PickRandomPlant());
                 currentAmountOfPlants++;
                 eligibleTiles.RemoveAt(index);  // Remove the tile from the list to avoid selecting it again
             }
         }
 
+        private Texture2D PickRandomPlant()
+        {
+            int index;
+            if (rnd.Next(0,2) == 0)
+            {
+                index = 0;
+            }
+            else
+            {
+                index = rnd.Next(1, plantTextures.Count);
+            }
+            return GlobalTextures.textures[plantTextures[index]];
+        }
     }
 }

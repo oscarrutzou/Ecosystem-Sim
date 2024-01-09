@@ -39,7 +39,7 @@ namespace EcosystemSim
                 DrawString($"Hover tile grid pos: ({tile.gridPos[0]}, {tile.gridPos[1]})");
                 DrawString($"Hover tile pos: {tile.position}");
                 DrawString($"Hover tile layerDepth: {tile.layerDepth}");
-                DrawString($"Hover tile layerDepth: {tile.canGrowPlants} + {tile.selectedPlant}");
+                DrawString($"Hover tile layerDepth: {tile.canGrowPlants} + {tile.selectedPlant?.texture.Name}");
             }
         }
 

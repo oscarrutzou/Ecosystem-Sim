@@ -124,12 +124,22 @@ namespace EcosystemSim
                     string[] parts = line.Split(',');
                     int[] gridPos = new int[] { int.Parse(parts[0]), int.Parse(parts[1]) };
                     Vector2 position = new Vector2(float.Parse(parts[2]), float.Parse(parts[3]));
-                    TileType type = (TileType)Enum.Parse(typeof(TileType), parts[4]);
-                    Tile tempTile = new Tile(grid, gridPos, position, type);
-                    tiles.Add(tempTile);
-                    if (type != TileType.Empty)
+
+                    TileType type;
+                    if (Enum.TryParse(parts[4], out type))  // Try to parse the tile type
                     {
-                        SceneData.gameObjectsToAdd.Add(tempTile); // Add the tile to your game objects list
+                        Tile tempTile = new Tile(grid, gridPos, position, type);
+                        tiles.Add(tempTile);
+                        if (type != TileType.Empty)
+                        {
+                            SceneData.gameObjectsToAdd.Add(tempTile);
+                        }
+                    }
+                    else
+                    {
+                        //If there is a error, where the tiletype is no longere there, use a default empty tile insted.
+                        Tile tempTile = new Tile(grid, gridPos, position, TileType.Empty);
+                        tiles.Add(tempTile);
                     }
                 }
 

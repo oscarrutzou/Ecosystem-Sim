@@ -32,7 +32,9 @@ namespace EcosystemSim
         //Change grids with keyboard,
         public static void InitStartGrids()
         {
-            grids.Add(new Grid(TileType.TestTile, "Bottom"));
+            Random rnd = new Random();
+            
+            grids.Add(new Grid(TileType.Grass, "Bottom"));
             grids.Add(new Grid("Middle"));
             grids.Add(new Grid("Top"));
 
