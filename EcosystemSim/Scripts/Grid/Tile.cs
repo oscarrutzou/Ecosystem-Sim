@@ -18,7 +18,6 @@ namespace EcosystemSim
         public Grid parentGrid;
         public bool isWalkable;
         public bool canGrowPlants;
-        public bool hasPlant;
         public int[] gridPos;
         public TileType tileType;
 
@@ -41,11 +40,14 @@ namespace EcosystemSim
         {
             isWalkable = false;
 
-            if (canGrowPlants) parentGrid.currentAmountOfPlants--;
+            if (selectedPlant != null)
+            {
+                parentGrid.currentAmountOfPlants--;
+                selectedPlant = null;
+            }
 
             plantTimer = 0;
             canGrowPlants = false;
-            hasPlant = false;
 
             switch (type)
             {
@@ -58,6 +60,7 @@ namespace EcosystemSim
                     texture = GlobalTextures.textures[TextureNames.TestTile];
                     isWalkable = true;
                     canGrowPlants = true;
+
                     break;
                 case TileType.TestTileNonWalk:
                     texture = GlobalTextures.textures[TextureNames.TestTileNonWalk];
@@ -70,18 +73,6 @@ namespace EcosystemSim
                     isWalkable = true;
                     canGrowPlants = true;
                     break;
-            }
-
-            if (canGrowPlants)
-            {
-                Random rnd = new Random();
-                int rndNmb = rnd.Next(0, 4);
-                if (rndNmb != 0 || parentGrid.currentAmountOfPlants >= parentGrid.maxAmountOfPlants) canGrowPlants = false;
-                else
-                {
-                    selectedPlant = new Plant(this, GlobalTextures.textures[TextureNames.GreensMushroom]);
-                    parentGrid.currentAmountOfPlants++;
-                }
             }
         }
 
@@ -110,7 +101,7 @@ namespace EcosystemSim
 
         public override void Update()
         {
-            if (!canGrowPlants || hasPlant) return;
+            if (!canGrowPlants || selectedPlant == null) return;
             //if (tileType != TileType.TestTile || hasPlant) return;
 
             plantTimer += (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds;
@@ -118,7 +109,6 @@ namespace EcosystemSim
             if (plantTimer >= plantTimeToGrow)
             {
                 plantTimer = 0;
-                hasPlant = true;
                 SceneData.gameObjectsToAdd.Add(selectedPlant);
             }
         }

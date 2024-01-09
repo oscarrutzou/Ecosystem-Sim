@@ -91,7 +91,11 @@ namespace EcosystemSim
 
         public static void Update()
         {
-
+            foreach (Grid grid in grids)
+            {
+                grid.UpdateMaxAmountOfPlants();
+                grid.UpdatePlantTiles();
+            }
         }
 
         public static void OnGridIndexChanged()
@@ -114,6 +118,7 @@ namespace EcosystemSim
             {
                 if (grid == null) continue;
                 grid.UpdateTileLayerDepths();
+                grid.UpdatePlantTiles();
             }
         }
 
@@ -122,7 +127,7 @@ namespace EcosystemSim
             foreach (Tile tile in tiles)
             {
                 tile.color = tint;
-                if (tile.hasPlant) tile.selectedPlant.color = tint;
+                if (tile.selectedPlant != null) tile.selectedPlant.color = tint;
             }
         }
 

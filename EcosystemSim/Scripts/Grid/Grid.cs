@@ -1,7 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using SharpDX.Direct3D9;
 using System;
-
+using System.Collections.Generic;
+using System.Linq;
 namespace EcosystemSim
 {
     public class Grid
@@ -75,8 +76,7 @@ namespace EcosystemSim
         private void InitGrid()
         {
             gridSizeDem *= (int)scale.X;
-            maxAmountOfPlants = Math.Max(width, width * height / 5);
-
+            
             Vector2 curPos = startPosPx;
 
             if (isCentered)
@@ -98,6 +98,8 @@ namespace EcosystemSim
                 curPos.X = this.startPosPx.X;
                 curPos.Y += gridSizeDem;
             }
+
+            UpdateMaxAmountOfPlants();
         }
 
         public Tile GetTile(Vector2 pos)
@@ -117,7 +119,19 @@ namespace EcosystemSim
 
             return null; // Position is out of bounds
         }
-
+        public void UpdateMaxAmountOfPlants()
+        {
+            //maxAmountOfPlants = Math.Max(width, width * height / 5);
+            int canGrowPlantTiles = tiles.Cast<Tile>().Count(tile => tile.canGrowPlants);
+            if (canGrowPlantTiles > 0)
+            {
+                maxAmountOfPlants = Math.Max(1, canGrowPlantTiles / 5);
+            }
+            else
+            {
+                maxAmountOfPlants = canGrowPlantTiles;
+            }
+        }
         public void UpdateTileLayerDepths()
         {
             foreach (Tile tile in tiles)
@@ -126,6 +140,29 @@ namespace EcosystemSim
             }
         }
 
+        public void UpdatePlantTiles()
+        {
+            Random rnd = new Random();
+            List<Tile> eligibleTiles = new List<Tile>();
+
+            // Find all tiles that are of type TestTile and do not have a plant
+            foreach (Tile tile in tiles)
+            {
+                if (tile.tileType == TileType.TestTile && tile.selectedPlant == null)
+                {
+                    eligibleTiles.Add(tile);
+                }
+            }
+
+            // Randomly select tiles from the eligible list until we reach maxAmountOfPlants or run out of eligible tiles
+            while (currentAmountOfPlants < maxAmountOfPlants && eligibleTiles.Count > 0)
+            {
+                int index = rnd.Next(eligibleTiles.Count);
+                eligibleTiles[index].selectedPlant = new Plant(eligibleTiles[index], GlobalTextures.textures[TextureNames.GreensMushroom]);
+                currentAmountOfPlants++;
+                eligibleTiles.RemoveAt(index);  // Remove the tile from the list to avoid selecting it again
+            }
+        }
 
     }
 }

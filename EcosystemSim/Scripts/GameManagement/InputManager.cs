@@ -98,6 +98,13 @@ namespace EcosystemSim
 
                 if (keyboardState.IsKeyDown(Keys.T) && !previousKeyboardState.IsKeyDown(Keys.T))
                 {
+                    foreach (Grid grid in GridManager.grids)
+                    {
+                        foreach (Tile tile in grid.tiles)
+                        {
+                            tile.ChangeTile(TileType.Empty);
+                        }
+                    }
                     SaveLoad.LoadGrids();
                 }
 

@@ -22,7 +22,7 @@ namespace EcosystemSim
             {
                 //if (GridManager.grids[i].tiles[0,0] == null) break;
                 int nonEmptyTilesCount = GridManager.grids[i].tiles.Cast<Tile>().Count(tile => tile.tileType != TileType.Empty);
-                int plantTiles = GridManager.grids[i].tiles.Cast<Tile>().Count(tile => tile.canGrowPlants);
+                int plantTiles = GridManager.grids[i].tiles.Cast<Tile>().Count(tile => tile.selectedPlant != null);
                 DrawString($"Grid{i}_{GridManager.grids[i].gridName}, tiles count: {nonEmptyTilesCount} + plant tiles: {plantTiles} / {GridManager.grids[i].maxAmountOfPlants}");
             }
             //DrawString($"Amount of Herbivores: {SceneData.herbivores.Count}");
@@ -39,6 +39,7 @@ namespace EcosystemSim
                 DrawString($"Hover tile grid pos: ({tile.gridPos[0]}, {tile.gridPos[1]})");
                 DrawString($"Hover tile pos: {tile.position}");
                 DrawString($"Hover tile layerDepth: {tile.layerDepth}");
+                DrawString($"Hover tile layerDepth: {tile.canGrowPlants} + {tile.selectedPlant}");
             }
         }
 

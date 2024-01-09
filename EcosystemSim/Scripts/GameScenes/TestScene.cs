@@ -22,5 +22,10 @@ namespace EcosystemSim
 
         }
 
+        public override void Update()
+        {
+            base.Update();
+            GridManager.Update();
+        }
     }
 }
