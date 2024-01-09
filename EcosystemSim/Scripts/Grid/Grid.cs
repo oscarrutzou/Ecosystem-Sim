@@ -42,6 +42,7 @@ namespace EcosystemSim
 
             InitGrid();
         }
+
         public Grid(TileType basicTileType, string name)
         {
             this.startPosPx = Vector2.Zero;
@@ -84,6 +85,9 @@ namespace EcosystemSim
 
         private void InitGrid()
         {
+            Random rnd = new Random();
+            TileType tileType;
+
             gridSizeDem *= (int)scale.X;
             
             Vector2 curPos = startPosPx;
@@ -93,12 +97,22 @@ namespace EcosystemSim
                 curPos = new Vector2(curPos.X - width * gridSizeDem / 2, curPos.Y - height * gridSizeDem / 2);
             }
             this.startPosPx = curPos;
-
+            
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
-                    Tile tempTile = new Tile(this, new int[] { x, y }, curPos, basicTileType);
+                    if (basicTileType == TileType.Plain)
+                    {
+                        if (rnd.Next(0, 3) != 0) tileType = TileType.Plain;
+                        else tileType = TileType.Grass;
+                    }
+                    else
+                    {
+                        tileType = basicTileType;
+                    }
+
+                    Tile tempTile = new Tile(this, new int[] { x, y }, curPos, tileType);
                     tiles[x, y] = tempTile;
                     if (basicTileType != TileType.Empty) SceneData.gameObjectsToAdd.Add(tempTile);
 

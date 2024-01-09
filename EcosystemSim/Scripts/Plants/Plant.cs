@@ -7,7 +7,6 @@ namespace EcosystemSim
 {
     public class Plant: GameObject
     {
-        private float plantTimer;
         public float plantGrowMaxTime;
         public Tile parentTile;
 
@@ -23,6 +22,16 @@ namespace EcosystemSim
         public override void Update()
         {
             if (parentTile.selectedPlant == null) isRemoved = true;
+
+        }
+
+        /// <summary>
+        /// If the plant is old or if it has been eaten
+        /// </summary>
+        public void Die()
+        {
+            parentTile.selectedPlant = null;
+            isRemoved = true;
         }
     }
 }

@@ -9,6 +9,7 @@ namespace EcosystemSim
     {
         public static void SaveGrid(Grid grid, int index, string description)
         {
+            DeleteExistingGrids();
             // Check if the description already starts with "grid" + index
             string prefix = "grid" + index;
             if (!description.StartsWith(prefix))
@@ -43,6 +44,20 @@ namespace EcosystemSim
             finally
             {
                 stream.Close();
+            }
+        }
+        public static void DeleteExistingGrids()
+        {
+            string appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string folder = Path.Combine(appdataPath, "EcoSystemSimData");
+
+            // Get all files that start with "grid"
+            string[] files = Directory.GetFiles(folder, "grid*.txt");
+
+            // Delete each file
+            foreach (string file in files)
+            {
+                //File.Delete(file);
             }
         }
 

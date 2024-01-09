@@ -10,6 +10,7 @@ namespace EcosystemSim
         Empty,
         //TestTile,
         TestTileNonWalk,
+        Plain,
         Grass,
     }
 
@@ -60,14 +61,18 @@ namespace EcosystemSim
                 //    texture = GlobalTextures.textures[TextureNames.TilePlain];
                 //    isWalkable = true;
                 //    canGrowPlants = true;
-
-                    break;
+                    //break;
                 case TileType.TestTileNonWalk:
                     texture = GlobalTextures.textures[TextureNames.TestTileNonWalk];
-                    SetCollisionBox(16,5);
+                    //SetCollisionBox(16,5);
                     break;
                 #endregion
 
+                case TileType.Plain:
+                    texture = GlobalTextures.textures[TextureNames.TilePlain];
+                    isWalkable = true;
+                    canGrowPlants = true;
+                    break;
                 case TileType.Grass:
                     texture = GlobalTextures.textures[TextureNames.TileGrassy];
                     isWalkable = true;
