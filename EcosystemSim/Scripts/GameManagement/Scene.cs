@@ -81,6 +81,9 @@ namespace EcosystemSim
                 case Tile tile:
                     SceneData.tiles.Add(tile);
                     break;
+                case Plant plant:
+                    SceneData.plants.Add(plant);
+                    break;
                 case Herbivore herbivore:
                     SceneData.herbivores.Add(herbivore);
                     break;
@@ -99,6 +102,9 @@ namespace EcosystemSim
             {
                 case Tile tile:
                     SceneData.tiles.Remove(tile);
+                    break;
+                case Plant plant:
+                    SceneData.plants.Remove(plant);
                     break;
                 case Herbivore herbivore:
                     SceneData.herbivores.Remove(herbivore);

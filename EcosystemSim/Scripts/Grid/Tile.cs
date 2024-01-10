@@ -25,6 +25,7 @@ namespace EcosystemSim
         private float plantTimer;
         private float plantTimeToGrow;
         public Plant selectedPlant;
+        public bool hasBeenPlanted;
         public Tile(Grid parentGrid,int[] gridPos, Vector2 position, TileType type)
         {
             this.parentGrid = parentGrid;
@@ -40,6 +41,7 @@ namespace EcosystemSim
         private void ChangeTileTexture(TileType type)
         {
             isWalkable = false;
+
 
             if (selectedPlant != null)
             {
@@ -57,11 +59,6 @@ namespace EcosystemSim
                     break;
 
                 #region TestTiles
-                //case TileType.TestTile:
-                //    texture = GlobalTextures.textures[TextureNames.TilePlain];
-                //    isWalkable = true;
-                //    canGrowPlants = true;
-                    //break;
                 case TileType.TestTileNonWalk:
                     texture = GlobalTextures.textures[TextureNames.TestTileNonWalk];
                     //SetCollisionBox(16,5);
@@ -106,16 +103,28 @@ namespace EcosystemSim
 
         public override void Update()
         {
-            if (!canGrowPlants || selectedPlant == null) return;
-            //if (tileType != TileType.TestTile || hasPlant) return;
+            if (!canGrowPlants || selectedPlant == null)
+                return;
+
+            if (hasBeenPlanted) return;
 
             plantTimer += (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds;
 
             if (plantTimer >= plantTimeToGrow)
             {
                 plantTimer = 0;
+                hasBeenPlanted = true;
                 SceneData.gameObjectsToAdd.Add(selectedPlant);
             }
+        }
+
+        public void DeletePlant()
+        {
+            if (selectedPlant == null) return;
+            hasBeenPlanted = false;
+            selectedPlant.isRemoved = true;
+            selectedPlant = null;
+            parentGrid.currentAmountOfPlants--;
         }
     }
 }

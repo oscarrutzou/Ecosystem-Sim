@@ -21,8 +21,8 @@ namespace EcosystemSim
         public Vector2 origin;
         public bool isCentered;
 
-        private int collisionBoxWidth;
-        private int collisionBoxHeight;
+        internal int collisionBoxWidth;
+        internal int collisionBoxHeight;
         private Vector2 offset;
         public Rectangle collisionBox
         {
@@ -91,6 +91,8 @@ namespace EcosystemSim
             Vector2 dir = target - position;
             rotation = (float)Math.Atan2(-dir.Y, -dir.X) + MathHelper.Pi;
         }
+
+
 
         internal void DrawDebugCollisionBox(Color color)
         {

@@ -20,9 +20,11 @@ namespace EcosystemSim
         public static bool mouseClicked;
         public static bool mouseRightClicked;
 
+        public static bool buildMode = true;
         public static bool mouseOutOfBounds;
         public static bool debugStats = true;
 
+        public static GameObject objOnHover;
         public static Tile tileOnHover;
         public static Grid selectedGrid;
         public static TileType selectedTileType = TileType.Grass;
@@ -67,7 +69,15 @@ namespace EcosystemSim
                 debugStats = !debugStats;
             }
 
+            if (keyboardState.IsKeyDown(Keys.Tab) && !previousKeyboardState.IsKeyDown(Keys.Tab))
+            {
+                buildMode = !buildMode;
+            }
+
             MoveCam();
+
+            if (!buildMode) return;
+
             ChangeSelectedTile();
 
             if (keyboardState.IsKeyDown(Keys.I) && !previousKeyboardState.IsKeyDown(Keys.I))
@@ -126,18 +136,46 @@ namespace EcosystemSim
             mouseClicked = (Mouse.GetState().LeftButton == ButtonState.Pressed) && (previousMouseState.LeftButton == ButtonState.Released);
             mouseRightClicked = (Mouse.GetState().RightButton == ButtonState.Pressed) && (previousMouseState.RightButton == ButtonState.Released);
 
-            if (GridManager.grids.Count != 0)
+            if (!buildMode)
             {
-                tileOnHover = GridManager.GetTileAtPos(mousePositionInWorld);
+                foreach (GameObject obj in SceneData.gameObjects)
+                {
+                    if (IsMouseOver(obj))
+                    {
+                        objOnHover = obj;
+                        return;
+                    }
+                }
+                //There isnt any object where the mouse is, therefore set objOnHover to null.
+                objOnHover = null;
+            }
+            else
+            {
+                if (GridManager.grids.Count != 0)
+                {
+                    tileOnHover = GridManager.GetTileAtPos(mousePositionInWorld);
 
-                if (Mouse.GetState().LeftButton == ButtonState.Pressed && tileOnHover != null)
-                {
-                    tileOnHover.ChangeTile(selectedTileType);
+                    if (Mouse.GetState().LeftButton == ButtonState.Pressed && tileOnHover != null)
+                    {
+                        tileOnHover.ChangeTile(selectedTileType);
+                    }
+                    if (Mouse.GetState().RightButton == ButtonState.Pressed && tileOnHover != null)
+                    {
+                        tileOnHover.ChangeTile(TileType.Empty);
+                    }
                 }
-                if (Mouse.GetState().RightButton == ButtonState.Pressed && tileOnHover != null)
-                {
-                    tileOnHover.ChangeTile(TileType.Empty);
-                }
+            }
+            
+        }
+        private static bool IsMouseOver(GameObject gameObject)
+        {
+            if (gameObject is Tile)
+            {
+                return false;
+            }
+            else
+            {
+                return gameObject.collisionBox.Contains(InputManager.mousePositionInWorld.ToPoint());
             }
         }
 

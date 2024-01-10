@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
+using SharpDX.Direct2D1.Effects;
 
 namespace EcosystemSim
 {
@@ -15,6 +16,9 @@ namespace EcosystemSim
             DrawString($"Selected tile type: {InputManager.selectedTileType}");
             DrawString($"Selected gridIndex: {GridManager.GridIndex}");
 
+            DrawString($"Build Mode: {InputManager.buildMode}");
+
+
             if (GridManager.selectedGrid == null) return;
             DrawString($"Selected grid: {GridManager.selectedGrid.gridName}");
             DrawString($"Selected grid layerDepth: {GridManager.selectedGrid.layerDepth}");
@@ -25,22 +29,43 @@ namespace EcosystemSim
                 int plantTiles = GridManager.grids[i].tiles.Cast<Tile>().Count(tile => tile.selectedPlant != null);
                 DrawString($"Grid{i}_{GridManager.grids[i].gridName}, tiles count: {nonEmptyTilesCount} + plant tiles: {plantTiles} / {GridManager.grids[i].maxAmountOfPlants}");
             }
-            //DrawString($"Amount of Herbivores: {SceneData.herbivores.Count}");
+            DrawString($"Amount of plants: {SceneData.plants.Count}");
             //DrawString($"Amount of Predators: {SceneData.predators.Count}");
             //DrawString($"Mouse in world: {InputManager.mousePositionInWorld}");
             //DrawString($"Mouse on UI: {InputManager.mousePositionOnScreen}");
             //DrawString($"Mouse out of bounds: {InputManager.mouseOutOfBounds}");
 
 
-            Tile tile = InputManager.tileOnHover;
-            if (tile != null)
+            if (InputManager.buildMode)
             {
-                DrawString($"Hover tile type: {tile.tileType}");
-                DrawString($"Hover tile grid pos: ({tile.gridPos[0]}, {tile.gridPos[1]})");
-                DrawString($"Hover tile pos: {tile.position}");
-                DrawString($"Hover tile layerDepth: {tile.layerDepth}");
-                DrawString($"Hover tile layerDepth: {tile.canGrowPlants} + {tile.selectedPlant?.texture.Name}");
+                Tile tile = InputManager.tileOnHover;
+                if (tile != null)
+                {
+                    DrawString($"Hover tile type: {tile.tileType}");
+                    DrawString($"Hover tile hasBeenPlanted: {tile.hasBeenPlanted}");
+                    DrawString($"Hover tile grid pos: ({tile.gridPos[0]}, {tile.gridPos[1]})");
+                    DrawString($"Hover tile pos: {tile.position}");
+                    DrawString($"Hover tile layerDepth: {tile.layerDepth}");
+                    DrawString($"Hover tile layerDepth: {tile.canGrowPlants} + {tile.selectedPlant?.texture.Name}");
+                }
             }
+            else
+            {
+                GameObject obj = InputManager.objOnHover;
+                if (obj != null)
+                {
+                    DrawString($"Hover obj pos: {obj.position}");
+                    DrawString($"Hover obj layerDepth: {obj.layerDepth}");
+                    if (obj is Agent agent)
+                    {
+                        DrawString($"Hover Agent target: {agent.target}");
+                        DrawString($"Hover Agent target list: {agent.targetObjectInRad.Count}");
+                        DrawString($"Hover Agent state: {agent.currentState}");
+
+                    }
+                }
+            }
+            
         }
 
         private static void DrawString(string text)

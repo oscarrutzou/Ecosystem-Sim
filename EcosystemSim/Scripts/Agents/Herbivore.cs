@@ -9,10 +9,17 @@ namespace EcosystemSim
 {
     public class Herbivore : Agent
     {
-        //public Herbivore(Vector2 pos) {
-        //    position = pos;
-        //    texture = GlobalTextures.textures[TextureNames.Bunny];
-        //}
+        public Herbivore(Vector2 pos)
+        {
+            position = pos;
+            texture = GlobalTextures.textures[TextureNames.Bunny];
+            currentState = AgentState.Search;
+        }
 
+        internal override void AgentSpecificSearch()
+        {
+            List<GameObject> list = SceneData.plants.Cast<GameObject>().ToList();
+            SearchForType(list);
+        }
     }
 }

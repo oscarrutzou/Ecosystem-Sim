@@ -9,6 +9,7 @@ namespace EcosystemSim
     public class Grid
     {
         public int gridSizeDem = 16;
+        private int basicSize = 4;
         public int currentAmountOfPlants;
         public int maxAmountOfPlants;
         private Vector2 scale = new Vector2(3, 3);
@@ -33,8 +34,8 @@ namespace EcosystemSim
         public Grid(string name)
         {
             this.startPosPx = Vector2.Zero;
-            this.width = 10;
-            this.height = 10;
+            this.width = basicSize;
+            this.height = basicSize;
             this.isCentered = true;
             this.basicTileType = TileType.Empty;
             tiles = new Tile[width, height]; // Initialize the 2D array
@@ -46,8 +47,8 @@ namespace EcosystemSim
         public Grid(TileType basicTileType, string name)
         {
             this.startPosPx = Vector2.Zero;
-            this.width = 10;
-            this.height = 10;
+            this.width = basicSize;
+            this.height = basicSize;   
             this.isCentered = true;
             this.basicTileType = basicTileType;
             tiles = new Tile[width, height]; // Initialize the 2D array
@@ -142,6 +143,7 @@ namespace EcosystemSim
 
             return null; // Position is out of bounds
         }
+
         public void UpdateMaxAmountOfPlants()
         {
             //maxAmountOfPlants = Math.Max(width, width * height / 5);
@@ -170,10 +172,14 @@ namespace EcosystemSim
             // Find all tiles that are of type TestTile and do not have a plant
             foreach (Tile tile in tiles)
             {
-                if (tile.tileType == TileType.Grass && tile.selectedPlant == null)
+                if (tile.tileType == TileType.Grass || tile.tileType == TileType.Plain)
                 {
-                    eligibleTiles.Add(tile);
+                    if (tile.selectedPlant == null)
+                    {
+                        eligibleTiles.Add(tile);
+                    }
                 }
+                
             }
 
             // Randomly select tiles from the eligible list until we reach maxAmountOfPlants or run out of eligible tiles
