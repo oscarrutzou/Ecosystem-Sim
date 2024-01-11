@@ -32,7 +32,8 @@ namespace EcosystemSim
         private static Dictionary<Keys, TileType> keyTileTypeMap = new Dictionary<Keys, TileType>
         {
             { Keys.D1, TileType.Grass },
-            { Keys.D2, TileType.TestTileNonWalk }
+            { Keys.D2, TileType.TestTileNonWalk },
+            { Keys.D3, TileType.Water },
         };
         #endregion
 

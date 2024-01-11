@@ -9,10 +9,10 @@ namespace EcosystemSim
     public class Grid
     {
         public int gridSizeDem = 16;
-        private int basicSize = 4;
+        private int basicSize = 10;
         public int currentAmountOfPlants;
         public int maxAmountOfPlants;
-        private int maxAmountOfPlantsDividing = 50;
+        private int maxAmountOfPlantsDividing = 5;
         private Vector2 scale = new Vector2(3, 3);
         public Tile[,] tiles;
         //public int[] gridSize = new int[] { 5, 5 };

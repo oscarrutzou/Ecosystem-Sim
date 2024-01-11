@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
 using System.Net.NetworkInformation;
+using SharpDX.Direct2D1;
 
 namespace EcosystemSim
 {
@@ -18,17 +19,21 @@ namespace EcosystemSim
     public abstract class Agent : GameObject
     {
         private int maxHealth = 100;
-        public int health;
+        public double health;
         public int damage = 10;
         public double thirstMeter;
         public int thirstMaxMeter = 100;
         public double hungermeter;
         public int hungerMaxmeter = 100;
         private int thirstHungerScale = 3;
-        public int searchRadPx = 150;
+        private int minAmountBeforeDmg = 50;
+        private int amountBeforeSearch = 80;
+        public int searchRadPx = 100;
+
         public int speed = 30;
         private double changeDirectionTimer = 0;
         internal double eatingTimer = 0;
+        internal double drinkingTimer = 0;
         private Vector2 direction;
         
         internal AgentState currentState;
@@ -52,20 +57,54 @@ namespace EcosystemSim
             CheckThirstHunger();
 
             HandleState();
+
+            ChangeDirectionOfSprite();
         }
+        private void ChangeDirectionOfSprite()
+        {
+            if (direction.X < 0)
+            {
+                spriteEffects = SpriteEffects.FlipHorizontally;
+            }
+            if (direction.X >= 0)
+            {
+                spriteEffects = SpriteEffects.None;
+            }
+        }
+
         private void CheckThirstHunger()
         {
             thirstMeter -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed * thirstHungerScale;
             hungermeter -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed * thirstHungerScale;
 
             if (currentState == AgentState.Eating || currentState == AgentState.Drinking) return;
-            if (hungermeter <= 90) {
+
+            if (thirstMeter <= amountBeforeSearch)
+            {
+                currentState = AgentState.Search;
+            }
+            else if (hungermeter <= amountBeforeSearch) {
                 currentState = AgentState.Search;
             }
             else
             {
                 currentState = AgentState.IdleWalk;
+
             }
+
+            if (hungermeter <= minAmountBeforeDmg || thirstMeter <= minAmountBeforeDmg)
+            {
+                health -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
+            }
+            else
+            {
+                if (health < maxHealth && health > 0)
+                {
+                    health += GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
+                }
+            }
+
+            if (health <= 0) isRemoved = true; //Agent died
         }
 
         private void HandleState()
@@ -78,7 +117,6 @@ namespace EcosystemSim
                     IdleWalk();
                     break;
                 case AgentState.Search:
-                    //AgentSpecificSearch();
                     if (targetObjectInRad.Count == 0)
                     {
                         IdleWalk();
@@ -127,7 +165,16 @@ namespace EcosystemSim
 
         internal virtual void Drinking()
         {
+            // Decrease the timer by the elapsed time
+            drinkingTimer -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
 
+            // If the timer is less than or equal to zero, change state to IdleWalk
+            if (drinkingTimer <= 0)
+            {
+
+                thirstMeter = thirstMaxMeter;
+                currentState = AgentState.IdleWalk;
+            }
         }
         
         //internal virtual void AgentSpecificSearch() { }
@@ -136,10 +183,17 @@ namespace EcosystemSim
         
         private void SearchForTarget()
         {
-            if (this is Herbivore)
+
+            if (thirstMeter <= amountBeforeSearch)
             {
-                List<GameObject> list = SceneData.plants.Cast<GameObject>().ToList();
-                SearchForType(list);
+                List<Tile> waterTiles = SceneData.tiles.Where(tile => tile.tileType == TileType.Water).ToList();
+                List<GameObject> tiles = waterTiles.Cast<GameObject>().ToList();
+                SearchForType(tiles);
+            }
+            else if (this is Herbivore)
+            {
+                List<GameObject> plantList = SceneData.plants.Cast<GameObject>().ToList();
+                SearchForType(plantList);
             } else if (this is Predator)
             {
 
@@ -175,7 +229,7 @@ namespace EcosystemSim
         {
             direction = new Vector2((float)(rnd.NextDouble() - 0.5), (float)(rnd.NextDouble() - 0.5));
             direction.Normalize(); // Make sure the direction vector has a length of 1                   
-            changeDirectionTimer = rnd.Next(10, 60);// Reset the timer with a random value between 1 and 5 seconds
+            changeDirectionTimer = rnd.Next(3, 8);// Reset the timer with a random value between 2 amounts of seconds
         }
 
         private void WalkTowardsTarget(Action actionOnDone)
@@ -210,8 +264,8 @@ namespace EcosystemSim
             else
             {
                 position = tempPos;
-
-                actionOnDone?.Invoke();
+                ChangeDirection();
+                //actionOnDone?.Invoke();
             }
         }
 
@@ -223,10 +277,10 @@ namespace EcosystemSim
             {
                 if (!obj.isRemoved && Vector2.Distance(this.position, obj.position) <= this.searchRadPx)
                 {
-                    if (obj is Herbivore || obj is Predator || obj is Plant)
+                    if (obj is Herbivore || obj is Predator || obj is Plant || obj is Tile)
                         targetObjectInRad.Add(obj);
                     else
-                        throw new Exception("The targetobjects must be a Herbivore, predator or plant");
+                        throw new Exception("The targetobjects must be a Herbivore, predator, plant or tile");
                 }
             }
             targetObjectInRad = targetObjectInRad.OrderBy(o => Vector2.Distance(this.position, o.position)).ToList();
@@ -276,8 +330,8 @@ namespace EcosystemSim
         public override void Draw()
         {
             base.Draw();
-            DrawSearchRad();
-            DrawDebugCollisionBox(Color.AliceBlue);
+            //DrawSearchRad();
+            if (InputManager.debugStats) DrawDebugCollisionBox(Color.AliceBlue);
         }
 
 

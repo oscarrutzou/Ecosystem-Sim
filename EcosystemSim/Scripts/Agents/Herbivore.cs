@@ -20,7 +20,11 @@ namespace EcosystemSim
         public override void ActionOnTargetFound()
         {
             //Brug a* i stedet for.
-            if (target != null && target is Plant)
+            if (target != null && target is Tile)
+            {
+                currentState = AgentState.Drinking;
+                drinkingTimer = 1;
+            } else if (target != null && target is Plant)
             {
                 currentState = AgentState.Eating;
                 eatingTimer = 1;

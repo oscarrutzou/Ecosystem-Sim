@@ -13,6 +13,7 @@ namespace EcosystemSim
     {
         TestTile,
         TestTileNonWalk,
+        TileWater,
         TileGrassy,
         TilePlain,
         GreensGrass,
@@ -39,6 +40,7 @@ namespace EcosystemSim
             {
                 {TextureNames.TestTile, content.Load<Texture2D>("World\\TestTile") },
                 {TextureNames.TestTileNonWalk, content.Load<Texture2D>("World\\TestTileNonWalkable") },
+                {TextureNames.TileWater, content.Load<Texture2D>("World\\TileWater") },
                 {TextureNames.TilePlain, content.Load<Texture2D>("World\\TilePlain") },
                 {TextureNames.TileGrassy, content.Load<Texture2D>("World\\TileGrassy") },
                 {TextureNames.GreensGrass, content.Load<Texture2D>("World\\GreensGrass") },

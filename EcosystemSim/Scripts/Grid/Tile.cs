@@ -12,6 +12,7 @@ namespace EcosystemSim
         TestTileNonWalk,
         Plain,
         Grass,
+        Water,
     }
 
     public class Tile: GameObject
@@ -54,10 +55,14 @@ namespace EcosystemSim
 
             switch (type)
             {
-                case TileType.Empty: 
+                case TileType.Empty:
                     texture = null;
                     break;
 
+                case TileType.Water:
+                    texture = GlobalTextures.textures[TextureNames.TileWater];
+                    isWalkable = true;
+                    break;
                 #region TestTiles
                 case TileType.TestTileNonWalk:
                     texture = GlobalTextures.textures[TextureNames.TestTileNonWalk];

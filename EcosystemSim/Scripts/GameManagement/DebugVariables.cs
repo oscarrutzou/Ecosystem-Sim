@@ -68,15 +68,23 @@ namespace EcosystemSim
                 }
             }
 
-            foreach (Herbivore herbivore in SceneData.herbivores)
+            //foreach (Herbivore herbivore in SceneData.herbivores)
+            //{
+            //    DrawString($"Herbivore health: {herbivore.health}");
+            //    DrawString($"Herbivore hungermeter: {herbivore.hungermeter}");
+            //    //DrawString($"Herbivore thirstMeter: {herbivore.thirstMeter}");
+            //    //DrawString($"Herbivore target: {herbivore.target}");
+            //    //DrawString($"Herbivore target list: {herbivore.targetObjectInRad.Count}");
+            //    //DrawString($"Herbivore state: {herbivore.currentState}");
+            //}
+            for (int i = 0; i < SceneData.herbivores.Count; i++)
             {
-                DrawString($"Herbivore hungermeter: {herbivore.hungermeter}");
-                //DrawString($"Herbivore thirstMeter: {herbivore.thirstMeter}");
-                //DrawString($"Herbivore target: {herbivore.target}");
-                //DrawString($"Herbivore target list: {herbivore.targetObjectInRad.Count}");
-                //DrawString($"Herbivore state: {herbivore.currentState}");
+                DrawString($"Herbivore {i} health: {(int)SceneData.herbivores[i].health}");
+                //DrawString($"Herbivore {i} hungermeter: {(int)SceneData.herbivores[i].hungermeter}");
+                //DrawString($"Herbivore {i} thirstMeter: {(int)SceneData.herbivores[i].thirstMeter}");
+                //DrawString($"Herbivore {i} state: {SceneData.herbivores[i].currentState}");
             }
-            
+
         }
 
         private static void DrawString(string text)
