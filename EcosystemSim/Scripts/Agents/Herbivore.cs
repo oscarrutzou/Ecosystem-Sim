@@ -16,10 +16,15 @@ namespace EcosystemSim
             currentState = AgentState.Search;
         }
 
-        internal override void AgentSpecificSearch()
+
+        public override void ActionOnTargetFound()
         {
-            List<GameObject> list = SceneData.plants.Cast<GameObject>().ToList();
-            SearchForType(list);
+            //Brug a* i stedet for.
+            if (target != null && target is Plant)
+            {
+                currentState = AgentState.Eating;
+                eatingTimer = 1;
+            }
         }
     }
 }

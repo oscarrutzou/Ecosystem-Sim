@@ -12,6 +12,7 @@ namespace EcosystemSim
         private int basicSize = 4;
         public int currentAmountOfPlants;
         public int maxAmountOfPlants;
+        private int maxAmountOfPlantsDividing = 50;
         private Vector2 scale = new Vector2(3, 3);
         public Tile[,] tiles;
         //public int[] gridSize = new int[] { 5, 5 };
@@ -150,7 +151,7 @@ namespace EcosystemSim
             int canGrowPlantTiles = tiles.Cast<Tile>().Count(tile => tile.canGrowPlants);
             if (canGrowPlantTiles > 0)
             {
-                maxAmountOfPlants = Math.Max(1, canGrowPlantTiles / 5);
+                maxAmountOfPlants = Math.Max(1, canGrowPlantTiles / maxAmountOfPlantsDividing);
             }
             else
             {

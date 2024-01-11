@@ -12,6 +12,7 @@ namespace EcosystemSim
         {
             GridManager.InitStartGrids();
             SceneData.gameObjectsToAdd.Add(new Herbivore(Vector2.Zero));
+            SceneData.gameObjectsToAdd.Add(new Herbivore(Vector2.Zero));
             //SceneData.gameObjectsToAdd.Add(new Predator(Vector2.Zero));
 
         }

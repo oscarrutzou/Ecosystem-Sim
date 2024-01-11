@@ -13,5 +13,12 @@ namespace EcosystemSim
             position = pos;
             texture = GlobalTextures.textures[TextureNames.Fox];
         }
+
+        public override void ActionOnTargetFound()
+        {
+            //Brug a* i stedet for.
+            currentState = AgentState.Eating;
+            eatingTimer = 1;
+        }
     }
 }

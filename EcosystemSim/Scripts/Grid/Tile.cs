@@ -103,10 +103,7 @@ namespace EcosystemSim
 
         public override void Update()
         {
-            if (!canGrowPlants || selectedPlant == null)
-                return;
-
-            if (hasBeenPlanted) return;
+            if (!canGrowPlants || selectedPlant == null || hasBeenPlanted) return;
 
             plantTimer += (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds;
 

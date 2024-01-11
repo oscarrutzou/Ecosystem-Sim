@@ -10,7 +10,7 @@ namespace EcosystemSim
     {
         public float plantGrowMaxTime;
         public Tile parentTile;
-
+        public bool isEaten;
         public Plant(Tile parentTile, Texture2D texture)
         {
             layerDepth = parentTile.layerDepth + 0.01f;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
+using System.Net.NetworkInformation;
 
 namespace EcosystemSim
 {
@@ -19,8 +20,11 @@ namespace EcosystemSim
         private int maxHealth = 100;
         public int health;
         public int damage = 10;
-        public int thirstMeter;
-        public int hungermeter;
+        public double thirstMeter;
+        public int thirstMaxMeter = 100;
+        public double hungermeter;
+        public int hungerMaxmeter = 100;
+        private int thirstHungerScale = 3;
         public int searchRadPx = 150;
         public int speed = 30;
         private double changeDirectionTimer = 0;
@@ -36,33 +40,53 @@ namespace EcosystemSim
             layerDepth = 0.2f;
             health = maxHealth;
             isCentered = true;
+            thirstMeter = thirstMaxMeter;
+            hungermeter = hungerMaxmeter;
             currentState = AgentState.IdleWalk;
         }
-
-        public override void Draw()
-        {
-            base.Draw();
-            DrawSearchRad();
-            DrawDebugCollisionBox(Color.AliceBlue);
-        }
-
 
         public override void Update()
         {
             base.Update();
+
+            CheckThirstHunger();
+
             HandleState();
+        }
+        private void CheckThirstHunger()
+        {
+            thirstMeter -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed * thirstHungerScale;
+            hungermeter -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed * thirstHungerScale;
+
+            if (currentState == AgentState.Eating || currentState == AgentState.Drinking) return;
+            if (hungermeter <= 90) {
+                currentState = AgentState.Search;
+            }
+            else
+            {
+                currentState = AgentState.IdleWalk;
+            }
         }
 
         private void HandleState()
         {
+            SearchForTarget();
+
             switch (currentState)
             {
                 case AgentState.IdleWalk:
                     IdleWalk();
                     break;
                 case AgentState.Search:
-                    AgentSpecificSearch();
-                    WalkTowardsTarget();
+                    //AgentSpecificSearch();
+                    if (targetObjectInRad.Count == 0)
+                    {
+                        IdleWalk();
+                    }
+                    else
+                    {
+                        WalkTowardsTarget(ActionOnTargetFound);
+                    }
                     break;
                 case AgentState.Eating:
                     Eating();
@@ -76,22 +100,28 @@ namespace EcosystemSim
             }
         }
 
+        public abstract void ActionOnTargetFound();
 
         internal virtual void Eating()
         {
             // Decrease the timer by the elapsed time
-            eatingTimer -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds;
+            eatingTimer -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
 
-            // If the timer is less than or equal to zero, change state to IdleWalk
-            if (eatingTimer <= 0 && target != null)
+            if (target == null || (target is Plant plant && plant.isEaten))
             {
-                if (target is Plant plant)
+                currentState = AgentState.Search;
+            }
+            // If the timer is less than or equal to zero, change state to IdleWalk
+            else if (eatingTimer <= 0)
+            {
+                if (target is Plant plantObj)
                 {
                     target = null;
-                    plant.DeletePlant();
+                    plantObj.isEaten = true;
+                    plantObj.DeletePlant();
                 }
-
-                currentState = AgentState.Search;
+                hungermeter = hungerMaxmeter;
+                currentState = AgentState.IdleWalk;
             }
         }
 
@@ -100,13 +130,25 @@ namespace EcosystemSim
 
         }
         
-        internal virtual void AgentSpecificSearch() { }
+        //internal virtual void AgentSpecificSearch() { }
 
         internal virtual void AgentSpecificAction() { }
+        
+        private void SearchForTarget()
+        {
+            if (this is Herbivore)
+            {
+                List<GameObject> list = SceneData.plants.Cast<GameObject>().ToList();
+                SearchForType(list);
+            } else if (this is Predator)
+            {
+
+            }
+        }
         public void IdleWalk()
         {
             // Decrease the timer by the elapsed time
-            changeDirectionTimer -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds;
+            changeDirectionTimer -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
 
             // If the timer is less than or equal to zero, change direction
             if (changeDirectionTimer <= 0)
@@ -115,7 +157,7 @@ namespace EcosystemSim
             }
 
             Vector2 tempPos = position;
-            Vector2 nextPos = position + direction * speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds;
+            Vector2 nextPos = position + direction * speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
 
             // Check if the next position is walkable
             if (CheckTileIsWalkable(nextPos))
@@ -136,7 +178,7 @@ namespace EcosystemSim
             changeDirectionTimer = rnd.Next(10, 60);// Reset the timer with a random value between 1 and 5 seconds
         }
 
-        private void WalkTowardsTarget()
+        private void WalkTowardsTarget(Action actionOnDone)
         {
             if (targetObjectInRad.Count == 0) return;
 
@@ -149,8 +191,7 @@ namespace EcosystemSim
             // If the agent is close enough to the target, change its state and return
             if (distanceToTarget <= 10)
             {
-                currentState = AgentState.Eating;
-                eatingTimer = 1;
+                actionOnDone?.Invoke();
                 return;
             }
 
@@ -159,7 +200,7 @@ namespace EcosystemSim
             direction.Normalize();
 
             Vector2 tempPos = position;
-            Vector2 nextPos = position + direction * speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds;
+            Vector2 nextPos = position + direction * speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
 
             // Check if the next position is walkable
             if (CheckTileIsWalkable(nextPos))
@@ -170,10 +211,7 @@ namespace EcosystemSim
             {
                 position = tempPos;
 
-                //Check i stedet for origin point (center af plant) 
-                //Brug a* i stedet for.
-                currentState = AgentState.Eating;
-                eatingTimer = 1;
+                actionOnDone?.Invoke();
             }
         }
 
@@ -185,16 +223,10 @@ namespace EcosystemSim
             {
                 if (!obj.isRemoved && Vector2.Distance(this.position, obj.position) <= this.searchRadPx)
                 {
-                    // Check if the agent is a Herbivore and the object is a Plant
-                    if (this is Herbivore && obj is Plant)
-                    {
+                    if (obj is Herbivore || obj is Predator || obj is Plant)
                         targetObjectInRad.Add(obj);
-                    }
-                    // Check if the agent is a Predator and the object is a Herbivore
-                    else if (this is Predator && obj is Herbivore)
-                    {
-                        targetObjectInRad.Add(obj);
-                    }
+                    else
+                        throw new Exception("The targetobjects must be a Herbivore, predator or plant");
                 }
             }
             targetObjectInRad = targetObjectInRad.OrderBy(o => Vector2.Distance(this.position, o.position)).ToList();
@@ -239,6 +271,13 @@ namespace EcosystemSim
         private bool IsPositionWalkable(Vector2 pos)
         {
             return GridManager.IsWalkable(pos);
+        }
+
+        public override void Draw()
+        {
+            base.Draw();
+            DrawSearchRad();
+            DrawDebugCollisionBox(Color.AliceBlue);
         }
 
 

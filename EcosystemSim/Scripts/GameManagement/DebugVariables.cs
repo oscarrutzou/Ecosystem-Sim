@@ -58,12 +58,23 @@ namespace EcosystemSim
                     DrawString($"Hover obj layerDepth: {obj.layerDepth}");
                     if (obj is Agent agent)
                     {
+                        DrawString($"Hover Agent hungermeter: {agent.hungermeter}");
+                        DrawString($"Hover Agent thirstMeter: {agent.thirstMeter}");
                         DrawString($"Hover Agent target: {agent.target}");
                         DrawString($"Hover Agent target list: {agent.targetObjectInRad.Count}");
                         DrawString($"Hover Agent state: {agent.currentState}");
 
                     }
                 }
+            }
+
+            foreach (Herbivore herbivore in SceneData.herbivores)
+            {
+                DrawString($"Herbivore hungermeter: {herbivore.hungermeter}");
+                //DrawString($"Herbivore thirstMeter: {herbivore.thirstMeter}");
+                //DrawString($"Herbivore target: {herbivore.target}");
+                //DrawString($"Herbivore target list: {herbivore.targetObjectInRad.Count}");
+                //DrawString($"Herbivore state: {herbivore.currentState}");
             }
             
         }

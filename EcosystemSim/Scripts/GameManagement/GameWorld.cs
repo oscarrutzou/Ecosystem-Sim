@@ -20,7 +20,7 @@ namespace EcosystemSim
         public SpriteBatch spriteBatch;
         public GraphicsDeviceManager gfxManager;
         public GraphicsDevice gfxDevice => GraphicsDevice;
-
+        public float gameSpeed { get; private set; }
         
         public static GameWorld Instance;
         #endregion
@@ -31,6 +31,7 @@ namespace EcosystemSim
 
             gfxManager = new GraphicsDeviceManager(this);
             random = new Random();
+            gameSpeed = 1f;
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
             Window.Title = "Ecosystem Simulation";
