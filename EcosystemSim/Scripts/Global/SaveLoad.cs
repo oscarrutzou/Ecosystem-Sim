@@ -29,11 +29,11 @@ namespace EcosystemSim
                 stream.SetLength(0);
                 StreamWriter writer = new StreamWriter(stream);
                 writer.WriteLine($"{grid.tiles[0,0].position.X}, {grid.tiles[0, 0].position.Y}"); //Start pos
-                writer.WriteLine($"{grid.width},{grid.height}"); //Width, height
+                writer.WriteLine($"{grid.rows},{grid.collumns}"); //Width, height
 
-                for (int y = 0; y < grid.height; y++)
+                for (int y = 0; y < grid.collumns; y++)
                 {
-                    for (int x = 0; x < grid.width; x++)
+                    for (int x = 0; x < grid.rows; x++)
                     {
                         Tile tile = grid.tiles[x, y];
                         writer.WriteLine($"{tile.gridPos[0]},{tile.gridPos[1]},{tile.position.X},{tile.position.Y},{tile.tileType}");
@@ -55,10 +55,10 @@ namespace EcosystemSim
             string[] files = Directory.GetFiles(folder, "grid*.txt");
 
             // Delete each file
-            foreach (string file in files)
-            {
-                //File.Delete(file);
-            }
+            //foreach (string file in files)
+            //{
+            //    File.Delete(file);
+            //}
         }
 
         public static void LoadGrids()

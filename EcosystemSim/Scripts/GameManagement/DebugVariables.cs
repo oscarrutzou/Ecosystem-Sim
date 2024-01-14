@@ -34,39 +34,62 @@ namespace EcosystemSim
             //DrawString($"Mouse in world: {InputManager.mousePositionInWorld}");
             //DrawString($"Mouse on UI: {InputManager.mousePositionOnScreen}");
             //DrawString($"Mouse out of bounds: {InputManager.mouseOutOfBounds}");
-
-
-            if (InputManager.buildMode)
+            if (InputManager.tileOnHover != null)
             {
-                Tile tile = InputManager.tileOnHover;
-                if (tile != null)
-                {
-                    DrawString($"Hover tile type: {tile.tileType}");
-                    DrawString($"Hover tile hasBeenPlanted: {tile.hasBeenPlanted}");
-                    DrawString($"Hover tile grid pos: ({tile.gridPos[0]}, {tile.gridPos[1]})");
-                    DrawString($"Hover tile pos: {tile.position}");
-                    DrawString($"Hover tile layerDepth: {tile.layerDepth}");
-                    DrawString($"Hover tile layerDepth: {tile.canGrowPlants} + {tile.selectedPlant?.texture.Name}");
-                }
-            }
-            else
-            {
-                GameObject obj = InputManager.objOnHover;
-                if (obj != null)
-                {
-                    DrawString($"Hover obj pos: {obj.position}");
-                    DrawString($"Hover obj layerDepth: {obj.layerDepth}");
-                    if (obj is Agent agent)
-                    {
-                        DrawString($"Hover Agent hungermeter: {agent.hungermeter}");
-                        DrawString($"Hover Agent thirstMeter: {agent.thirstMeter}");
-                        DrawString($"Hover Agent target: {agent.target}");
-                        DrawString($"Hover Agent target list: {agent.targetObjectInRad.Count}");
-                        DrawString($"Hover Agent state: {agent.currentState}");
+                DrawString($"Grid index hover: {InputManager.tileOnHover.gridPos[0]},{InputManager.tileOnHover.gridPos[1]}");
 
-                    }
-                }
             }
+
+            if (GameWorld.Instance.currentScene is TestScene scene && scene.astar.lastPath != null)
+            {
+                DrawString($"Start pos: {GridManager.GetTileAtPos(InputManager.startPos).gridPos[0]},{GridManager.GetTileAtPos(InputManager.startPos).gridPos[1]}");
+                DrawString($"Start astar pos: {scene.astar.lastPath.First().gridPos[0]},{scene.astar.lastPath.First().gridPos[1]}");
+                DrawString($"End pos: {GridManager.GetTileAtPos(InputManager.endPos).gridPos[0]},{GridManager.GetTileAtPos(InputManager.endPos).gridPos[1]}");
+                DrawString($"End astar pos: {scene.astar.lastPath.Last().gridPos[0]},{scene.astar.lastPath.Last().gridPos[1]}");
+            }
+            if (InputManager.path?.Count > 0)
+            {
+                DrawString($"Tile: {InputManager.path.Count}");
+
+                //for(int i = 0;i < InputManager.path.Count;i++)
+                //{
+                //    DrawString($"Tile{i}: {InputManager.path}");
+
+                //}
+            }
+
+
+            //if (InputManager.buildMode)
+            //{
+            //    Tile tile = InputManager.tileOnHover;
+            //    if (tile != null)
+            //    {
+            //        DrawString($"Hover tile type: {tile.tileType}");
+            //        DrawString($"Hover tile hasBeenPlanted: {tile.hasBeenPlanted}");
+            //        DrawString($"Hover tile grid pos: ({tile.gridPos[0]}, {tile.gridPos[1]})");
+            //        DrawString($"Hover tile pos: {tile.position}");
+            //        DrawString($"Hover tile layerDepth: {tile.layerDepth}");
+            //        DrawString($"Hover tile layerDepth: {tile.canGrowPlants} + {tile.selectedPlant?.texture.Name}");
+            //    }
+            //}
+            //else
+            //{
+            //    GameObject obj = InputManager.objOnHover;
+            //    if (obj != null)
+            //    {
+            //        DrawString($"Hover obj pos: {obj.position}");
+            //        DrawString($"Hover obj layerDepth: {obj.layerDepth}");
+            //        if (obj is Agent agent)
+            //        {
+            //            DrawString($"Hover Agent hungermeter: {agent.hungermeter}");
+            //            DrawString($"Hover Agent thirstMeter: {agent.thirstMeter}");
+            //            DrawString($"Hover Agent target: {agent.target}");
+            //            DrawString($"Hover Agent target list: {agent.targetObjectInRad.Count}");
+            //            DrawString($"Hover Agent state: {agent.currentState}");
+
+            //        }
+            //    }
+            //}
 
             //foreach (Herbivore herbivore in SceneData.herbivores)
             //{

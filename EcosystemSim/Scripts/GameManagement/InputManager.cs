@@ -20,7 +20,7 @@ namespace EcosystemSim
         public static bool mouseClicked;
         public static bool mouseRightClicked;
 
-        public static bool buildMode = true;
+        public static bool buildMode;
         public static bool mouseOutOfBounds;
         public static bool debugStats = true;
 
@@ -28,6 +28,11 @@ namespace EcosystemSim
         public static Tile tileOnHover;
         public static Grid selectedGrid;
         public static TileType selectedTileType = TileType.Grass;
+
+
+        public static Vector2 startPos;
+        public static Vector2 endPos;
+        public static Stack<Tile> path = new Stack<Tile>();
 
         private static Dictionary<Keys, TileType> keyTileTypeMap = new Dictionary<Keys, TileType>
         {
@@ -73,6 +78,14 @@ namespace EcosystemSim
             if (keyboardState.IsKeyDown(Keys.Tab) && !previousKeyboardState.IsKeyDown(Keys.Tab))
             {
                 buildMode = !buildMode;
+            }
+
+            if (keyboardState.IsKeyDown(Keys.Enter) && !previousKeyboardState.IsKeyDown(Keys.Enter))
+            {
+                if (GameWorld.Instance.currentScene is TestScene scene)
+                {
+                    path = scene.astar.FindPath(startPos, endPos);
+                }
             }
 
             MoveCam();
@@ -139,12 +152,29 @@ namespace EcosystemSim
 
             if (!buildMode)
             {
-                foreach (GameObject obj in SceneData.gameObjects)
+                //foreach (GameObject obj in SceneData.gameObjects)
+                //{
+                //    if (IsMouseOver(obj))
+                //    {
+                //        objOnHover = obj;
+                //        return;
+                //    }
+                //}
+                tileOnHover = GridManager.GetTileAtPos(mousePositionInWorld);
+                if (tileOnHover != null)
                 {
-                    if (IsMouseOver(obj))
+
+                    if (mouseClicked)
                     {
-                        objOnHover = obj;
-                        return;
+                        startPos = tileOnHover.position;
+                        //tileOnHover.color = Color.Pink;
+                    }
+                    if (mouseRightClicked)
+                    {
+                        endPos = tileOnHover.position;
+
+                        //tileOnHover.color = Color.Green;
+
                     }
                 }
                 //There isnt any object where the mouse is, therefore set objOnHover to null.

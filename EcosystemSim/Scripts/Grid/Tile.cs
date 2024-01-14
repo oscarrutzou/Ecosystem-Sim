@@ -2,13 +2,13 @@
 using Microsoft.Xna.Framework.Graphics;
 using SharpDX.Direct2D1.Effects;
 using System;
+using System.Windows.Forms;
 
 namespace EcosystemSim
 {
     public enum TileType
     {
         Empty,
-        //TestTile,
         TestTileNonWalk,
         Plain,
         Grass,
@@ -17,6 +17,7 @@ namespace EcosystemSim
 
     public class Tile: GameObject
     {
+        public static int NodeSize = 48;
         public Grid parentGrid;
         public bool isWalkable;
         public bool canGrowPlants;
@@ -27,11 +28,38 @@ namespace EcosystemSim
         private float plantTimeToGrow;
         public Plant selectedPlant;
         public bool hasBeenPlanted;
-        public Tile(Grid parentGrid,int[] gridPos, Vector2 position, TileType type)
+
+        public Tile parent;
+        public Vector2 Center
+        {
+            get
+            {
+                return new Vector2(position.X + NodeSize / 2, position.Y + NodeSize / 2);
+            }
+        }
+        public float distanceToTarget;
+        public float cost;
+        public float weight;
+        public float F
+        {
+            get
+            {
+                if (distanceToTarget != -1 && cost != -1)
+                    return distanceToTarget + cost;
+                else
+                    return -1;
+            }
+        }
+
+        public Tile(Grid parentGrid,int[] gridPos, Vector2 position, TileType type, float weight = 1)
         {
             this.parentGrid = parentGrid;
             this.gridPos = gridPos;
             this.position = position;
+            distanceToTarget = -1;
+            cost = 1;
+            this.weight = weight;
+            parent = null;
             tileType = type;
             ChangeTileTexture(type);
 
@@ -42,7 +70,6 @@ namespace EcosystemSim
         private void ChangeTileTexture(TileType type)
         {
             isWalkable = false;
-
 
             if (selectedPlant != null)
             {
@@ -57,6 +84,7 @@ namespace EcosystemSim
             {
                 case TileType.Empty:
                     texture = null;
+                    //isWalkable = true;
                     break;
 
                 case TileType.Water:
