@@ -35,8 +35,7 @@ namespace EcosystemSim
 
         public override void ActionOnTargetFound()
         {
-            //Brug a* i stedet for.
-            if (target != null && target is Tile)
+            if (target != null && target is Tile tile && tile.tileType == TileType.Water)
             {
                 currentState = AgentState.Drinking;
                 drinkingTimer = 1;

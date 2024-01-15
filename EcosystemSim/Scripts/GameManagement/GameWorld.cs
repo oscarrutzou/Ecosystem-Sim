@@ -31,7 +31,7 @@ namespace EcosystemSim
 
             gfxManager = new GraphicsDeviceManager(this);
             random = new Random();
-            gameSpeed = 1f;
+            gameSpeed = 5f;
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
             Window.Title = "Ecosystem Simulation";

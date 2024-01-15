@@ -10,9 +10,14 @@ namespace EcosystemSim
     public static class DebugVariables
     {
         private static Vector2 pos;
+        public static double herbivoresAlive;
         public static void DrawDebug()
         {
             pos = new Vector2(10, 10);
+
+            if (SceneData.herbivores.Count > 0){
+                herbivoresAlive += GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
+            }
             //DrawString($"Selected tile type: {InputManager.selectedTileType}");
             //DrawString($"Selected gridIndex: {GridManager.GridIndex}");
 
@@ -90,16 +95,22 @@ namespace EcosystemSim
             //    //DrawString($"Herbivore target list: {herbivore.targetObjectInRad.Count}");
             //    //DrawString($"Herbivore state: {herbivore.currentState}");
             //}
+            DrawString($"herbivoresAlive timer: {herbivoresAlive}");
             DrawString($"Herbivore count: {SceneData.herbivores.Count}");
 
             for (int i = 0; i < SceneData.herbivores.Count; i++)
             {
                 //DrawString($"Herbivore {i}, pos: {SceneData.herbivores[i].position} + targetpos: {SceneData.herbivores[i].target.position} + health: {(int)SceneData.herbivores[i].health}");
+                DrawString(" ");
                 DrawString($"Herbivore {i} hungermeter: {(int)SceneData.herbivores[i].hungermeter}");
                 DrawString($"Herbivore {i} thirstMeter: {(int)SceneData.herbivores[i].thirstMeter}");
+                DrawString($"Herbivore {i} health: {(int)SceneData.herbivores[i].health}");
                 DrawString($"Herbivore {i} targetInRad: {SceneData.herbivores[i].targetObjectInRad.Count}");
                 DrawString($"Herbivore {i} state: {SceneData.herbivores[i].currentState}");
-                DrawString(" ");
+                DrawString($"Herbivore {i} path: {SceneData.herbivores[i].path?.Count}");
+                DrawString($"Herbivore {i} debug: {SceneData.herbivores[i].amountDebug}");
+                DrawString($"Herbivore {i} pathEndTile: {SceneData.herbivores[i]?.pathEndTile?.tileType}");
+                DrawString($"Herbivore {i} distanceToTarget: {SceneData.herbivores[i].distanceToTarget}");
             }
 
         }

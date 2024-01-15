@@ -23,6 +23,8 @@ namespace EcosystemSim
                     return null;
                 if (end == null || !end.isWalkable && end.tileType != TileType.Empty)
                     return null;
+                if (start.gridPos == end.gridPos)
+                    return null;
             }
 
             foreach (var grid in grids)
@@ -89,6 +91,68 @@ namespace EcosystemSim
             }
 
             return null;
+        }
+
+        private static List<Tile> GetAdjacencies(Tile t)
+        {
+            List<Tile> temp = new List<Tile>();
+            int x = t.gridPos[0];
+            int y = t.gridPos[1];
+
+            // Define the possible directions
+            List<(int dx, int dy)> directions = new List<(int, int)>
+            {
+                (-1, 0), // Left
+                (1, 0),  // Right
+                (0, 1),  // Down
+                (0, -1), // Up
+                (-1, 1), // Left + Down
+                (-1, -1), // Left + Up
+                (1, 1), // Right + Down
+                (1, -1) // Right + Up
+            };
+
+            foreach (var direction in directions)
+            {
+                int nx = x + direction.dx;
+                int ny = y + direction.dy;
+
+                // Check all grids for a valid tile at the new position
+                foreach (var grid in grids)
+                {
+                    if (nx >= 0 && nx < Grid.collumns && ny >= 0 && ny < Grid.rows)
+                    {
+                        Tile tempTile = grid.GetTile(nx, ny);
+                        if (tempTile != null && tempTile.tileType != TileType.Empty)
+                        {
+                            temp.Add(tempTile);
+                        }
+                    }
+                }
+            }
+            // Filter out diagonally adjacent tiles with non-walkable tiles on their straight sides
+            temp = temp.Where(tile =>
+            {
+                // Check if the tile is diagonally adjacent
+                if (Math.Abs(tile.gridPos[0] - t.gridPos[0]) == 1 && Math.Abs(tile.gridPos[1] - t.gridPos[1]) == 1)
+                {
+                    // Check the tiles directly to each side
+                    bool isWalkableSide1 = grids.Select(grid => grid.GetTile(t.gridPos[0] + (tile.gridPos[0] - t.gridPos[0]), t.gridPos[1])).All(adjTile => adjTile != null && adjTile.isWalkable);
+                    bool isWalkableSide2 = grids.Select(grid => grid.GetTile(t.gridPos[0], t.gridPos[1] + (tile.gridPos[1] - t.gridPos[1]))).All(adjTile => adjTile != null && adjTile.isWalkable);
+
+                    // If both sides are walkable, the tile is valid
+                    // If either side is not walkable, the tile is not valid
+                    return isWalkableSide1 && isWalkableSide2;
+                }
+
+                // If the tile is not diagonally adjacent, it is valid
+                return true;
+            }).ToList();
+
+            // Filter out tiles that are not walkable
+            temp = temp.Where(tile => tile.isWalkable).ToList();
+
+            return temp;
         }
         //Does nada:/
         public static Stack<Tile> OptimizePath(Stack<Tile> path, Grid grid)
@@ -185,67 +249,6 @@ namespace EcosystemSim
             return result;
         }
 
-        private static List<Tile> GetAdjacencies(Tile t)
-        {
-            List<Tile> temp = new List<Tile>();
-            int x = t.gridPos[0];
-            int y = t.gridPos[1];
-
-            // Define the possible directions
-            List<(int dx, int dy)> directions = new List<(int, int)>
-            {
-                (-1, 0), // Left
-                (1, 0),  // Right
-                (0, 1),  // Down
-                (0, -1), // Up
-                (-1, 1), // Left + Down
-                (-1, -1), // Left + Up
-                (1, 1), // Right + Down
-                (1, -1) // Right + Up
-            };
-
-            foreach (var direction in directions)
-            {
-                int nx = x + direction.dx;
-                int ny = y + direction.dy;
-
-                // Check all grids for a valid tile at the new position
-                foreach (var grid in grids)
-                {
-                    if (nx >= 0 && nx < Grid.collumns && ny >= 0 && ny < Grid.rows)
-                    {
-                        Tile tempTile = grid.GetTile(nx, ny);
-                        if (tempTile != null && tempTile.tileType != TileType.Empty)
-                        {
-                            temp.Add(tempTile);
-                        }
-                    }
-                }
-            }
-            // Filter out diagonally adjacent tiles with non-walkable tiles on their straight sides
-            temp = temp.Where(tile =>
-            {
-                // Check if the tile is diagonally adjacent
-                if (Math.Abs(tile.gridPos[0] - t.gridPos[0]) == 1 && Math.Abs(tile.gridPos[1] - t.gridPos[1]) == 1)
-                {
-                    // Check the tiles directly to each side
-                    bool isWalkableSide1 = grids.Select(grid => grid.GetTile(t.gridPos[0] + (tile.gridPos[0] - t.gridPos[0]), t.gridPos[1])).All(adjTile => adjTile != null && adjTile.isWalkable);
-                    bool isWalkableSide2 = grids.Select(grid => grid.GetTile(t.gridPos[0], t.gridPos[1] + (tile.gridPos[1] - t.gridPos[1]))).All(adjTile => adjTile != null && adjTile.isWalkable);
-
-                    // If both sides are walkable, the tile is valid
-                    // If either side is not walkable, the tile is not valid
-                    return isWalkableSide1 && isWalkableSide2;
-                }
-
-                // If the tile is not diagonally adjacent, it is valid
-                return true;
-            }).ToList();
-
-            // Filter out tiles that are not walkable
-            temp = temp.Where(tile => tile.isWalkable).ToList();
-
-            return temp;
-        }
 
         //public static void UpdateDebugColor()
         //{
@@ -258,7 +261,7 @@ namespace EcosystemSim
         //            if (t.color != Color.Gray){
         //                t.color = Color.White;
         //            }
-                        
+
         //        }
 
         //        foreach (Tile tile in lastPath)

@@ -112,6 +112,15 @@ namespace EcosystemSim
                             tile.ChangeTile(TileType.Empty);
                         }
                     }
+                    foreach (Agent agent in SceneData.herbivores)
+                    {
+                        agent.isRemoved = true;
+                    }
+                    foreach (Agent agent in SceneData.predators)
+                    {
+                        agent.isRemoved = true;
+                    }
+                    DebugVariables.herbivoresAlive = 0;
                 }
 
                 if (keyboardState.IsKeyDown(Keys.T) && !previousKeyboardState.IsKeyDown(Keys.T))

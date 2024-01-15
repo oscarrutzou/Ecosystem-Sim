@@ -27,21 +27,25 @@ namespace EcosystemSim
         public double hungermeter;
         public int hungerMaxmeter = 100;
         private int thirstHungerScale = 3;
-        private int minAmountBeforeDmg = 50;
-        private int amountBeforeSearch = 80;
-        public int searchRadPx = 100;
+        private int minAmountBeforeDmg = 30;
+        private int amountBeforeSearch = 50;
+        public int searchRadPx = 200;
 
         public int speed = 30;
-        private double changeDirectionTimer = 0;
+        //private double changeDirectionTimer = 0;
         internal double eatingTimer = 0;
         internal double drinkingTimer = 0;
         private Vector2 direction;
         
         internal AgentState currentState;
         public GameObject target;
-        private Stack<Tile> path;
+        public Stack<Tile> path;
         private Tile targetTile;
         public List<GameObject> targetObjectInRad = new List<GameObject>();
+
+        public int amountDebug;
+        public float distanceToTarget;
+        public Tile pathEndTile;
 
         private Random rnd = new Random();
         public Agent() {
@@ -97,17 +101,17 @@ namespace EcosystemSim
 
             if (hungermeter <= minAmountBeforeDmg || thirstMeter <= minAmountBeforeDmg)
             {
-                health -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
+                health -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed * thirstHungerScale;
             }
             else
             {
                 if (health < maxHealth && health > 0)
                 {
-                    health += GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
+                    health += GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed * thirstHungerScale;
                 }
             }
 
-            if (health <= 0) isRemoved = true; //Agent died
+            if (health <= 0 || thirstMeter <= 0 || hungermeter <= -50) isRemoved = true; //Agent died
         }
 
         private void HandleState()
@@ -117,17 +121,19 @@ namespace EcosystemSim
             switch (currentState)
             {
                 case AgentState.IdleWalk:
-                    IdleWalk();
+                    WalkTowardsTargetIdle();
                     break;
                 case AgentState.Search:
                     if (targetObjectInRad.Count == 0)
                     {
-                        IdleWalk();
+                        WalkTowardsTargetIdle();
                     }
                     else
                     {
                         WalkTowardsTarget(ActionOnTargetFound);
                     }
+                    //WalkTowardsTarget(ActionOnTargetFound);
+
                     break;
                 case AgentState.Eating:
                     Eating();
@@ -180,8 +186,6 @@ namespace EcosystemSim
             }
         }
         
-        //internal virtual void AgentSpecificSearch() { }
-
         internal virtual void AgentSpecificAction() { }
         
         private void SearchForTarget()
@@ -191,114 +195,165 @@ namespace EcosystemSim
             {
                 List<Tile> waterTiles = SceneData.tiles.Where(tile => tile.tileType == TileType.Water).ToList();
                 SearchForType(waterTiles);
+
+                if (hungermeter <= amountBeforeSearch && targetObjectInRad.Count == 0)
+                {
+                    CheckHungerSearch();
+                }
+
+                if (targetObjectInRad.Count == 0)
+                {
+                    SearchForIdleWalkTiles();
+                }
             }
             else if(hungermeter <= amountBeforeSearch)
             {
-                if (this is Herbivore)
-                {
-                    List<GameObject> plantList = SceneData.plants.Cast<GameObject>().ToList();
-                    SearchForType(plantList);
-                }
-                else if (this is Predator)
-                {
+                CheckHungerSearch();
 
-                }
-            }
-        }
-
-        public void IdleWalk()
-        {
-            // Decrease the timer by the elapsed time
-            changeDirectionTimer -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
-
-            if (targetTile != null)
-            {
-                // Calculate the direction to the target tile
-                direction = targetTile.Center - position;
-                if (direction != Vector2.Zero)
+                if (thirstMeter <= amountBeforeSearch && targetObjectInRad.Count == 0)
                 {
-                    direction.Normalize();
+                    CheckHungerSearch();
                 }
 
-                Vector2 nextPos = position + direction * speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
-
-                // Check if the next position is close to the target tile
-                if (Vector2.Distance(nextPos, targetTile.Center) < speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed)
+                if (targetObjectInRad.Count == 0)
                 {
-                    // If it is, move to the target tile and get the next target tile from the path
-                    position = targetTile.Center;
-                    targetTile = (path.Count > 0) ? path.Pop() : null;
-                }
-                else
-                {
-                    // If it's not, move towards the target tile
-                    position = nextPos;
+                    SearchForIdleWalkTiles();
                 }
             }
             else
             {
-                // If there's no target tile, change direction
-                ChangeDirection();
+                //For idleWalk
+                SearchForIdleWalkTiles();
             }
         }
+        private void CheckHungerSearch()
+        {
+            if (this is Herbivore)
+            {
+                List<GameObject> plantList = SceneData.plants.Cast<GameObject>().ToList();
+                SearchForType(plantList);
+            }
+            else if (this is Predator)
+            {
 
-        private void ChangeDirection()
+            }
+        }
+        private void SearchForIdleWalkTiles()
         {
             List<Tile> walkableTiles = SceneData.tiles.Where(tile => tile.isWalkable).ToList();
             SearchForType(walkableTiles);
-
-            if (targetObjectInRad.Count > 0)
-            {
-                // Select a random tile from targetObjectInRad
-                target = targetObjectInRad[rnd.Next(targetObjectInRad.Count)];
-            }
-
-            path = Astar.FindPath(position, target.position);
-            if (path != null && path.Count > 0)
-            {
-                targetTile = path.Pop();
-            }
-
-            changeDirectionTimer = rnd.Next(3, 8); // Reset the timer with a random value between 2 amounts of seconds
         }
 
-        private void WalkTowardsTarget(Action actionOnDone)
+        public void WalkTowardsTargetIdle()
         {
-            if (targetObjectInRad.Count == 0) return;
-
-            // Get the first target in the list
-            target = targetObjectInRad[0];
-
-            // Calculate the distance to the target
-            float distanceToTarget = Vector2.Distance(position, target.position);
-
-            // If the agent is close enough to the target, change its state and return
-            if (distanceToTarget <= 10)
+            
+            if (targetTile == null)
             {
-                actionOnDone?.Invoke();
-                return;
+                // If there's no target tile, change direction
+                GetTargetTile(true);
             }
 
-            // Calculate the direction vector from the agent to the target
-            direction = target.position - position;
-            direction.Normalize();
+            if (targetTile == null) return;
 
-            Vector2 tempPos = position;
+            // Calculate the direction to the target tile
+            direction = targetTile.Center - position;
+            if (direction != Vector2.Zero)
+            {
+                direction.Normalize();
+            }
+
             Vector2 nextPos = position + direction * speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
 
-            // Check if the next position is walkable
-            if (CheckTileIsWalkable(nextPos))
+            // Check if the next position is close to the target tile
+            if (Vector2.Distance(nextPos, targetTile.Center) < speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed)
             {
-                position = nextPos;
+                // If it is, move to the target tile and get the next target tile from the path
+                position = targetTile.Center;
+                targetTile = (path.Count > 0) ? path.Pop() : null;
             }
             else
             {
-                position = tempPos;
-                ChangeDirection();
-                //actionOnDone?.Invoke();
+                // If it's not, move towards the target tile
+                position = nextPos;
             }
+
         }
 
+        public void WalkTowardsTarget(Action onTargetReached)
+        {
+            if (targetTile == null)
+            {
+                // If there's no target tile, change direction
+                GetTargetTile(false);
+            }
+            
+            //If the agent is close enough to the target, change its state and return
+            if (targetTile == null)
+            {
+                onTargetReached?.Invoke();
+                pathEndTile = null;
+                return;
+            }
+
+            // Calculate the direction to the target tile
+            direction = targetTile.Center - position;
+            if (direction != Vector2.Zero)
+            {
+                direction.Normalize();
+            }
+
+            Vector2 nextPos = position + direction * speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
+
+            // Check if the next position is close to the target tile
+            if (Vector2.Distance(nextPos, targetTile.Center) < speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed)
+            {
+                // If it is, move to the target tile and get the next target tile from the path
+                position = targetTile.Center;
+                targetTile = (path.Count > 0) ? path.Pop() : null;
+                
+            }
+            else
+            {
+                // If it's not, move towards the target tile
+                position = nextPos;
+            }
+        }
+ 
+        private void GetTargetTile(bool randomTarget)
+        {
+           
+            if (targetObjectInRad.Count > 0)
+            {
+                if (randomTarget)
+                {
+                    // Select a random tile from targetObjectInRad
+                    target = targetObjectInRad[rnd.Next(targetObjectInRad.Count)];
+                }
+                else
+                {
+                    target = targetObjectInRad[0]; //Since we already have sorted the list for closest target.
+                }
+                
+            }
+
+            if (target == null) return;
+
+            if (path == null || path.Count == 0)
+            {
+                path = Astar.FindPath(position, target.position);
+                if (Vector2.Distance(position, target.position) <= 10)
+                {
+                    targetTile = null;
+                }
+                amountDebug++;
+            }
+
+            if (path != null && path.Count > 0)
+            {
+                pathEndTile = path.Last();
+                targetTile = path.Pop();
+            }
+        }
 
         internal void SearchForType(List<Tile> targetTiles)
         {
