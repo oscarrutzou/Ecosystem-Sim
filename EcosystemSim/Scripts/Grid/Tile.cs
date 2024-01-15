@@ -38,7 +38,7 @@ namespace EcosystemSim
             }
         }
         public float distanceToTarget;
-        public float cost;
+        public float cost; //Cost like diffuculty or effort that the tile should have. Maybe stuff like mud has a higher cost, so it will avoid mud.
         public float weight;
         public float F
         {
@@ -102,11 +102,13 @@ namespace EcosystemSim
                     texture = GlobalTextures.textures[TextureNames.TilePlain];
                     isWalkable = true;
                     canGrowPlants = true;
+                    //cost = 1;
                     break;
                 case TileType.Grass:
                     texture = GlobalTextures.textures[TextureNames.TileGrassy];
                     isWalkable = true;
                     canGrowPlants = true;
+                    cost = 30;
                     break;
             }
         }

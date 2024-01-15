@@ -7,15 +7,31 @@ using System.Threading.Tasks;
 
 namespace EcosystemSim
 {
+    public enum HerbivoreType
+    {
+        Rabbit,
+    }
+
     public class Herbivore : Agent
     {
-        public Herbivore(Vector2 pos)
+        public HerbivoreType type;
+        public Herbivore(Vector2 pos, HerbivoreType type)
         {
             position = pos;
-            texture = GlobalTextures.textures[TextureNames.Bunny];
-            currentState = AgentState.Search;
+            this.type = type;
+            SwitchType();
+            currentState = AgentState.IdleWalk;
         }
 
+        private void SwitchType()
+        {
+            switch (type)
+            {
+                case HerbivoreType.Rabbit:
+                    texture = GlobalTextures.textures[TextureNames.Bunny];
+                    break;
+            }
+        }
 
         public override void ActionOnTargetFound()
         {

@@ -28,17 +28,19 @@ namespace EcosystemSim
         public static Tile tileOnHover;
         public static Grid selectedGrid;
         public static TileType selectedTileType = TileType.Grass;
+        public static HerbivoreType selectedHervicoreType = HerbivoreType.Rabbit;
 
-
-        public static Vector2 startPos;
-        public static Vector2 endPos;
-        public static Stack<Tile> path = new Stack<Tile>();
 
         private static Dictionary<Keys, TileType> keyTileTypeMap = new Dictionary<Keys, TileType>
         {
             { Keys.D1, TileType.Grass },
             { Keys.D2, TileType.TestTileNonWalk },
             { Keys.D3, TileType.Water },
+        };
+
+        private static Dictionary<Keys, HerbivoreType> keyHerbivoreTypeMap = new Dictionary<Keys, HerbivoreType>
+        {
+            { Keys.D1, HerbivoreType.Rabbit },
         };
         #endregion
 
@@ -78,14 +80,6 @@ namespace EcosystemSim
             if (keyboardState.IsKeyDown(Keys.Tab) && !previousKeyboardState.IsKeyDown(Keys.Tab))
             {
                 buildMode = !buildMode;
-            }
-
-            if (keyboardState.IsKeyDown(Keys.Enter) && !previousKeyboardState.IsKeyDown(Keys.Enter))
-            {
-                if (GameWorld.Instance.currentScene is TestScene scene)
-                {
-                    path = scene.astar.FindPath(startPos, endPos);
-                }
             }
 
             MoveCam();
@@ -166,15 +160,9 @@ namespace EcosystemSim
 
                     if (mouseClicked)
                     {
-                        startPos = tileOnHover.position;
-                        //tileOnHover.color = Color.Pink;
-                    }
-                    if (mouseRightClicked)
-                    {
-                        endPos = tileOnHover.position;
-
-                        //tileOnHover.color = Color.Green;
-
+                        //startPos = tileOnHover.position;
+                        Herbivore herbivore = new Herbivore(tileOnHover.Center, selectedHervicoreType);
+                        SceneData.gameObjectsToAdd.Add(herbivore);
                     }
                 }
                 //There isnt any object where the mouse is, therefore set objOnHover to null.

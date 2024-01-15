@@ -7,17 +7,14 @@ namespace EcosystemSim
 {
     public class TestScene : Scene
     {
-        public Astar astar;
+        //public Astar astar;
         public override void Initialize()
         {
             GridManager.InitStartGrids();
+            //SceneData.gameObjectsToAdd.Add(new Herbivore(Vector2.Zero));
 
-            //for (int i = 0; i < 10; i++)
-            //{
-            //    SceneData.gameObjectsToAdd.Add(new Herbivore(Vector2.Zero));
-            //}
             //SceneData.gameObjectsToAdd.Add(new Predator(Vector2.Zero));
-            astar = new Astar(GridManager.grids);
+            //astar = new Astar(GridManager.grids);
         }
         public override void DrawOnScreen()
         {
@@ -31,7 +28,7 @@ namespace EcosystemSim
         {
             base.Update();
             GridManager.Update();
-            astar.UpdateDebugColor();
+            //Astar.UpdateDebugColor();
         }
     }
 }

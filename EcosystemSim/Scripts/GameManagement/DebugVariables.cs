@@ -13,50 +13,40 @@ namespace EcosystemSim
         public static void DrawDebug()
         {
             pos = new Vector2(10, 10);
-            DrawString($"Selected tile type: {InputManager.selectedTileType}");
-            DrawString($"Selected gridIndex: {GridManager.GridIndex}");
+            //DrawString($"Selected tile type: {InputManager.selectedTileType}");
+            //DrawString($"Selected gridIndex: {GridManager.GridIndex}");
 
-            DrawString($"Build Mode: {InputManager.buildMode}");
+            //DrawString($"Build Mode: {InputManager.buildMode}");
 
 
-            if (GridManager.selectedGrid == null) return;
-            DrawString($"Selected grid: {GridManager.selectedGrid.gridName}");
-            DrawString($"Selected grid layerDepth: {GridManager.selectedGrid.layerDepth}");
-            for (int i = 0; i < GridManager.grids.Count; i++)
-            {
-                //if (GridManager.grids[i].tiles[0,0] == null) break;
-                int nonEmptyTilesCount = GridManager.grids[i].tiles.Cast<Tile>().Count(tile => tile.tileType != TileType.Empty);
-                int plantTiles = GridManager.grids[i].tiles.Cast<Tile>().Count(tile => tile.selectedPlant != null);
-                DrawString($"Grid{i}_{GridManager.grids[i].gridName}, tiles count: {nonEmptyTilesCount} + plant tiles: {plantTiles} / {GridManager.grids[i].maxAmountOfPlants}");
-            }
-            DrawString($"Amount of plants: {SceneData.plants.Count}");
-            //DrawString($"Amount of Predators: {SceneData.predators.Count}");
-            //DrawString($"Mouse in world: {InputManager.mousePositionInWorld}");
-            //DrawString($"Mouse on UI: {InputManager.mousePositionOnScreen}");
-            //DrawString($"Mouse out of bounds: {InputManager.mouseOutOfBounds}");
-            if (InputManager.tileOnHover != null)
-            {
-                DrawString($"Grid index hover: {InputManager.tileOnHover.gridPos[0]},{InputManager.tileOnHover.gridPos[1]}");
+            //if (GridManager.selectedGrid == null) return;
+            //DrawString($"Selected grid: {GridManager.selectedGrid.gridName}");
+            //DrawString($"Selected grid layerDepth: {GridManager.selectedGrid.layerDepth}");
+            //for (int i = 0; i < GridManager.grids.Count; i++)
+            //{
+            //    //if (GridManager.grids[i].tiles[0,0] == null) break;
+            //    int nonEmptyTilesCount = GridManager.grids[i].tiles.Cast<Tile>().Count(tile => tile.tileType != TileType.Empty);
+            //    int plantTiles = GridManager.grids[i].tiles.Cast<Tile>().Count(tile => tile.selectedPlant != null);
+            //    DrawString($"Grid{i}_{GridManager.grids[i].gridName}, tiles count: {nonEmptyTilesCount} + plant tiles: {plantTiles} / {GridManager.grids[i].maxAmountOfPlants}");
+            //}
+            //DrawString($"Amount of plants: {SceneData.plants.Count}");
+            ////DrawString($"Amount of Predators: {SceneData.predators.Count}");
+            ////DrawString($"Mouse in world: {InputManager.mousePositionInWorld}");
+            ////DrawString($"Mouse on UI: {InputManager.mousePositionOnScreen}");
+            ////DrawString($"Mouse out of bounds: {InputManager.mouseOutOfBounds}");
+            //if (InputManager.tileOnHover != null)
+            //{
+            //    DrawString($"Grid index hover: {InputManager.tileOnHover.gridPos[0]},{InputManager.tileOnHover.gridPos[1]}");
 
-            }
+            //}
 
-            if (GameWorld.Instance.currentScene is TestScene scene && scene.astar.lastPath != null)
-            {
-                DrawString($"Start pos: {GridManager.GetTileAtPos(InputManager.startPos).gridPos[0]},{GridManager.GetTileAtPos(InputManager.startPos).gridPos[1]}");
-                DrawString($"Start astar pos: {scene.astar.lastPath.First().gridPos[0]},{scene.astar.lastPath.First().gridPos[1]}");
-                DrawString($"End pos: {GridManager.GetTileAtPos(InputManager.endPos).gridPos[0]},{GridManager.GetTileAtPos(InputManager.endPos).gridPos[1]}");
-                DrawString($"End astar pos: {scene.astar.lastPath.Last().gridPos[0]},{scene.astar.lastPath.Last().gridPos[1]}");
-            }
-            if (InputManager.path?.Count > 0)
-            {
-                DrawString($"Tile: {InputManager.path.Count}");
-
-                //for(int i = 0;i < InputManager.path.Count;i++)
-                //{
-                //    DrawString($"Tile{i}: {InputManager.path}");
-
-                //}
-            }
+            //if (GameWorld.Instance.currentScene is TestScene scene && scene.astar.lastPath != null)
+            //{
+            //    DrawString($"Start pos: {GridManager.GetTileAtPos(InputManager.startPos).gridPos[0]},{GridManager.GetTileAtPos(InputManager.startPos).gridPos[1]}");
+            //    DrawString($"Start astar pos: {scene.astar.lastPath.First().gridPos[0]},{scene.astar.lastPath.First().gridPos[1]}");
+            //    DrawString($"End pos: {GridManager.GetTileAtPos(InputManager.endPos).gridPos[0]},{GridManager.GetTileAtPos(InputManager.endPos).gridPos[1]}");
+            //    DrawString($"End astar pos: {scene.astar.lastPath.Last().gridPos[0]},{scene.astar.lastPath.Last().gridPos[1]}");
+            //}
 
 
             //if (InputManager.buildMode)
@@ -100,12 +90,16 @@ namespace EcosystemSim
             //    //DrawString($"Herbivore target list: {herbivore.targetObjectInRad.Count}");
             //    //DrawString($"Herbivore state: {herbivore.currentState}");
             //}
+            DrawString($"Herbivore count: {SceneData.herbivores.Count}");
+
             for (int i = 0; i < SceneData.herbivores.Count; i++)
             {
-                DrawString($"Herbivore {i} health: {(int)SceneData.herbivores[i].health}");
-                //DrawString($"Herbivore {i} hungermeter: {(int)SceneData.herbivores[i].hungermeter}");
-                //DrawString($"Herbivore {i} thirstMeter: {(int)SceneData.herbivores[i].thirstMeter}");
-                //DrawString($"Herbivore {i} state: {SceneData.herbivores[i].currentState}");
+                //DrawString($"Herbivore {i}, pos: {SceneData.herbivores[i].position} + targetpos: {SceneData.herbivores[i].target.position} + health: {(int)SceneData.herbivores[i].health}");
+                DrawString($"Herbivore {i} hungermeter: {(int)SceneData.herbivores[i].hungermeter}");
+                DrawString($"Herbivore {i} thirstMeter: {(int)SceneData.herbivores[i].thirstMeter}");
+                DrawString($"Herbivore {i} targetInRad: {SceneData.herbivores[i].targetObjectInRad.Count}");
+                DrawString($"Herbivore {i} state: {SceneData.herbivores[i].currentState}");
+                DrawString(" ");
             }
 
         }

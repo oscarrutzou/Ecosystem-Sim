@@ -8,6 +8,7 @@ using SharpDX.Direct2D1;
 
 namespace EcosystemSim
 {
+
     public enum AgentState
     {
         IdleWalk, //Random around, herbivore should maneuver away from predators.
@@ -38,6 +39,8 @@ namespace EcosystemSim
         
         internal AgentState currentState;
         public GameObject target;
+        private Stack<Tile> path;
+        private Tile targetTile;
         public List<GameObject> targetObjectInRad = new List<GameObject>();
 
         private Random rnd = new Random();
@@ -187,49 +190,76 @@ namespace EcosystemSim
             if (thirstMeter <= amountBeforeSearch)
             {
                 List<Tile> waterTiles = SceneData.tiles.Where(tile => tile.tileType == TileType.Water).ToList();
-                List<GameObject> tiles = waterTiles.Cast<GameObject>().ToList();
-                SearchForType(tiles);
+                SearchForType(waterTiles);
             }
-            else if (this is Herbivore)
+            else if(hungermeter <= amountBeforeSearch)
             {
-                List<GameObject> plantList = SceneData.plants.Cast<GameObject>().ToList();
-                SearchForType(plantList);
-            } else if (this is Predator)
-            {
+                if (this is Herbivore)
+                {
+                    List<GameObject> plantList = SceneData.plants.Cast<GameObject>().ToList();
+                    SearchForType(plantList);
+                }
+                else if (this is Predator)
+                {
 
+                }
             }
         }
+
         public void IdleWalk()
         {
             // Decrease the timer by the elapsed time
             changeDirectionTimer -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
 
-            // If the timer is less than or equal to zero, change direction
-            if (changeDirectionTimer <= 0)
+            if (targetTile != null)
             {
-                ChangeDirection();
-            }
+                // Calculate the direction to the target tile
+                direction = targetTile.Center - position;
+                if (direction != Vector2.Zero)
+                {
+                    direction.Normalize();
+                }
 
-            Vector2 tempPos = position;
-            Vector2 nextPos = position + direction * speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
+                Vector2 nextPos = position + direction * speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
 
-            // Check if the next position is walkable
-            if (CheckTileIsWalkable(nextPos))
-            {
-                position = nextPos;
+                // Check if the next position is close to the target tile
+                if (Vector2.Distance(nextPos, targetTile.Center) < speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed)
+                {
+                    // If it is, move to the target tile and get the next target tile from the path
+                    position = targetTile.Center;
+                    targetTile = (path.Count > 0) ? path.Pop() : null;
+                }
+                else
+                {
+                    // If it's not, move towards the target tile
+                    position = nextPos;
+                }
             }
             else
             {
-                position = tempPos;
+                // If there's no target tile, change direction
                 ChangeDirection();
             }
         }
 
         private void ChangeDirection()
         {
-            direction = new Vector2((float)(rnd.NextDouble() - 0.5), (float)(rnd.NextDouble() - 0.5));
-            direction.Normalize(); // Make sure the direction vector has a length of 1                   
-            changeDirectionTimer = rnd.Next(3, 8);// Reset the timer with a random value between 2 amounts of seconds
+            List<Tile> walkableTiles = SceneData.tiles.Where(tile => tile.isWalkable).ToList();
+            SearchForType(walkableTiles);
+
+            if (targetObjectInRad.Count > 0)
+            {
+                // Select a random tile from targetObjectInRad
+                target = targetObjectInRad[rnd.Next(targetObjectInRad.Count)];
+            }
+
+            path = Astar.FindPath(position, target.position);
+            if (path != null && path.Count > 0)
+            {
+                targetTile = path.Pop();
+            }
+
+            changeDirectionTimer = rnd.Next(3, 8); // Reset the timer with a random value between 2 amounts of seconds
         }
 
         private void WalkTowardsTarget(Action actionOnDone)
@@ -270,6 +300,19 @@ namespace EcosystemSim
         }
 
 
+        internal void SearchForType(List<Tile> targetTiles)
+        {
+            targetObjectInRad.Clear();
+            foreach (Tile tile in targetTiles)
+            {
+                if (!tile.isRemoved && Vector2.Distance(this.position, tile.position) <= this.searchRadPx)
+                {
+                    targetObjectInRad.Add(tile);
+                }
+            }
+            targetObjectInRad = targetObjectInRad.OrderBy(o => Vector2.Distance(this.position, o.position)).ToList();
+        }
+
         internal void SearchForType(List<GameObject> targetObjects)
         {
             targetObjectInRad.Clear();
@@ -277,10 +320,7 @@ namespace EcosystemSim
             {
                 if (!obj.isRemoved && Vector2.Distance(this.position, obj.position) <= this.searchRadPx)
                 {
-                    if (obj is Herbivore || obj is Predator || obj is Plant || obj is Tile)
-                        targetObjectInRad.Add(obj);
-                    else
-                        throw new Exception("The targetobjects must be a Herbivore, predator, plant or tile");
+                    targetObjectInRad.Add(obj);
                 }
             }
             targetObjectInRad = targetObjectInRad.OrderBy(o => Vector2.Distance(this.position, o.position)).ToList();
@@ -331,7 +371,7 @@ namespace EcosystemSim
         {
             base.Draw();
             //DrawSearchRad();
-            if (InputManager.debugStats) DrawDebugCollisionBox(Color.AliceBlue);
+            //if (InputManager.debugStats) DrawDebugCollisionBox(Color.AliceBlue);
         }
 
 

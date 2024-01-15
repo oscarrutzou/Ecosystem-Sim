@@ -28,15 +28,12 @@ namespace EcosystemSim
         private static float maxLayerDepth = 0.8f;
         private static Color tintColor = Color.Gray;
 
-        //Gen 3 grids
-        //Change grids with keyboard,
         public static void InitStartGrids()
         {
- 
-
-            grids.Add(new Grid(TileType.Plain, "Bottom"));
+            grids.Add(new Grid(TileType.Plain ,"Bottom"));
             grids.Add(new Grid("Middle"));
             grids.Add(new Grid("Top"));
+
 
             OnGridIndexChanged();
         }

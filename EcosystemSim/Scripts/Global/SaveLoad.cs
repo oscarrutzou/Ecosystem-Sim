@@ -29,11 +29,11 @@ namespace EcosystemSim
                 stream.SetLength(0);
                 StreamWriter writer = new StreamWriter(stream);
                 writer.WriteLine($"{grid.tiles[0,0].position.X}, {grid.tiles[0, 0].position.Y}"); //Start pos
-                writer.WriteLine($"{grid.rows},{grid.collumns}"); //Width, height
+                writer.WriteLine($"{Grid.rows},{Grid.collumns}"); //Width, height
 
-                for (int y = 0; y < grid.collumns; y++)
+                for (int y = 0; y < Grid.collumns; y++)
                 {
-                    for (int x = 0; x < grid.rows; x++)
+                    for (int x = 0; x < Grid.rows; x++)
                     {
                         Tile tile = grid.tiles[x, y];
                         writer.WriteLine($"{tile.gridPos[0]},{tile.gridPos[1]},{tile.position.X},{tile.position.Y},{tile.tileType}");
@@ -129,7 +129,10 @@ namespace EcosystemSim
                 int height = int.Parse(firstLineSizeParts[1]);
 
                 //Need to make it here so the tiles can use the grid
-                Grid grid = new Grid(gridStartPos, width, height, false, description);
+                Grid.startPosPx = gridStartPos;
+                Grid.collumns = width;
+                Grid.rows = height;
+                Grid grid = new Grid(description);
                 
                 List<Tile> tiles = new List<Tile>();
                 string line;
