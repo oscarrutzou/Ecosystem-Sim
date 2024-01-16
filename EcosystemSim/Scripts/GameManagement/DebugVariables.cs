@@ -107,7 +107,6 @@ namespace EcosystemSim
                 DrawString(" ");
                 DrawString($"Herbivore {i} hungermeter: {(int)SceneData.herbivores[i].hungermeter}");
                 DrawString($"Herbivore {i} thirstMeter: {(int)SceneData.herbivores[i].thirstMeter}");
-                DrawString($"Herbivore {i} hasReachedTarget: {SceneData.herbivores[i].hasReachedTarget}");
                 //DrawString($"Herbivore {i} health: {(int)SceneData.herbivores[i].health}");
                 DrawString($"Herbivore {i} targetInRad: {SceneData.herbivores[i].targetObjectInRad.Count}");
                 DrawString($"Herbivore {i} state: {SceneData.herbivores[i].currentState}");
@@ -122,7 +121,7 @@ namespace EcosystemSim
                 }
                 else
                 {
-                    DrawString($"Herbivore {i} targetName: {SceneData.herbivores[i].targetName}");
+                    DrawString($"Herbivore {i} targetName: {SceneData.herbivores[i].target?.GetType().Name}");
                 }
                 //DrawString($"Herbivore {i} debug: {SceneData.herbivores[i].amountDebug}");
                 //DrawString($"Herbivore {i} pathEndTile: {SceneData.herbivores[i]?.pathEndTile?.tileType}");
