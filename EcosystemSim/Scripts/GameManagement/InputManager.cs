@@ -29,8 +29,7 @@ namespace EcosystemSim
         public static Grid selectedGrid;
         public static TileType selectedTileType = TileType.Grass;
         public static HerbivoreType selectedHervicoreType = HerbivoreType.Rabbit;
-
-
+        private static int gameSpeedIndex = 1;
         private static Dictionary<Keys, TileType> keyTileTypeMap = new Dictionary<Keys, TileType>
         {
             { Keys.D1, TileType.Grass },
@@ -41,6 +40,24 @@ namespace EcosystemSim
         private static Dictionary<Keys, HerbivoreType> keyHerbivoreTypeMap = new Dictionary<Keys, HerbivoreType>
         {
             { Keys.D1, HerbivoreType.Rabbit },
+        };
+
+        private static Dictionary<int, float> gameSpeedTime = new Dictionary<int, float>() {
+            { 1, 0.5f },
+            { 2, 1f },
+            { 3, 2f },
+            { 4, 5f },
+            { 5, 10f },
+        };
+
+        private static List<float> gameSpeed = new List<float>()
+        {
+            { 0.5f},
+            { 1f},
+            { 2f},
+            { 5f},
+            { 10f},
+            { 50f},
         };
         #endregion
 
@@ -83,6 +100,24 @@ namespace EcosystemSim
             }
 
             MoveCam();
+
+            if (keyboardState.IsKeyDown(Keys.Left) && !previousKeyboardState.IsKeyDown(Keys.Left))
+            {
+                if (gameSpeedIndex >= 1)
+                {
+                    gameSpeedIndex -= 1;
+                    GameWorld.Instance.gameSpeed = gameSpeed[gameSpeedIndex];
+                }
+            }
+
+            if (keyboardState.IsKeyDown(Keys.Right) && !previousKeyboardState.IsKeyDown(Keys.Right))
+            {
+                if (gameSpeedIndex < gameSpeed.Count - 1)
+                {
+                    gameSpeedIndex += 1;
+                    GameWorld.Instance.gameSpeed = gameSpeed[gameSpeedIndex];
+                }
+            }
 
             if (!buildMode) return;
 

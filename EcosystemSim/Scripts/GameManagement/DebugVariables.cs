@@ -95,6 +95,7 @@ namespace EcosystemSim
             //    //DrawString($"Herbivore target list: {herbivore.targetObjectInRad.Count}");
             //    //DrawString($"Herbivore state: {herbivore.currentState}");
             //}
+            DrawString($"GameSpeed: {GameWorld.Instance.gameSpeed}");
             DrawString($"herbivoresAlive timer: {herbivoresAlive}");
             DrawString($"Herbivore count: {SceneData.herbivores.Count}");
 
@@ -104,13 +105,14 @@ namespace EcosystemSim
                 DrawString(" ");
                 DrawString($"Herbivore {i} hungermeter: {(int)SceneData.herbivores[i].hungermeter}");
                 DrawString($"Herbivore {i} thirstMeter: {(int)SceneData.herbivores[i].thirstMeter}");
-                DrawString($"Herbivore {i} health: {(int)SceneData.herbivores[i].health}");
+                //DrawString($"Herbivore {i} health: {(int)SceneData.herbivores[i].health}");
                 DrawString($"Herbivore {i} targetInRad: {SceneData.herbivores[i].targetObjectInRad.Count}");
                 DrawString($"Herbivore {i} state: {SceneData.herbivores[i].currentState}");
                 DrawString($"Herbivore {i} path: {SceneData.herbivores[i].path?.Count}");
-                DrawString($"Herbivore {i} debug: {SceneData.herbivores[i].amountDebug}");
-                DrawString($"Herbivore {i} pathEndTile: {SceneData.herbivores[i]?.pathEndTile?.tileType}");
-                DrawString($"Herbivore {i} distanceToTarget: {SceneData.herbivores[i].distanceToTarget}");
+                DrawString($"Herbivore {i} canFindPath: {SceneData.herbivores[i].canFindPath}");
+                //DrawString($"Herbivore {i} debug: {SceneData.herbivores[i].amountDebug}");
+                //DrawString($"Herbivore {i} pathEndTile: {SceneData.herbivores[i]?.pathEndTile?.tileType}");
+                //DrawString($"Herbivore {i} distanceToTarget: {SceneData.herbivores[i].distanceToTarget}");
             }
 
         }

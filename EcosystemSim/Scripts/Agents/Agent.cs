@@ -34,6 +34,7 @@ namespace EcosystemSim
         public int speed = 30;
         //private double changeDirectionTimer = 0;
         internal double eatingTimer = 0;
+        private bool isEating;
         internal double drinkingTimer = 0;
         private Vector2 direction;
         
@@ -46,7 +47,7 @@ namespace EcosystemSim
         public int amountDebug;
         public float distanceToTarget;
         public Tile pathEndTile;
-
+        public bool canFindPath;
         private Random rnd = new Random();
         public Agent() {
             layerDepth = 0.2f;
@@ -79,6 +80,7 @@ namespace EcosystemSim
             }
         }
 
+        #region Search and set states
         private void CheckThirstHunger()
         {
             thirstMeter -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed * thirstHungerScale;
@@ -89,15 +91,41 @@ namespace EcosystemSim
             if (thirstMeter <= amountBeforeSearch)
             {
                 currentState = AgentState.Search;
+                SearchForWater();
+
+                if (hungermeter <= amountBeforeSearch && targetObjectInRad.Count == 0)
+                {
+                    SearchForFoodObjects();
+                }
+
+                if (targetObjectInRad.Count == 0)
+                {
+                    SearchForIdleWalkTiles();
+                }
             }
             else if (hungermeter <= amountBeforeSearch) {
                 currentState = AgentState.Search;
+
+                SearchForFoodObjects();
+
+                if (thirstMeter <= amountBeforeSearch && targetObjectInRad.Count == 0)
+                {
+                    SearchForWater();
+                }
+
+                if (targetObjectInRad.Count == 0)
+                {
+                    currentState = AgentState.Search;
+                    SearchForIdleWalkTiles();
+                }
             }
             else
             {
                 currentState = AgentState.IdleWalk;
-
+                SearchForIdleWalkTiles();
             }
+
+            //SearchForTarget();
 
             if (hungermeter <= minAmountBeforeDmg || thirstMeter <= minAmountBeforeDmg)
             {
@@ -114,119 +142,12 @@ namespace EcosystemSim
             if (health <= 0 || thirstMeter <= 0 || hungermeter <= -50) isRemoved = true; //Agent died
         }
 
-        private void HandleState()
+        private void SearchForWater()
         {
-            SearchForTarget();
-
-            switch (currentState)
-            {
-                case AgentState.IdleWalk:
-                    WalkTowardsTargetIdle();
-                    break;
-                case AgentState.Search:
-                    if (targetObjectInRad.Count == 0)
-                    {
-                        WalkTowardsTargetIdle();
-                    }
-                    else
-                    {
-                        WalkTowardsTarget(ActionOnTargetFound);
-                    }
-                    //WalkTowardsTarget(ActionOnTargetFound);
-
-                    break;
-                case AgentState.Eating:
-                    Eating();
-                    break;
-                case AgentState.Drinking:
-                    Drinking();
-                    break;
-                case AgentState.AgentSpecific:
-                    AgentSpecificAction();
-                    break;
-            }
+            List<Tile> waterTiles = SceneData.tiles.Where(tile => tile.tileType == TileType.Water).ToList();
+            SearchForType(waterTiles);
         }
-
-        public abstract void ActionOnTargetFound();
-
-        internal virtual void Eating()
-        {
-            // Decrease the timer by the elapsed time
-            eatingTimer -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
-
-            if (target == null || (target is Plant plant && plant.isEaten))
-            {
-                currentState = AgentState.Search;
-            }
-            // If the timer is less than or equal to zero, change state to IdleWalk
-            else if (eatingTimer <= 0)
-            {
-                if (target is Plant plantObj)
-                {
-                    target = null;
-                    plantObj.isEaten = true;
-                    plantObj.DeletePlant();
-                }
-                hungermeter = hungerMaxmeter;
-                currentState = AgentState.IdleWalk;
-            }
-        }
-
-        internal virtual void Drinking()
-        {
-            // Decrease the timer by the elapsed time
-            drinkingTimer -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
-
-            // If the timer is less than or equal to zero, change state to IdleWalk
-            if (drinkingTimer <= 0)
-            {
-
-                thirstMeter = thirstMaxMeter;
-                currentState = AgentState.IdleWalk;
-            }
-        }
-        
-        internal virtual void AgentSpecificAction() { }
-        
-        private void SearchForTarget()
-        {
-
-            if (thirstMeter <= amountBeforeSearch)
-            {
-                List<Tile> waterTiles = SceneData.tiles.Where(tile => tile.tileType == TileType.Water).ToList();
-                SearchForType(waterTiles);
-
-                if (hungermeter <= amountBeforeSearch && targetObjectInRad.Count == 0)
-                {
-                    CheckHungerSearch();
-                }
-
-                if (targetObjectInRad.Count == 0)
-                {
-                    SearchForIdleWalkTiles();
-                }
-            }
-            else if(hungermeter <= amountBeforeSearch)
-            {
-                CheckHungerSearch();
-
-                if (thirstMeter <= amountBeforeSearch && targetObjectInRad.Count == 0)
-                {
-                    CheckHungerSearch();
-                }
-
-                if (targetObjectInRad.Count == 0)
-                {
-                    SearchForIdleWalkTiles();
-                }
-            }
-            else
-            {
-                //For idleWalk
-                SearchForIdleWalkTiles();
-            }
-        }
-        private void CheckHungerSearch()
+        private void SearchForFoodObjects()
         {
             if (this is Herbivore)
             {
@@ -243,6 +164,38 @@ namespace EcosystemSim
             List<Tile> walkableTiles = SceneData.tiles.Where(tile => tile.isWalkable).ToList();
             SearchForType(walkableTiles);
         }
+
+        #endregion
+
+        private void HandleState()
+        {
+            switch (currentState)
+            {
+                case AgentState.IdleWalk:
+                    WalkTowardsTargetIdle();
+                    break;
+                case AgentState.Search:
+                    if (targetObjectInRad.Count == 0 || targetObjectInRad.First() is Tile tile && tile.tileType != TileType.Water)
+                    {
+                        WalkTowardsTargetIdle();
+                    }
+                    else
+                    {
+                        WalkTowardsTarget(ActionOnTargetFound);
+                    }
+                    break;
+                case AgentState.Eating:
+                    Eating();
+                    break;
+                case AgentState.Drinking:
+                    Drinking();
+                    break;
+                case AgentState.AgentSpecific:
+                    AgentSpecificAction();
+                    break;
+            }
+        }
+
 
         public void WalkTowardsTargetIdle()
         {
@@ -287,11 +240,20 @@ namespace EcosystemSim
                 GetTargetTile(false);
             }
             
-            //If the agent is close enough to the target, change its state and return
+            //If the agent is close enough to the target, or not found the path
             if (targetTile == null)
             {
-                onTargetReached?.Invoke();
-                pathEndTile = null;
+                float distance = Vector2.Distance(position, target.position);
+                if (distance <= 35) //If it cant find the path, since its already here
+                {
+                    onTargetReached?.Invoke();
+                    pathEndTile = null;
+                }
+                else //Not found the path, walk idle
+                {
+                    SearchForIdleWalkTiles();
+                    WalkTowardsTargetIdle();
+                }
                 return;
             }
 
@@ -336,16 +298,16 @@ namespace EcosystemSim
                 
             }
 
-            if (target == null) return;
+            if (target == null) return; //If there isnt any in the targetObjectInRad
 
             if (path == null || path.Count == 0)
             {
                 path = Astar.FindPath(position, target.position);
-                if (Vector2.Distance(position, target.position) <= 10)
+
+                if (Vector2.Distance(position, target.position) <= 35)
                 {
                     targetTile = null;
                 }
-                amountDebug++;
             }
 
             if (path != null && path.Count > 0)
@@ -381,45 +343,65 @@ namespace EcosystemSim
             targetObjectInRad = targetObjectInRad.OrderBy(o => Vector2.Distance(this.position, o.position)).ToList();
         }
 
+        public abstract void ActionOnTargetFound();
+
+        internal virtual void Eating()
+        {
+            // Decrease the timer by the elapsed time
+            eatingTimer -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
+
+            if (target == null || target is Plant plant && plant.isBeingEaten && !isEating)
+            {
+                currentState = AgentState.Search;
+            }
+            // If the timer is less than or equal to zero, change state to IdleWalk
+            else
+            {
+                if (target is Plant plant1)
+                {
+                    plant1.isBeingEaten = true;
+                    isEating = true;
+                }
+
+                if (eatingTimer <= 0)
+                {
+                    if (target is Plant plantObj)
+                    {
+                        target = null;
+                        plantObj.DeletePlant();
+                    }
+
+                    if (target is Herbivore herbivore)
+                    {
+                        herbivore.isRemoved = true;
+                    }
+                    isEating = false;
+                    hungermeter = hungerMaxmeter;
+                    currentState = AgentState.IdleWalk;
+                }
+            }
+        }
+
+        internal virtual void Drinking()
+        {
+            // Decrease the timer by the elapsed time
+            drinkingTimer -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
+
+            // If the timer is less than or equal to zero, change state to IdleWalk
+            if (drinkingTimer <= 0)
+            {
+                thirstMeter = thirstMaxMeter;
+                currentState = AgentState.IdleWalk;
+            }
+        }
+
+        internal virtual void AgentSpecificAction() { }
+
 
         private void DrawSearchRad()
         {
             Vector2 pos = new Vector2(position.X - (GlobalTextures.textures[TextureNames.UISearchRad100].Width / 2), position.Y - (GlobalTextures.textures[TextureNames.UISearchRad100].Height / 2));
             GameWorld.Instance.spriteBatch.Draw(GlobalTextures.textures[TextureNames.UISearchRad100], pos, null, Color.Black, 0, Vector2.Zero, 1, SpriteEffects.None, 1);
-        }
-
-        public bool CheckTileIsWalkable(Vector2 nextPos)
-        {
-            // Calculate the positions of the four corners of the agent's bounding box
-            Vector2 topLeft = nextPos + new Vector2(-texture.Width / 2 * scale, -texture.Height / 2 * scale);
-            Vector2 topRight = nextPos + new Vector2(texture.Width / 2 * scale, -texture.Height / 2 * scale);
-            Vector2 bottomLeft = nextPos + new Vector2(-texture.Width / 2 * scale, texture.Height / 2 * scale);
-            Vector2 bottomRight = nextPos + new Vector2(texture.Width / 2 * scale, texture.Height / 2 * scale);
-
-            // Calculate the number of points to check on each edge of the bounding box
-            int numPointsToCheck = Math.Max(texture.Width / 2, texture.Height / 2);
-
-            // Check if any point on the bounding box is in a non-walkable tile
-            for (int i = 0; i <= numPointsToCheck; i++)
-            {
-                float t = (float)i / numPointsToCheck;
-                if (!IsPositionWalkable(Vector2.Lerp(topLeft, topRight, t)) ||
-                    !IsPositionWalkable(Vector2.Lerp(topLeft, bottomLeft, t)) ||
-                    !IsPositionWalkable(Vector2.Lerp(topRight, bottomRight, t)) ||
-                    !IsPositionWalkable(Vector2.Lerp(bottomLeft, bottomRight, t)))
-                {
-                    return false;
-                }
-            }
-
-            // If no non-walkable tile was found, return true
-            return true;
-        }
-
-
-        private bool IsPositionWalkable(Vector2 pos)
-        {
-            return GridManager.IsWalkable(pos);
         }
 
         public override void Draw()

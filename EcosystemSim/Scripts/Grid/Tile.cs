@@ -140,7 +140,7 @@ namespace EcosystemSim
         {
             if (!canGrowPlants || selectedPlant == null || hasBeenPlanted) return;
 
-            plantTimer += (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds;
+            plantTimer += (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
 
             if (plantTimer >= plantTimeToGrow)
             {
