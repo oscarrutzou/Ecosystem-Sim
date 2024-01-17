@@ -10,7 +10,7 @@ namespace EcosystemSim
     public static class GridManager
     {
         public static List<Grid> grids = new List<Grid>();
-        public static Grid selectedGrid {  get; private set; }
+        public static Grid selectedGrid { get; private set; }
 
         private static int _gridIndex;
         public static int GridIndex
@@ -30,7 +30,7 @@ namespace EcosystemSim
 
         public static void InitStartGrids()
         {
-            grids.Add(new Grid(TileType.Plain ,"Bottom"));
+            grids.Add(new Grid(TileType.Plain, "Bottom"));
             grids.Add(new Grid("Middle"));
             grids.Add(new Grid("Top"));
 
@@ -40,6 +40,12 @@ namespace EcosystemSim
 
         public static Tile GetTileAtPos(Vector2 pos) => selectedGrid?.GetTile(pos);
 
+        public static int[] GetGridPosAtPos(Vector2 pos) => grids[0].GetGridPos(pos);
+
+        public static Vector2 GetCenterPosInGridLeftTop() => Grid.startPosPx;
+        public static Vector2 GetCenterPosInGridRightTop() => Grid.startPosPx + (new Vector2(Tile.NodeSize, Tile.NodeSize) * new Vector2(Grid.collumns - 1, 0));
+        public static Vector2 GetCenterPosInGridLeftBottom() => Grid.startPosPx + (new Vector2(Tile.NodeSize, Tile.NodeSize) * new Vector2(0, Grid.rows - 1));
+        public static Vector2 GetCenterPosInGridRightBottom() => Grid.startPosPx + (new Vector2(Tile.NodeSize, Tile.NodeSize) * new Vector2(Grid.collumns - 1, Grid.rows - 1));
 
         public static bool IsWalkable(Vector2 pos)
         {

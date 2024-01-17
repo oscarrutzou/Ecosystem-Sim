@@ -110,6 +110,18 @@ namespace EcosystemSim
             return null; // Position is out of bounds
         }
 
+        public int[] GetGridPos(Vector2 pos)
+        {
+            if (pos.X < startPosPx.X || pos.Y < startPosPx.Y)
+            {
+                return null; // Position is negative, otherwise it will make a invisable tile in the debug, since it cast to int, then it gets rounded to 0 and results in row and column
+            }
+
+            int gridX = (int)((pos.X - startPosPx.X) / gridSizeDem);
+            int gridY = (int)((pos.Y - startPosPx.Y) / gridSizeDem);
+            return new int[] { gridX, gridY };
+        }
+
         public Tile GetTile(int x, int y) => tiles[x, y];
 
         public void UpdateMaxAmountOfPlants()

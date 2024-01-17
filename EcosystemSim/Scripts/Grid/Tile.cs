@@ -83,7 +83,7 @@ namespace EcosystemSim
             switch (type)
             {
                 case TileType.Empty:
-                    texture = null;
+                    texture = GlobalTextures.textures[TextureNames.TileEmpty];
                     //isWalkable = true;
                     break;
 

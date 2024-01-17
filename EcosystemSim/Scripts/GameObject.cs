@@ -18,12 +18,33 @@ namespace EcosystemSim
         public bool isRemoved;
         public bool isVisible = true;
 
-        public Vector2 origin;
+        internal Vector2 origin;
         public bool isCentered;
 
         internal int collisionBoxWidth;
         internal int collisionBoxHeight;
         private Vector2 offset;
+
+        public Vector2 centerPos
+        {
+            get
+            {
+                // Try to get the width and height of the texture or the current frame of the animation.
+                Texture2D drawTexture = texture ?? animation?.frames[animation.currentFrame];
+                if (drawTexture is null)
+                    throw new InvalidOperationException("GameObject must have a valid texture or animation.");
+
+                // If the collision box width or height is bigger 0, use the width and height of the texture.
+                int width = collisionBoxWidth > 0 ? collisionBoxWidth : drawTexture.Width;
+                int height = collisionBoxHeight > 0 ? collisionBoxHeight : drawTexture.Height;
+
+                return new Vector2(
+                    (int)(position.X + (width / 2) * scale),
+                    (int)(position.Y + (height / 2) * scale)
+                );
+            }
+            set { }
+        }
         public Rectangle collisionBox
         {
             get

@@ -19,6 +19,8 @@ namespace EcosystemSim
     }
     public abstract class Agent : GameObject
     {
+        public static int deathByThristCounter;
+        public static int deathByHungerCounter;
         private int maxHealth = 100;
         public double health;
         public int damage = 10;
@@ -31,7 +33,7 @@ namespace EcosystemSim
         private int amountBeforeSearch = 50;
         public int searchRadPx = 200;
 
-        public int speed = 30;
+        public int speed = 40;
         //private double changeDirectionTimer = 0;
         internal double eatingTimer = 0;
         private bool isEating;
@@ -39,6 +41,7 @@ namespace EcosystemSim
         private Vector2 direction;
         
         internal AgentState currentState;
+        //private GameObject newTarget = null;
         public GameObject target;
         public Stack<Tile> path;
         private Tile targetTile;
@@ -48,7 +51,14 @@ namespace EcosystemSim
         public float distanceToTarget;
         public Tile pathEndTile;
         public bool canFindPath;
+        public bool hasReachedTarget;
+
         private Random rnd = new Random();
+        public bool isThirsty;
+        public bool isHungry;
+        private List<Vector2> cornerGridTilePos = new List<Vector2>();
+        private int amountBeforeReached = 35;
+        public string targetName;
         public Agent() {
             layerDepth = 0.2f;
             health = maxHealth;
@@ -62,12 +72,27 @@ namespace EcosystemSim
         {
             base.Update();
 
+            SetCornerGridPos();
+            
             CheckThirstHunger();
 
             HandleState();
+            targetName = "";
+            targetName = target?.GetType().Name;
 
             ChangeDirectionOfSprite();
         }
+
+        private void SetCornerGridPos()
+        {
+            cornerGridTilePos.Clear();
+            cornerGridTilePos.Add(GridManager.GetCenterPosInGridLeftTop());
+            cornerGridTilePos.Add(GridManager.GetCenterPosInGridRightTop());
+            cornerGridTilePos.Add(GridManager.GetCenterPosInGridLeftBottom());
+            cornerGridTilePos.Add(GridManager.GetCenterPosInGridRightBottom());
+
+        }
+
         private void ChangeDirectionOfSprite()
         {
             if (direction.X < 0)
@@ -88,13 +113,18 @@ namespace EcosystemSim
 
             if (currentState == AgentState.Eating || currentState == AgentState.Drinking) return;
 
+            if (thirstMeter > amountBeforeSearch) isThirsty = false;
+            if (hungermeter > amountBeforeSearch) isHungry = false;
+
             if (thirstMeter <= amountBeforeSearch)
             {
                 currentState = AgentState.Search;
+                isThirsty = true;
                 SearchForWater();
 
                 if (hungermeter <= amountBeforeSearch && targetObjectInRad.Count == 0)
                 {
+                    isHungry = true;
                     SearchForFoodObjects();
                 }
 
@@ -105,11 +135,12 @@ namespace EcosystemSim
             }
             else if (hungermeter <= amountBeforeSearch) {
                 currentState = AgentState.Search;
-
+                isHungry = true;
                 SearchForFoodObjects();
 
                 if (thirstMeter <= amountBeforeSearch && targetObjectInRad.Count == 0)
                 {
+                    isThirsty = true;
                     SearchForWater();
                 }
 
@@ -125,8 +156,6 @@ namespace EcosystemSim
                 SearchForIdleWalkTiles();
             }
 
-            //SearchForTarget();
-
             if (hungermeter <= minAmountBeforeDmg || thirstMeter <= minAmountBeforeDmg)
             {
                 health -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed * thirstHungerScale;
@@ -139,7 +168,13 @@ namespace EcosystemSim
                 }
             }
 
-            if (health <= 0 || thirstMeter <= 0 || hungermeter <= -50) isRemoved = true; //Agent died
+            if (health <= 0 || thirstMeter <= 0 || hungermeter <= -50)
+            {
+                if (thirstMeter <= 0) deathByThristCounter++;
+                else if (hungermeter <= -50) deathByHungerCounter++;
+                GameWorld.Instance.gameSpeed = 1;
+                isRemoved = true; //Agent died
+            }
         }
 
         private void SearchForWater()
@@ -175,7 +210,7 @@ namespace EcosystemSim
                     WalkTowardsTargetIdle();
                     break;
                 case AgentState.Search:
-                    if (targetObjectInRad.Count == 0 || targetObjectInRad.First() is Tile tile && tile.tileType != TileType.Water)
+                    if (targetObjectInRad.Count == 0 || targetObjectInRad.First() is Tile tile && tile.tileType != TileType.Water) //Also check tiletype, since its still in search state when thirsty.
                     {
                         WalkTowardsTargetIdle();
                     }
@@ -199,14 +234,11 @@ namespace EcosystemSim
 
         public void WalkTowardsTargetIdle()
         {
-            
-            if (targetTile == null)
-            {
-                // If there's no target tile, change direction
-                GetTargetTile(true);
-            }
+            GetTargetTile(true);
 
-            if (targetTile == null) return;
+
+
+            if (path == null || targetTile == null) return;
 
             // Calculate the direction to the target tile
             direction = targetTile.Center - position;
@@ -214,6 +246,7 @@ namespace EcosystemSim
             {
                 direction.Normalize();
             }
+            
 
             Vector2 nextPos = position + direction * speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
 
@@ -223,39 +256,30 @@ namespace EcosystemSim
                 // If it is, move to the target tile and get the next target tile from the path
                 position = targetTile.Center;
                 targetTile = (path.Count > 0) ? path.Pop() : null;
+                if (hasReachedTarget) hasReachedTarget = false;
             }
             else
             {
                 // If it's not, move towards the target tile
                 position = nextPos;
             }
+
 
         }
 
         public void WalkTowardsTarget(Action onTargetReached)
         {
-            if (targetTile == null)
-            {
-                // If there's no target tile, change direction
-                GetTargetTile(false);
-            }
-            
+            GetTargetTile(false);
+
             //If the agent is close enough to the target, or not found the path
-            if (targetTile == null)
+            if (hasReachedTarget)
             {
-                float distance = Vector2.Distance(position, target.position);
-                if (distance <= 35) //If it cant find the path, since its already here
-                {
-                    onTargetReached?.Invoke();
-                    pathEndTile = null;
-                }
-                else //Not found the path, walk idle
-                {
-                    SearchForIdleWalkTiles();
-                    WalkTowardsTargetIdle();
-                }
-                return;
+                onTargetReached?.Invoke();
+                hasReachedTarget = false;
+                //return;
             }
+
+            if (path == null || targetTile == null) return;
 
             // Calculate the direction to the target tile
             direction = targetTile.Center - position;
@@ -279,42 +303,90 @@ namespace EcosystemSim
                 // If it's not, move towards the target tile
                 position = nextPos;
             }
+
+
         }
- 
+
+
         private void GetTargetTile(bool randomTarget)
         {
-           
+            GameObject newTarget = null;
+            GameObject tempCurTarget = target;
+            if (target != null)
+            {
+                if (Vector2.Distance(position, target.position) <= amountBeforeReached)
+                {
+                    hasReachedTarget = true;
+                    //path = null; // Reset the path
+                    //target = null; // Reset the target
+                    //return; // Return from the function
+                }
+            }
+
             if (targetObjectInRad.Count > 0)
             {
                 if (randomTarget)
                 {
-                    // Select a random tile from targetObjectInRad
-                    target = targetObjectInRad[rnd.Next(targetObjectInRad.Count)];
+                    if (rnd.Next(0, 2) == 0)
+                    {
+                        newTarget = PickRandomCorner();
+                    }
+                    else
+                    {
+                        newTarget = targetObjectInRad[rnd.Next(targetObjectInRad.Count)];
+                    }
                 }
                 else
                 {
-                    target = targetObjectInRad[0]; //Since we already have sorted the list for closest target.
+                    newTarget = targetObjectInRad[0]; //Since we already have sorted the list for closest target.
                 }
-                
             }
 
-            if (target == null) return; //If there isnt any in the targetObjectInRad
+            if (newTarget == null || IsNewTargetAndTargetSame(tempCurTarget, newTarget)) return; //If there isn't any in the targetObjectInRad
 
-            if (path == null || path.Count == 0)
+            
+
+            // If the agent has not found a path yet, or if the target type has changed, or if the target is a Tile and its tileType has changed, find a new path
+            if (path == null || path.Count == 0 )
             {
+                target = newTarget;
+
                 path = Astar.FindPath(position, target.position);
 
-                if (Vector2.Distance(position, target.position) <= 35)
+                if (path != null)
                 {
-                    targetTile = null;
+                    pathEndTile = path.Last();
+                    targetTile = path.Pop();
                 }
             }
 
-            if (path != null && path.Count > 0)
+        }
+
+        private bool IsNewTargetAndTargetSame(GameObject target, GameObject newTarget)
+        {
+            if (target == null) return false;
+            if (target is Tile targetTile && newTarget is Tile newTargetTile)
             {
-                pathEndTile = path.Last();
-                targetTile = path.Pop();
-            }
+                if (isThirsty)
+                {
+                    if (targetTile.tileType != TileType.Water && newTargetTile.tileType == TileType.Water) return false;
+                    else if (targetTile.tileType == TileType.Water && newTargetTile.tileType != TileType.Water) return true;
+                }
+
+                return targetTile.tileType == newTargetTile.tileType;
+             }
+
+            return target.GetType()  == newTarget.GetType();
+        }
+
+        private GameObject PickRandomCorner()
+        {
+            //Closest corner.
+            Vector2 closestCorner = cornerGridTilePos.Aggregate((x, y) => Vector2.Distance(x, position) < Vector2.Distance(y, position) ? x : y);
+            cornerGridTilePos.Remove(closestCorner);
+
+            int randomPick = rnd.Next(cornerGridTilePos.Count);
+            return GridManager.GetTileAtPos(cornerGridTilePos[randomPick]);
         }
 
         internal void SearchForType(List<Tile> targetTiles)
@@ -378,6 +450,7 @@ namespace EcosystemSim
                     isEating = false;
                     hungermeter = hungerMaxmeter;
                     currentState = AgentState.IdleWalk;
+                    CheckThirstHunger();
                 }
             }
         }
@@ -392,6 +465,7 @@ namespace EcosystemSim
             {
                 thirstMeter = thirstMaxMeter;
                 currentState = AgentState.IdleWalk;
+                CheckThirstHunger();
             }
         }
 

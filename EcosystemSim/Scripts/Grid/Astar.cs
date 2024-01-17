@@ -85,8 +85,6 @@ namespace EcosystemSim
                 
                 //optimize with saving last path in agent, then use that and check if the new path.count is larger that oldpath,
                 //then check if you start at the end of last path, and search to the new pos, and use that count - 2 (since we shouldnt count start and end tiles again) and add the lastpath. Compare to newPath.count.
-
-                //lastPath = path;
                 return path;
             }
 
@@ -154,101 +152,6 @@ namespace EcosystemSim
 
             return temp;
         }
-        //Does nada:/
-        public static Stack<Tile> OptimizePath(Stack<Tile> path, Grid grid)
-        {
-            Stack<Tile> optimizedPath = new Stack<Tile>();
-            Tile current = path.Pop();
-            optimizedPath.Push(current);
-
-            while (path.Count > 0)
-            {
-                Tile next = path.Peek();
-
-                // Check if there's a direct line of sight between the current tile and the next tile
-                if (HasLineOfSight(current, next, grid))
-                {
-                    // If there's a line of sight, remove the next tile from the original path
-                    // but don't add it to the optimized path yet
-                    path.Pop();
-                }
-                else
-                {
-                    // If there's no line of sight, move to the next tile
-                    current = path.Pop();
-                    optimizedPath.Push(current);
-                }
-            }
-
-            return optimizedPath;
-        }
-
-        public static bool HasLineOfSight(Tile start, Tile end, Grid grid)
-        {
-            List<Vector2> points = GetPointsOnLine(start.gridPos[0], start.gridPos[1], end.gridPos[0], end.gridPos[1]);
-
-            foreach (Vector2 point in points)
-            {
-                // Get all tiles at this point in all grids
-                List<Tile> tilesAtPoint = grids.Select(g => g.GetTile(point)).Where(tile => tile != null).ToList();
-
-                // If any tile at this point is not walkable, return false
-                if (tilesAtPoint.Any(tile => !tile.isWalkable && tile.tileType != TileType.Empty))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        //Bresenham’s line algorithm
-        public static List<Vector2> GetPointsOnLine(int x0, int y0, int x1, int y1)
-        {
-            List<Vector2> result = new List<Vector2>();
-
-            bool steep = Math.Abs(y1 - y0) > Math.Abs(x1 - x0);
-            if (steep)
-            {
-                int t;
-                t = x0; // swap x0 and y0
-                x0 = y0;
-                y0 = t;
-                t = x1; // swap x1 and y1
-                x1 = y1;
-                y1 = t;
-            }
-            if (x0 > x1)
-            {
-                int t;
-                t = x0; // swap x0 and x1
-                x0 = x1;
-                x1 = t;
-                t = y0; // swap y0 and y1
-                y0 = y1;
-                y1 = t;
-            }
-            int dx = x1 - x0;
-            int dy = Math.Abs(y1 - y0);
-
-            int error = dx / 2;
-            int ystep = (y0 < y1) ? 1 : -1;
-            int y = y0;
-
-            for (int x = x0; x <= x1; x++)
-            {
-                result.Add(new Vector2((steep ? y : x), (steep ? x : y)));
-                error -= dy;
-                if (error < 0)
-                {
-                    y += ystep;
-                    error += dx;
-                }
-            }
-
-            return result;
-        }
-
 
         //public static void UpdateDebugColor()
         //{

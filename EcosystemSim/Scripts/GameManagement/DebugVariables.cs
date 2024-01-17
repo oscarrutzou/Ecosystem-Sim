@@ -54,19 +54,19 @@ namespace EcosystemSim
             //}
 
 
-            //if (InputManager.buildMode)
-            //{
-            //    Tile tile = InputManager.tileOnHover;
-            //    if (tile != null)
-            //    {
-            //        DrawString($"Hover tile type: {tile.tileType}");
-            //        DrawString($"Hover tile hasBeenPlanted: {tile.hasBeenPlanted}");
-            //        DrawString($"Hover tile grid pos: ({tile.gridPos[0]}, {tile.gridPos[1]})");
-            //        DrawString($"Hover tile pos: {tile.position}");
-            //        DrawString($"Hover tile layerDepth: {tile.layerDepth}");
-            //        DrawString($"Hover tile layerDepth: {tile.canGrowPlants} + {tile.selectedPlant?.texture.Name}");
-            //    }
-            //}
+            if (InputManager.buildMode)
+            {
+                Tile tile = InputManager.tileOnHover;
+                if (tile != null)
+                {
+                    DrawString($"Hover tile type: {tile.tileType}");
+                    DrawString($"Hover tile hasBeenPlanted: {tile.hasBeenPlanted}");
+                    DrawString($"Hover tile grid pos: ({tile.gridPos[0]}, {tile.gridPos[1]})");
+                    DrawString($"Hover tile pos: {tile.position}");
+                    DrawString($"Hover tile layerDepth: {tile.layerDepth}");
+                    DrawString($"Hover tile layerDepth: {tile.canGrowPlants} + {tile.selectedPlant?.texture.Name}");
+                }
+            }
             //else
             //{
             //    GameObject obj = InputManager.objOnHover;
@@ -98,6 +98,8 @@ namespace EcosystemSim
             DrawString($"GameSpeed: {GameWorld.Instance.gameSpeed}");
             DrawString($"herbivoresAlive timer: {herbivoresAlive}");
             DrawString($"Herbivore count: {SceneData.herbivores.Count}");
+            DrawString($"DeathByThristCounter count: {Agent.deathByThristCounter}");
+            DrawString($"DeathByHungerCounter count: {Agent.deathByHungerCounter}");
 
             for (int i = 0; i < SceneData.herbivores.Count; i++)
             {
@@ -105,11 +107,23 @@ namespace EcosystemSim
                 DrawString(" ");
                 DrawString($"Herbivore {i} hungermeter: {(int)SceneData.herbivores[i].hungermeter}");
                 DrawString($"Herbivore {i} thirstMeter: {(int)SceneData.herbivores[i].thirstMeter}");
+                DrawString($"Herbivore {i} hasReachedTarget: {SceneData.herbivores[i].hasReachedTarget}");
                 //DrawString($"Herbivore {i} health: {(int)SceneData.herbivores[i].health}");
                 DrawString($"Herbivore {i} targetInRad: {SceneData.herbivores[i].targetObjectInRad.Count}");
                 DrawString($"Herbivore {i} state: {SceneData.herbivores[i].currentState}");
                 DrawString($"Herbivore {i} path: {SceneData.herbivores[i].path?.Count}");
                 DrawString($"Herbivore {i} canFindPath: {SceneData.herbivores[i].canFindPath}");
+                DrawString($"Herbivore {i} drinkingTimer: {SceneData.herbivores[i].drinkingTimer}");
+
+
+                if (SceneData.herbivores[i].target is Tile tile)
+                {
+                    DrawString($"Herbivore {i} targetName: {tile.tileType}");
+                }
+                else
+                {
+                    DrawString($"Herbivore {i} targetName: {SceneData.herbivores[i].targetName}");
+                }
                 //DrawString($"Herbivore {i} debug: {SceneData.herbivores[i].amountDebug}");
                 //DrawString($"Herbivore {i} pathEndTile: {SceneData.herbivores[i]?.pathEndTile?.tileType}");
                 //DrawString($"Herbivore {i} distanceToTarget: {SceneData.herbivores[i].distanceToTarget}");
