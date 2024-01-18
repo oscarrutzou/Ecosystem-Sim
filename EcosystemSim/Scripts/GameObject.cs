@@ -146,7 +146,7 @@ namespace EcosystemSim
             }
         }
 
-        private void DrawLine(Texture2D pixel, Vector2 start, Vector2 end, Color color)
+        internal void DrawLine(Texture2D pixel, Vector2 start, Vector2 end, Color color)
         {
             float length = Vector2.Distance(start, end);
             float angle = (float)Math.Atan2(end.Y - start.Y, end.X - start.X);

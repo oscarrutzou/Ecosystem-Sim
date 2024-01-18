@@ -111,6 +111,14 @@ namespace EcosystemSim
                 }
             }
 
+            if (keyboardState.IsKeyDown(Keys.Enter) && !previousKeyboardState.IsKeyDown(Keys.Enter))
+            {
+                for (int i = 0; i < 50; i++)
+                {
+                    SceneData.gameObjectsToAdd.Add(new Herbivore(Vector2.Zero, HerbivoreType.Rabbit));
+                }
+            }
+
             if (!buildMode) return;
 
             ChangeSelectedTile();

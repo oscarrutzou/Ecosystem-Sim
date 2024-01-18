@@ -13,10 +13,7 @@ namespace EcosystemSim
             GridManager.InitStartGrids();
 
             //SaveLoad.LoadGrids();
-            for (int i = 0; i < 1; i++)
-            {
-                //SceneData.gameObjectsToAdd.Add(new Herbivore(Vector2.Zero, HerbivoreType.Rabbit));
-            }
+
             //SceneData.gameObjectsToAdd.Add(new Predator(Vector2.Zero));
             //astar = new Astar(GridManager.grids);
         }
