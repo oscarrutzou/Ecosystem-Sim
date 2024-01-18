@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using SharpDX.Direct2D1.Effects;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace EcosystemSim
@@ -50,6 +51,15 @@ namespace EcosystemSim
                     return -1;
             }
         }
+
+        public static List<TileType> grassTileTypes = new List<TileType>() { 
+            TileType.Plain,
+            TileType.Grass,
+        };
+
+        public static List<TileType> waterTileTypes = new List<TileType>() {
+            TileType.Water,
+        };
 
         public Tile(Grid parentGrid,int[] gridPos, Vector2 position, TileType type, float weight = 1)
         {
@@ -135,6 +145,8 @@ namespace EcosystemSim
             // Change the tile type
             tileType = newType;
         }
+        
+
 
         public override void Update()
         {
@@ -158,5 +170,23 @@ namespace EcosystemSim
             selectedPlant = null;
             parentGrid.currentAmountOfPlants--;
         }
+
+        //// Check if the tile's type is in the list of water tile types
+        //public static bool IsTileTypeGrowableGrass(TileType tileType) => grassTileTypes.Contains(tileType);
+        //// Check if the tile's type is in the list of water tile types
+        //public static bool IsTileTypeWater(TileType tileType) => waterTileTypes.Contains(tileType);
+
+        public static bool IsTileTypeGrowableGrass(TileType tileType)
+        {
+            bool temp = grassTileTypes.Contains(tileType); 
+            return temp;
+        }
+
+        public static bool IsTileTypeWater(TileType tileType)
+        {
+            bool temp = waterTileTypes.Contains(tileType);
+            return temp;
+        }
+
     }
 }

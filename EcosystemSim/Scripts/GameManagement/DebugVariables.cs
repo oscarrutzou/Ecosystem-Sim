@@ -21,7 +21,6 @@ namespace EcosystemSim
             //DrawString($"Selected tile type: {InputManager.selectedTileType}");
             //DrawString($"Selected gridIndex: {GridManager.GridIndex}");
 
-            //DrawString($"Build Mode: {InputManager.buildMode}");
 
 
             //if (GridManager.selectedGrid == null) return;
@@ -53,6 +52,7 @@ namespace EcosystemSim
             //    DrawString($"End astar pos: {scene.astar.lastPath.Last().gridPos[0]},{scene.astar.lastPath.Last().gridPos[1]}");
             //}
 
+            DrawString($"Build Mode: {InputManager.buildMode}");
             DrawString($"GameSpeed: {GameWorld.Instance.gameSpeed}");
             DrawString($"herbivoresAlive timer: {herbivoresAlive}");
             DrawString($"Herbivore count: {SceneData.herbivores.Count}");
@@ -83,11 +83,18 @@ namespace EcosystemSim
                     {
                         DrawString($"Hover Agent hungermeter: {agent.hungermeter}");
                         DrawString($"Hover Agent thirstMeter: {agent.thirstMeter}");
-                        DrawString($"Hover Agent target: {agent.target}");
+                        //DrawString($"Hover Agent target: {agent.target}");
                         DrawString($"Hover Agent target list: {agent.targetObjectInRad.Count}");
                         DrawString($"Hover Agent state: {agent.currentState}");
-                        DrawString($"Hover Agent position: {agent.position}");
-                        DrawString($"Hover Agent target.position: {agent.target.position}");
+                        int[] curPos = GridManager.grids[0].GetTile(agent.position).gridPos;
+                        DrawString($"Hover Agent grid position: {curPos[0]}, {curPos[1]}");
+                        DrawString($"Hover Agent target tile grid position: {agent.nextTargetTile?.gridPos[0]}, {agent.nextTargetTile?.gridPos[1]}");
+                        
+                        if (agent.target != null)
+                        {
+                            int[] targetPos = GridManager.grids[0].GetTile(agent.target.position).gridPos;
+                            DrawString($"Hover Agent target gridpos: {targetPos[0]}, {targetPos[1]}");
+                        }
 
                     }
                 }

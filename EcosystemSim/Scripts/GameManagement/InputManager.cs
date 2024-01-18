@@ -42,17 +42,9 @@ namespace EcosystemSim
             { Keys.D1, HerbivoreType.Rabbit },
         };
 
-        private static Dictionary<int, float> gameSpeedTime = new Dictionary<int, float>() {
-            { 1, 0.5f },
-            { 2, 1f },
-            { 3, 2f },
-            { 4, 5f },
-            { 5, 10f },
-        };
-
         private static List<float> gameSpeed = new List<float>()
         {
-            { 0.5f},
+            { 0.1f},
             { 1f},
             { 2f},
             { 5f},
@@ -183,28 +175,34 @@ namespace EcosystemSim
 
             if (!buildMode)
             {
-                foreach (GameObject obj in SceneData.gameObjects)
+                //objOnHover = null;
+
+                foreach (GameObject obj in SceneData.herbivores)
                 {
                     if (IsMouseOver(obj))
                     {
                         objOnHover = obj;
-                        return;
+                        break;
                     }
                 }
 
-                //tileOnHover = GridManager.GetTileAtPos(mousePositionInWorld);
-                //if (tileOnHover != null)
-                //{
+                if (mouseRightClicked && objOnHover != null && objOnHover is Agent agent)
+                {
+                    agent.thirstMeter = 40;
+                    agent.hungermeter = 40;
+                }
 
-                //    if (mouseClicked)
-                //    {
-                //        //startPos = tileOnHover.position;
-                //        Herbivore herbivore = new Herbivore(tileOnHover.Center, selectedHervicoreType);
-                //        SceneData.gameObjectsToAdd.Add(herbivore);
-                //    }
-                //}
-                //There isnt any object where the mouse is, therefore set objOnHover to null.
-                objOnHover = null;
+                tileOnHover = GridManager.GetTileAtPos(mousePositionInWorld);
+                if (tileOnHover != null)
+                {
+
+                    if (mouseClicked)
+                    {
+                        //startPos = tileOnHover.position;
+                        Herbivore herbivore = new Herbivore(tileOnHover.Center, selectedHervicoreType);
+                        SceneData.gameObjectsToAdd.Add(herbivore);
+                    }
+                }
             }
             else
             {
@@ -222,6 +220,8 @@ namespace EcosystemSim
                     }
                 }
             }
+
+
             
         }
         private static bool IsMouseOver(GameObject gameObject)

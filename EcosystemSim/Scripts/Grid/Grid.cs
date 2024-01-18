@@ -10,8 +10,8 @@ namespace EcosystemSim
     {
         public static bool isInitialized = false;
         public static Vector2 startPosPx = Vector2.Zero;
-        public static int collumns = 30;
-        public static int rows = 30;
+        public static int collumns = 10;
+        public static int rows = 10;
         public static bool isCentered = true;
 
 

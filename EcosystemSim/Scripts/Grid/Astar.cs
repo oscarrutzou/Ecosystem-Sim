@@ -7,11 +7,11 @@ using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace EcosystemSim
 {
-    public static class Astar
+    public class Astar
     {
-        private static List<Grid> grids = GridManager.grids;
-
-        public static Stack<Tile> FindPath(Vector2 Start, Vector2 End)
+        private List<Grid> grids = GridManager.grids;
+        public bool startNTargetPosSame;
+        public Stack<Tile> FindPath(Vector2 Start, Vector2 End)
         {
             if (grids.Count == 0) return null;
 
@@ -24,8 +24,13 @@ namespace EcosystemSim
                 if (end == null || !end.isWalkable && end.tileType != TileType.Empty)
                     return null;
                 if (start.gridPos == end.gridPos)
+                {
+                    startNTargetPosSame = true;
                     return null;
+                }
             }
+
+            startNTargetPosSame = false;
 
             foreach (var grid in grids)
             {
@@ -91,7 +96,7 @@ namespace EcosystemSim
             return null;
         }
 
-        private static List<Tile> GetAdjacencies(Tile t)
+        private List<Tile> GetAdjacencies(Tile t)
         {
             List<Tile> temp = new List<Tile>();
             int x = t.gridPos[0];

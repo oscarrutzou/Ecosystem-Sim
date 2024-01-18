@@ -31,19 +31,21 @@ namespace EcosystemSim
         private int thirstHungerScale = 1;
         private int minAmountBeforeDmg = 30;
         internal int amountBeforeSearch = 50;
-        public int searchRadPx = 200;
+        public int searchRadPx = 400;
 
         public int speed = 60;
         //private double changeDirectionTimer = 0;
         internal double eatingTimer = 0;
         private bool isEating;
+        internal bool isThirsty;
+        internal bool isHungry;
         internal double drinkingTimer = 0;
         private Vector2 direction;
         
         internal AgentState currentState;
         public GameObject target;
         public Stack<Tile> path;
-        private Tile targetTile;
+        public Tile nextTargetTile;
         public List<GameObject> targetObjectInRad = new List<GameObject>();
 
         public int amountDebug;
@@ -51,6 +53,9 @@ namespace EcosystemSim
         public Tile pathEndTile;
         public bool canFindPath;
         private Random rnd = new Random();
+
+        public Astar astar;
+
         public Agent() {
             layerDepth = 0.2f;
             health = maxHealth;
@@ -58,6 +63,7 @@ namespace EcosystemSim
             thirstMeter = thirstMaxMeter;
             hungermeter = hungerMaxmeter;
             currentState = AgentState.IdleWalk;
+            astar = new Astar();
         }
 
         public override void Update()
@@ -88,7 +94,14 @@ namespace EcosystemSim
             thirstMeter -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed * thirstHungerScale;
             hungermeter -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed * thirstHungerScale;
 
+
+
             if (currentState == AgentState.Eating || currentState == AgentState.Drinking) return;
+
+
+            isThirsty = thirstMeter <= amountBeforeSearch;
+            isHungry = hungermeter <= amountBeforeSearch;
+
 
             if (thirstMeter <= amountBeforeSearch)
             {
@@ -218,18 +231,13 @@ namespace EcosystemSim
 
 
         public void WalkTowardsTargetIdle()
-        {
-            
-            if (targetTile == null)
-            {
-                // If there's no target tile, change direction
-                GetTargetTile(true);
-            }
+        {  
+            GetTargetTile(true);
 
-            if (targetTile == null) return;
+            if (nextTargetTile == null) return;
 
             // Calculate the direction to the target tile
-            direction = targetTile.Center - position;
+            direction = nextTargetTile.Center - position;
             if (direction != Vector2.Zero)
             {
                 direction.Normalize();
@@ -238,11 +246,11 @@ namespace EcosystemSim
             Vector2 nextPos = position + direction * speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
 
             // Check if the next position is close to the target tile
-            if (Vector2.Distance(nextPos, targetTile.Center) < speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed)
+            if (Vector2.Distance(nextPos, nextTargetTile.Center) < speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed)
             {
                 // If it is, move to the target tile and get the next target tile from the path
-                position = targetTile.Center;
-                targetTile = (path.Count > 0) ? path.Pop() : null;
+                position = nextTargetTile.Center;
+                nextTargetTile = (path.Count > 0) ? path.Pop() : null;
             }
             else
             {
@@ -254,14 +262,10 @@ namespace EcosystemSim
 
         public void WalkTowardsTarget(Action onTargetReached)
         {
-            if (targetTile == null)
-            {
-                // If there's no target tile, change direction
-                GetTargetTile(false);
-            }
+            GetTargetTile(false);
             
             //If the agent is close enough to the target, or not found the path
-            if (targetTile == null)
+            if (nextTargetTile == null)
             {
                 float distance = Vector2.Distance(position, target.position);
                 if (distance <= 35) //If it cant find the path, since its already here
@@ -278,7 +282,7 @@ namespace EcosystemSim
             }
 
             // Calculate the direction to the target tile
-            direction = targetTile.Center - position;
+            direction = nextTargetTile.Center - position;
             if (direction != Vector2.Zero)
             {
                 direction.Normalize();
@@ -287,11 +291,11 @@ namespace EcosystemSim
             Vector2 nextPos = position + direction * speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
 
             // Check if the next position is close to the target tile
-            if (Vector2.Distance(nextPos, targetTile.Center) < speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed)
+            if (Vector2.Distance(nextPos, nextTargetTile.Center) < speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed)
             {
                 // If it is, move to the target tile and get the next target tile from the path
-                position = targetTile.Center;
-                targetTile = (path.Count > 0) ? path.Pop() : null;
+                position = nextTargetTile.Center;
+                nextTargetTile = (path.Count > 0) ? path.Pop() : null;
                 
             }
             else
@@ -303,39 +307,80 @@ namespace EcosystemSim
  
         private void GetTargetTile(bool randomTarget)
         {
-           
+
+
+            GameObject tempTarget = null;
             if (targetObjectInRad.Count > 0)
             {
                 if (randomTarget)
                 {
                     // Select a random tile from targetObjectInRad
-                    targetObjectInRad = targetObjectInRad.OrderBy(x => rnd.Next()).ToList();
-                    target = targetObjectInRad[0];
+                    //targetObjectInRad = targetObjectInRad.OrderBy(x => rnd.Next()).ToList();
+                    targetObjectInRad.Reverse(); //Takes the furthest, for testing
+                    tempTarget = targetObjectInRad[0];
                 }
                 else
                 {
-                    target = targetObjectInRad[0]; //Since we already have sorted the list for closest target.
+                    tempTarget = targetObjectInRad[0]; //Since we already have sorted the list for closest target.
                 }
                 
             }
 
-            if (target == null) return; //If there isnt any in the targetObjectInRad
+            if (tempTarget == null) return;
+            if (IsNewTargetAndTargetSameType(target, tempTarget)) return;
 
-            if (path == null || path.Count == 0)
+            path = null;
+            target = tempTarget;
+
+            path = astar.FindPath(position, target.position);
+
+            if (astar.startNTargetPosSame) //Since path is null if they are at the same tile, so 
             {
-                path = Astar.FindPath(position, target.position);
-
-                if (GridManager.grids[0].GetTile(position).gridPos == GridManager.grids[0].GetTile(target.position).gridPos) //Since path is null if they are at the same tile, so 
-                {
-                    targetTile = null;
-                }
+                nextTargetTile = null;
             }
 
             if (path != null && path.Count > 0)
             {
                 pathEndTile = path.Last();
-                targetTile = path.Pop();
+                nextTargetTile = path.Pop();
             }
+        }
+
+
+        /// <summary>
+        /// False == new path
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="newTarget"></param>
+        /// <returns></returns>
+        private bool IsNewTargetAndTargetSameType(GameObject target, GameObject newTarget)
+        {
+            if (target == null) return false;
+            if (nextTargetTile == null) return false; //Meaning it has walked to the target
+
+            if (nextTargetTile.gridPos == pathEndTile.gridPos) return true; //Meaning it dosent have to generate a new path
+
+            Tile gridPosTarget = GridManager.GetTileAtPos(target.position);
+            Tile gridPosNewTarget = GridManager.GetTileAtPos(newTarget.position);
+
+            if (isThirsty)
+            {
+                if (Tile.IsTileTypeWater(gridPosNewTarget.tileType))
+                {
+                    return Tile.IsTileTypeWater(pathEndTile.tileType);
+                }
+            }
+            else if (isHungry)
+            {
+                //Check plants for herbivore
+                //This is herbivore
+                //Is target not plant and new target is plant = false
+                //is target plant and new target is plant = true;
+            }
+
+            if (Tile.IsTileTypeGrowableGrass(gridPosTarget.tileType) && Tile.IsTileTypeGrowableGrass(gridPosNewTarget.tileType)) return true;
+            
+            return false;
         }
 
         internal void SearchForType(List<Tile> targetTiles)
