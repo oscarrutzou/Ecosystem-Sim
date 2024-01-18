@@ -160,13 +160,6 @@ namespace EcosystemSim
 
                 if (keyboardState.IsKeyDown(Keys.T) && !previousKeyboardState.IsKeyDown(Keys.T))
                 {
-                    foreach (Grid grid in GridManager.grids)
-                    {
-                        foreach (Tile tile in grid.tiles)
-                        {
-                            tile.ChangeTile(TileType.Empty);
-                        }
-                    }
                     SaveLoad.LoadGrids();
                 }
 
@@ -190,25 +183,26 @@ namespace EcosystemSim
 
             if (!buildMode)
             {
-                //foreach (GameObject obj in SceneData.gameObjects)
-                //{
-                //    if (IsMouseOver(obj))
-                //    {
-                //        objOnHover = obj;
-                //        return;
-                //    }
-                //}
-                tileOnHover = GridManager.GetTileAtPos(mousePositionInWorld);
-                if (tileOnHover != null)
+                foreach (GameObject obj in SceneData.gameObjects)
                 {
-
-                    if (mouseClicked)
+                    if (IsMouseOver(obj))
                     {
-                        //startPos = tileOnHover.position;
-                        Herbivore herbivore = new Herbivore(tileOnHover.Center, selectedHervicoreType);
-                        SceneData.gameObjectsToAdd.Add(herbivore);
+                        objOnHover = obj;
+                        return;
                     }
                 }
+
+                //tileOnHover = GridManager.GetTileAtPos(mousePositionInWorld);
+                //if (tileOnHover != null)
+                //{
+
+                //    if (mouseClicked)
+                //    {
+                //        //startPos = tileOnHover.position;
+                //        Herbivore herbivore = new Herbivore(tileOnHover.Center, selectedHervicoreType);
+                //        SceneData.gameObjectsToAdd.Add(herbivore);
+                //    }
+                //}
                 //There isnt any object where the mouse is, therefore set objOnHover to null.
                 objOnHover = null;
             }

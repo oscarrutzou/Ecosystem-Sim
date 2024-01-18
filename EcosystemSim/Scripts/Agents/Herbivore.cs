@@ -37,8 +37,15 @@ namespace EcosystemSim
         {
             if (target != null && target is Tile tile && tile.tileType == TileType.Water)
             {
-                currentState = AgentState.Drinking;
-                drinkingTimer = 1;
+                if (currentState != AgentState.Drinking && thirstMeter <= amountBeforeSearch)
+                {
+                    currentState = AgentState.Drinking;
+                    drinkingTimer = 1;
+                }
+                else
+                {
+                    currentState = AgentState.IdleWalk;
+                }
             } else if (target != null && target is Plant)
             {
                 currentState = AgentState.Eating;

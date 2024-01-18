@@ -108,7 +108,7 @@ namespace EcosystemSim
                     texture = GlobalTextures.textures[TextureNames.TileGrassy];
                     isWalkable = true;
                     canGrowPlants = true;
-                    cost = 30;
+                    //cost = 300;
                     break;
             }
         }

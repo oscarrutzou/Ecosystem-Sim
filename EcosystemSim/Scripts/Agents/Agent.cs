@@ -28,12 +28,12 @@ namespace EcosystemSim
         public int thirstMaxMeter = 100;
         public double hungermeter;
         public int hungerMaxmeter = 100;
-        private int thirstHungerScale = 3;
+        private int thirstHungerScale = 1;
         private int minAmountBeforeDmg = 30;
-        private int amountBeforeSearch = 50;
+        internal int amountBeforeSearch = 50;
         public int searchRadPx = 200;
 
-        public int speed = 30;
+        public int speed = 60;
         //private double changeDirectionTimer = 0;
         internal double eatingTimer = 0;
         private bool isEating;
@@ -110,11 +110,6 @@ namespace EcosystemSim
 
                 SearchForFoodObjects();
 
-                if (thirstMeter <= amountBeforeSearch && targetObjectInRad.Count == 0)
-                {
-                    SearchForWater();
-                }
-
                 if (targetObjectInRad.Count == 0)
                 {
                     currentState = AgentState.Search;
@@ -127,7 +122,6 @@ namespace EcosystemSim
                 SearchForIdleWalkTiles();
             }
 
-            //SearchForTarget();
 
             if (hungermeter <= minAmountBeforeDmg || thirstMeter <= minAmountBeforeDmg)
             {
@@ -141,7 +135,19 @@ namespace EcosystemSim
                 }
             }
 
-            if (health <= 0 || thirstMeter <= 0 || hungermeter <= -50) isRemoved = true; //Agent died
+            if (health <= 0 || thirstMeter <= 0 || hungermeter <= -50)
+            {
+                isRemoved = true; //Agent died
+                if (hungermeter <= -50)
+                {
+                    deathByHungerCounter++;
+                    
+                }
+                else if (thirstMeter <= 0)
+                {
+                    deathByThristCounter++;
+                }
+            }
         }
 
         private void SearchForWater()
@@ -163,9 +169,21 @@ namespace EcosystemSim
         }
         private void SearchForIdleWalkTiles()
         {
-            List<Tile> walkableTiles = SceneData.tiles.Where(tile => tile.isWalkable).ToList();
+            List<Tile> walkableTiles;
+
+            // If the herbivore is not thirsty, exclude water tiles from the list of walkable tiles
+            if (thirstMeter > amountBeforeSearch)
+            {
+                walkableTiles = SceneData.tiles.Where(tile => tile.isWalkable && tile.tileType != TileType.Water).ToList();
+            }
+            else
+            {
+                walkableTiles = SceneData.tiles.Where(tile => tile.isWalkable).ToList();
+            }
+
             SearchForType(walkableTiles);
         }
+
 
         #endregion
 
@@ -291,7 +309,8 @@ namespace EcosystemSim
                 if (randomTarget)
                 {
                     // Select a random tile from targetObjectInRad
-                    target = targetObjectInRad[rnd.Next(targetObjectInRad.Count)];
+                    targetObjectInRad = targetObjectInRad.OrderBy(x => rnd.Next()).ToList();
+                    target = targetObjectInRad[0];
                 }
                 else
                 {
@@ -306,7 +325,7 @@ namespace EcosystemSim
             {
                 path = Astar.FindPath(position, target.position);
 
-                if (Vector2.Distance(position, target.position) <= 35)
+                if (GridManager.grids[0].GetTile(position).gridPos == GridManager.grids[0].GetTile(target.position).gridPos) //Since path is null if they are at the same tile, so 
                 {
                     targetTile = null;
                 }

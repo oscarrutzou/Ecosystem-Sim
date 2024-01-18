@@ -10,8 +10,8 @@ namespace EcosystemSim
     {
         public static bool isInitialized = false;
         public static Vector2 startPosPx = Vector2.Zero;
-        public static int collumns = 10;
-        public static int rows = 10;
+        public static int collumns = 30;
+        public static int rows = 30;
         public static bool isCentered = true;
 
 
@@ -54,6 +54,8 @@ namespace EcosystemSim
 
         private void InitGrid()
         {
+            if (collumns < 2 || rows < 2) throw new ArgumentException("It should atleast have 4 tiles");
+
             if (isCentered && !isInitialized)
             {
                 startPosPx = new Vector2(startPosPx.X - rows * gridSizeDem / 2, startPosPx.Y - collumns * gridSizeDem / 2);

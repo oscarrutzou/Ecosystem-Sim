@@ -53,6 +53,11 @@ namespace EcosystemSim
             //    DrawString($"End astar pos: {scene.astar.lastPath.Last().gridPos[0]},{scene.astar.lastPath.Last().gridPos[1]}");
             //}
 
+            DrawString($"GameSpeed: {GameWorld.Instance.gameSpeed}");
+            DrawString($"herbivoresAlive timer: {herbivoresAlive}");
+            DrawString($"Herbivore count: {SceneData.herbivores.Count}");
+            DrawString($"DeathByThristCounter count: {Agent.deathByThristCounter}");
+            DrawString($"DeathByHungerCounter count: {Agent.deathByHungerCounter}");
 
             if (InputManager.buildMode)
             {
@@ -67,24 +72,26 @@ namespace EcosystemSim
                     DrawString($"Hover tile layerDepth: {tile.canGrowPlants} + {tile.selectedPlant?.texture.Name}");
                 }
             }
-            //else
-            //{
-            //    GameObject obj = InputManager.objOnHover;
-            //    if (obj != null)
-            //    {
-            //        DrawString($"Hover obj pos: {obj.position}");
-            //        DrawString($"Hover obj layerDepth: {obj.layerDepth}");
-            //        if (obj is Agent agent)
-            //        {
-            //            DrawString($"Hover Agent hungermeter: {agent.hungermeter}");
-            //            DrawString($"Hover Agent thirstMeter: {agent.thirstMeter}");
-            //            DrawString($"Hover Agent target: {agent.target}");
-            //            DrawString($"Hover Agent target list: {agent.targetObjectInRad.Count}");
-            //            DrawString($"Hover Agent state: {agent.currentState}");
+            else
+            {
+                GameObject obj = InputManager.objOnHover;
+                if (obj != null)
+                {
+                    DrawString($"Hover obj pos: {obj.position}");
+                    DrawString($"Hover obj layerDepth: {obj.layerDepth}");
+                    if (obj is Agent agent)
+                    {
+                        DrawString($"Hover Agent hungermeter: {agent.hungermeter}");
+                        DrawString($"Hover Agent thirstMeter: {agent.thirstMeter}");
+                        DrawString($"Hover Agent target: {agent.target}");
+                        DrawString($"Hover Agent target list: {agent.targetObjectInRad.Count}");
+                        DrawString($"Hover Agent state: {agent.currentState}");
+                        DrawString($"Hover Agent position: {agent.position}");
+                        DrawString($"Hover Agent target.position: {agent.target.position}");
 
-            //        }
-            //    }
-            //}
+                    }
+                }
+            }
 
             //foreach (Herbivore herbivore in SceneData.herbivores)
             //{
@@ -95,38 +102,34 @@ namespace EcosystemSim
             //    //DrawString($"Herbivore target list: {herbivore.targetObjectInRad.Count}");
             //    //DrawString($"Herbivore state: {herbivore.currentState}");
             //}
-            DrawString($"GameSpeed: {GameWorld.Instance.gameSpeed}");
-            DrawString($"herbivoresAlive timer: {herbivoresAlive}");
-            DrawString($"Herbivore count: {SceneData.herbivores.Count}");
-            DrawString($"DeathByThristCounter count: {Agent.deathByThristCounter}");
-            DrawString($"DeathByHungerCounter count: {Agent.deathByHungerCounter}");
-
-            for (int i = 0; i < SceneData.herbivores.Count; i++)
-            {
-                //DrawString($"Herbivore {i}, pos: {SceneData.herbivores[i].position} + targetpos: {SceneData.herbivores[i].target.position} + health: {(int)SceneData.herbivores[i].health}");
-                DrawString(" ");
-                DrawString($"Herbivore {i} hungermeter: {(int)SceneData.herbivores[i].hungermeter}");
-                DrawString($"Herbivore {i} thirstMeter: {(int)SceneData.herbivores[i].thirstMeter}");
-                //DrawString($"Herbivore {i} health: {(int)SceneData.herbivores[i].health}");
-                DrawString($"Herbivore {i} targetInRad: {SceneData.herbivores[i].targetObjectInRad.Count}");
-                DrawString($"Herbivore {i} state: {SceneData.herbivores[i].currentState}");
-                DrawString($"Herbivore {i} path: {SceneData.herbivores[i].path?.Count}");
-                DrawString($"Herbivore {i} canFindPath: {SceneData.herbivores[i].canFindPath}");
-                DrawString($"Herbivore {i} drinkingTimer: {SceneData.herbivores[i].drinkingTimer}");
 
 
-                if (SceneData.herbivores[i].target is Tile tile)
-                {
-                    DrawString($"Herbivore {i} targetName: {tile.tileType}");
-                }
-                else
-                {
-                    DrawString($"Herbivore {i} targetName: {SceneData.herbivores[i].target?.GetType().Name}");
-                }
-                //DrawString($"Herbivore {i} debug: {SceneData.herbivores[i].amountDebug}");
-                //DrawString($"Herbivore {i} pathEndTile: {SceneData.herbivores[i]?.pathEndTile?.tileType}");
-                //DrawString($"Herbivore {i} distanceToTarget: {SceneData.herbivores[i].distanceToTarget}");
-            }
+            //for (int i = 0; i < SceneData.herbivores.Count; i++)
+            //{
+            //    //DrawString($"Herbivore {i}, pos: {SceneData.herbivores[i].position} + targetpos: {SceneData.herbivores[i].target.position} + health: {(int)SceneData.herbivores[i].health}");
+            //    DrawString(" ");
+            //    DrawString($"Herbivore {i} hungermeter: {(int)SceneData.herbivores[i].hungermeter}");
+            //    DrawString($"Herbivore {i} thirstMeter: {(int)SceneData.herbivores[i].thirstMeter}");
+            //    //DrawString($"Herbivore {i} health: {(int)SceneData.herbivores[i].health}");
+            //    DrawString($"Herbivore {i} targetInRad: {SceneData.herbivores[i].targetObjectInRad.Count}");
+            //    DrawString($"Herbivore {i} state: {SceneData.herbivores[i].currentState}");
+            //    DrawString($"Herbivore {i} path: {SceneData.herbivores[i].path?.Count}");
+            //    DrawString($"Herbivore {i} canFindPath: {SceneData.herbivores[i].canFindPath}");
+            //    DrawString($"Herbivore {i} drinkingTimer: {SceneData.herbivores[i].drinkingTimer}");
+
+
+            //    if (SceneData.herbivores[i].target is Tile tile)
+            //    {
+            //        DrawString($"Herbivore {i} targetName: {tile.tileType}");
+            //    }
+            //    else
+            //    {
+            //        DrawString($"Herbivore {i} targetName: {SceneData.herbivores[i].target?.GetType().Name}");
+            //    }
+            //    //DrawString($"Herbivore {i} debug: {SceneData.herbivores[i].amountDebug}");
+            //    //DrawString($"Herbivore {i} pathEndTile: {SceneData.herbivores[i]?.pathEndTile?.tileType}");
+            //    //DrawString($"Herbivore {i} distanceToTarget: {SceneData.herbivores[i].distanceToTarget}");
+            //}
 
         }
 

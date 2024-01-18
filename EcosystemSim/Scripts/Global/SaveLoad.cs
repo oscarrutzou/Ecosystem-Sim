@@ -68,6 +68,11 @@ namespace EcosystemSim
                 tile.isRemoved = true;
             }
 
+            foreach (Plant plant in SceneData.plants)
+            {
+                plant.isRemoved = true;
+            }
+
             string appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string folder = Path.Combine(appdataPath, "EcoSystemSimData");
 
@@ -108,6 +113,7 @@ namespace EcosystemSim
 
         private static Grid LoadGrid(int index, string description)
         {
+
             string gridName = description;
             string appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string folder = Path.Combine(appdataPath, "EcoSystemSimData");
