@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
-using System.Net.NetworkInformation;
-using SharpDX.Direct2D1;
-using Microsoft.Win32;
 
 namespace EcosystemSim
 {
@@ -32,7 +29,7 @@ namespace EcosystemSim
         private int thirstHungerScale = 1;
         private int minAmountBeforeDmg = 30;
         internal int amountBeforeSearch = 50;
-        public int searchRadPx = 300;
+        public int searchRadPx = 200;
 
         public int speed = 60;
         //private double changeDirectionTimer = 0;
@@ -298,18 +295,18 @@ namespace EcosystemSim
             {
                 if (randomTarget)
                 {
-                    // Select a random tile from targetObjectInRad
-                    //if (rnd.Next(0, 2) == 0)
-                    //{
-                    //    targetObjectInRad.Reverse(); //Takes the furthest, for testing
-                    //    tempTarget = targetObjectInRad[0];
-                    //}
-                    //else
-                    //{
-                        
-                    //}
                     targetObjectInRad = targetObjectInRad.OrderBy(x => rnd.Next()).ToList();
                     tempTarget = targetObjectInRad[0];
+
+                    //foreach (GameObject gm in SceneData.tiles)
+                    //{
+                    //    gm.color = Color.White;
+                    //}
+
+                    //foreach (GameObject targetObject in targetObjectInRad)
+                    //{
+                    //    targetObject.color = Color.Green;
+                    //}
                 }
                 else
                 {
@@ -369,15 +366,18 @@ namespace EcosystemSim
         internal void SearchForType(List<Tile> targetTiles)
         {
             targetObjectInRad.Clear();
+            GameObject ob = this;
+            Tile standingOn = GridManager.GetTileAtPos(this.position);
+
             foreach (Tile tile in targetTiles)
             {
-                if (!tile.isRemoved && Vector2.Distance(this.position, tile.position) <= this.searchRadPx)
+                if (!tile.isRemoved && Vector2.Distance(this.position, tile.centerPos) <= this.searchRadPx)
                 {
                     targetObjectInRad.Add(tile);
                 }
             }
             
-            targetObjectInRad = targetObjectInRad.OrderBy(o => Vector2.Distance(this.position, o.position)).ToList();
+            targetObjectInRad = targetObjectInRad.OrderBy(o => Vector2.Distance(this.position, o.centerPos)).ToList();
         }
 
         internal void SearchForType(List<GameObject> targetObjects)
@@ -385,12 +385,12 @@ namespace EcosystemSim
             targetObjectInRad.Clear();
             foreach (GameObject obj in targetObjects)
             {
-                if (!obj.isRemoved && Vector2.Distance(this.position, obj.position) <= this.searchRadPx)
+                if (!obj.isRemoved && Vector2.Distance(this.position, obj.centerPos) <= this.searchRadPx)
                 {
                     targetObjectInRad.Add(obj);
                 }
             }
-            targetObjectInRad = targetObjectInRad.OrderBy(o => Vector2.Distance(this.position, o.position)).ToList();
+            targetObjectInRad = targetObjectInRad.OrderBy(o => Vector2.Distance(this.position, o.centerPos)).ToList();
         }
 
         public abstract void ActionOnTargetFound();
@@ -460,17 +460,25 @@ namespace EcosystemSim
             //DrawSearchRad();
             //if (InputManager.debugStats) DrawDebugCollisionBox(Color.AliceBlue);
 
-            Texture2D pixel = new Texture2D(GameWorld.Instance.gfxDevice, 1, 1);
-            pixel.SetData(new[] { Color.White });
+            //Texture2D pixel = new Texture2D(GameWorld.Instance.gfxDevice, 1, 1);
+            //pixel.SetData(new[] { Color.White });
 
-            if (pathEndTile != null && debugFullPath != null) {
-                Vector2 pos = position;
-                foreach (Tile tile in debugFullPath)
-                {
-                    DrawLine(pixel, pos, tile.Center, Color.Red);
-                    pos = tile.Center;
-                }
-            }
+            //if (pathEndTile != null && debugFullPath != null) {
+            //    Vector2 pos = position;
+            //    foreach (Tile tile in debugFullPath)
+            //    {
+            //        DrawLine(pixel, pos, tile.Center, Color.Red);
+            //        pos = tile.Center;
+            //    }
+            //}
+
+
+            //DrawLine(pixel, position, new Vector2(position.X, position.Y + searchRadPx), Color.Blue);
+            //DrawLine(pixel, position, new Vector2(position.X, position.Y - searchRadPx), Color.Blue);
+            //DrawLine(pixel, position, new Vector2(position.X + searchRadPx, position.Y), Color.Blue);
+            //DrawLine(pixel, position, new Vector2(position.X - searchRadPx, position.Y), Color.Blue);
+
+
         }
 
 
