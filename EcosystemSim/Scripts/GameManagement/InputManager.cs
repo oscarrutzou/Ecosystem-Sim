@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace EcosystemSim
 {
@@ -23,6 +24,7 @@ namespace EcosystemSim
         public static bool buildMode;
         public static bool mouseOutOfBounds;
         public static bool debugStats = true;
+        public static bool debugWalkableTiles = true;
 
         public static GameObject objOnHover;
         public static Tile tileOnHover;
@@ -35,6 +37,7 @@ namespace EcosystemSim
             { Keys.D1, TileType.Grass },
             { Keys.D2, TileType.TestTileNonWalk },
             { Keys.D3, TileType.Water },
+            { Keys.D4, TileType.TestTileNonFullNonWalk },
         };
 
         private static Dictionary<Keys, HerbivoreType> keyHerbivoreTypeMap = new Dictionary<Keys, HerbivoreType>
@@ -89,6 +92,38 @@ namespace EcosystemSim
             if (keyboardState.IsKeyDown(Keys.Tab) && !previousKeyboardState.IsKeyDown(Keys.Tab))
             {
                 buildMode = !buildMode;
+            }
+            if (keyboardState.IsKeyDown(Keys.F) && !previousKeyboardState.IsKeyDown(Keys.F))
+            {
+                debugWalkableTiles = !debugWalkableTiles;
+            }
+
+            if (debugWalkableTiles)
+            {
+                foreach (Tile tile in SceneData.tiles)
+                {
+                    //Get all tiles at that pos
+                    //find if one is not walkable
+                    //Color all tiles in that temp to that color
+                    if (GridManager.grids.All(g =>
+                    {
+                        Tile temp = g.GetTile(tile.gridPos[0], tile.gridPos[1]);
+                        return temp != null && temp.isWalkable || temp != null && temp.tileType == TileType.Empty;
+                    }))
+                    {
+                        if (tile.color != DebugVariables.selectedGridColor)
+                        {
+                            tile.color = Color.White;
+                        }
+                    }
+                    else
+                    {
+                        if (tile.color != DebugVariables.selectedGridColor)
+                        {
+                            tile.color = DebugVariables.debugNonWalkableTilesColor;
+                        }
+                    }
+                }
             }
 
             MoveCam();

@@ -93,8 +93,6 @@ namespace EcosystemSim
             }
 
             UpdateMaxAmountOfPlants();
-
-            
         }
 
         public Tile GetTile(Vector2 pos)
@@ -147,34 +145,6 @@ namespace EcosystemSim
             else
             {
                 maxAmountOfPlants = canGrowPlantTiles;
-            }
-        }
-
-
-        public void UpdatePlantTiles()
-        {
-            List<Tile> eligibleTiles = new List<Tile>();
-
-            // Find all tiles that are of type TestTile and do not have a plant
-            foreach (Tile tile in tiles)
-            {
-                if (tile.tileType == TileType.Grass || tile.tileType == TileType.Plain)
-                {
-                    if (tile.selectedPlant == null)
-                    {
-                        eligibleTiles.Add(tile);
-                    }
-                }
-                
-            }
-
-            // Randomly select tiles from the eligible list until we reach maxAmountOfPlants or run out of eligible tiles
-            while (currentAmountOfPlants < maxAmountOfPlants && eligibleTiles.Count > 0)
-            {
-                int index = rnd.Next(eligibleTiles.Count);
-                eligibleTiles[index].selectedPlant = new Plant(eligibleTiles[index], PickRandomPlant());
-                currentAmountOfPlants++;
-                eligibleTiles.RemoveAt(index);  // Remove the tile from the list to avoid selecting it again
             }
         }
 

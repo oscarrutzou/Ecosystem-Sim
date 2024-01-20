@@ -11,6 +11,7 @@ namespace EcosystemSim
     {
         Empty,
         TestTileNonWalk,
+        TestTileNonFullNonWalk,
         Plain,
         Grass,
         Water,
@@ -104,6 +105,10 @@ namespace EcosystemSim
                 #region TestTiles
                 case TileType.TestTileNonWalk:
                     texture = GlobalTextures.textures[TextureNames.TestTileNonWalk];
+                    //SetCollisionBox(16,5);
+                    break;
+                case TileType.TestTileNonFullNonWalk:
+                    texture = GlobalTextures.textures[TextureNames.TestNotFullNonWalk];
                     //SetCollisionBox(16,5);
                     break;
                 #endregion

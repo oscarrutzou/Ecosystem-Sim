@@ -39,6 +39,15 @@ namespace EcosystemSim
         }
 
         public static Tile GetTileAtPos(Vector2 pos) => selectedGrid?.GetTile(pos);
+        public static List<Tile> GetTilesAtPos(Vector2 pos)
+        {
+            List<Tile> tiles = new List<Tile>();
+            foreach (Grid grid in grids)
+            {
+                tiles.Add(grid.GetTile(pos));
+            }
+            return tiles;
+        }
 
         public static int[] GetGridPosAtPos(Vector2 pos) => grids[0].GetGridPos(pos);
 
@@ -100,7 +109,7 @@ namespace EcosystemSim
             {
                 grid.UpdateMaxAmountOfPlants();
 
-                if (!grid.hasInitPlants)
+                if (!grid.hasInitPlants) //Need ti be here since InitPlants use the tile gameobjects, and they are first made in the first update.
                 {
                     grid.InitPlants();
                     grid.hasInitPlants = true;
@@ -110,11 +119,11 @@ namespace EcosystemSim
 
         public static void OnGridIndexChanged()
         {
-            if (selectedGrid != null) ChangeTileTing(selectedGrid.tiles, Color.White);
+            if (selectedGrid != null) ChangeTileTint(selectedGrid.tiles, Color.White);
 
             selectedGrid = grids[GridIndex];
 
-            ChangeTileTing(selectedGrid.tiles, tintColor);
+            ChangeTileTint(selectedGrid.tiles, DebugVariables.selectedGridColor);
 
             float depthIncrement = maxLayerDepth / grids.Count; // Calculate depth increment
 
@@ -131,12 +140,15 @@ namespace EcosystemSim
             }
         }
 
-        private static void ChangeTileTing(Tile[,] tiles, Color tint)
+        private static void ChangeTileTint(Tile[,] tiles, Color tint)
         {
             foreach (Tile tile in tiles)
             {
-                tile.color = tint;
-                if (tile.selectedPlant != null) tile.selectedPlant.color = tint;
+                if (tile.color != DebugVariables.debugNonWalkableTilesColor)
+                {
+                    tile.color = tint;
+                    if (tile.selectedPlant != null) tile.selectedPlant.color = tint;
+                }
             }
         }
 
