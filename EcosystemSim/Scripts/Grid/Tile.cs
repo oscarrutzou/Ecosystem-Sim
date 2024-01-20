@@ -169,6 +169,8 @@ namespace EcosystemSim
             selectedPlant.isRemoved = true;
             selectedPlant = null;
             parentGrid.currentAmountOfPlants--;
+
+            parentGrid.PlantNewPlant(this);
         }
 
         //// Check if the tile's type is in the list of water tile types

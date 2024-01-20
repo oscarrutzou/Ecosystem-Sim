@@ -27,6 +27,8 @@ namespace EcosystemSim
         public float layerDepth;
         private Random rnd = new Random();
 
+        public bool hasInitPlants;
+
         private List<TextureNames> plantTextures = new List<TextureNames>() {
             TextureNames.GreensGrass,
             TextureNames.GreensMushroom,
@@ -36,7 +38,6 @@ namespace EcosystemSim
 
         public Grid(string name)
         {
-
             this.basicTileType = TileType.Empty;
             tiles = new Tile[rows, collumns]; // Initialize the 2D array
             gridName = name;
@@ -92,6 +93,8 @@ namespace EcosystemSim
             }
 
             UpdateMaxAmountOfPlants();
+
+            
         }
 
         public Tile GetTile(Vector2 pos)
@@ -125,6 +128,13 @@ namespace EcosystemSim
         }
 
         public Tile GetTile(int x, int y) => tiles[x, y];
+        public void UpdateTileLayerDepths()
+        {
+            foreach (Tile tile in tiles)
+            {
+                tile.layerDepth = layerDepth;
+            }
+        }
 
         public void UpdateMaxAmountOfPlants()
         {
@@ -139,13 +149,7 @@ namespace EcosystemSim
                 maxAmountOfPlants = canGrowPlantTiles;
             }
         }
-        public void UpdateTileLayerDepths()
-        {
-            foreach (Tile tile in tiles)
-            {
-                tile.layerDepth = layerDepth;
-            }
-        }
+
 
         public void UpdatePlantTiles()
         {
@@ -172,6 +176,45 @@ namespace EcosystemSim
                 currentAmountOfPlants++;
                 eligibleTiles.RemoveAt(index);  // Remove the tile from the list to avoid selecting it again
             }
+        }
+
+        public void InitPlants()
+        {
+            List<Tile> eligibleTiles = new List<Tile>();
+            eligibleTiles = SceneData.tiles.Where(tile => tile.isWalkable && tile.selectedPlant == null && Tile.IsTileTypeGrowableGrass(tile.tileType)).ToList();
+
+            // Randomly select tiles from the eligible list until we reach maxAmountOfPlants or run out of eligible tiles
+            while (currentAmountOfPlants < maxAmountOfPlants && eligibleTiles.Count > 0)
+            {
+                int index = rnd.Next(eligibleTiles.Count);
+                eligibleTiles[index].selectedPlant = new Plant(eligibleTiles[index], PickRandomPlant());
+                currentAmountOfPlants++;
+                eligibleTiles.RemoveAt(index);  // Remove the tile from the list to avoid selecting it again
+            }
+        }
+
+        //Fix these parts where it searches though all the objects, very inefficent.
+        public void PlantNewPlant(Tile curTile)
+        {
+            if (currentAmountOfPlants >= maxAmountOfPlants) return;
+
+            List<Tile> closeTiles = new List<Tile>();
+            List<Tile> eligibleTiles = new List<Tile>();
+
+            eligibleTiles = SceneData.tiles.Where(tile => tile.isWalkable && tile.selectedPlant == null && Tile.IsTileTypeGrowableGrass(tile.tileType) && curTile.centerPos != tile.centerPos).ToList();
+
+            foreach (Tile tile in eligibleTiles)
+            {
+                if (!tile.isRemoved && Vector2.Distance(curTile.centerPos, tile.centerPos) <= 100)
+                {
+                    closeTiles.Add(tile);
+                }
+            }
+
+            closeTiles = closeTiles.OrderBy(o => Vector2.Distance(curTile.centerPos, o.centerPos)).ToList();
+            int index = rnd.Next(closeTiles.Count);
+            closeTiles[index].selectedPlant = new Plant(closeTiles[index], PickRandomPlant());
+            currentAmountOfPlants++;
         }
 
         private Texture2D PickRandomPlant()

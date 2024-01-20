@@ -99,7 +99,12 @@ namespace EcosystemSim
             foreach (Grid grid in grids)
             {
                 grid.UpdateMaxAmountOfPlants();
-                grid.UpdatePlantTiles();
+
+                if (!grid.hasInitPlants)
+                {
+                    grid.InitPlants();
+                    grid.hasInitPlants = true;
+                }
             }
         }
 
@@ -123,7 +128,6 @@ namespace EcosystemSim
             {
                 if (grid == null) continue;
                 grid.UpdateTileLayerDepths();
-                grid.UpdatePlantTiles();
             }
         }
 

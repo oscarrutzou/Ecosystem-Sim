@@ -366,8 +366,6 @@ namespace EcosystemSim
         internal void SearchForType(List<Tile> targetTiles)
         {
             targetObjectInRad.Clear();
-            GameObject ob = this;
-            Tile standingOn = GridManager.GetTileAtPos(this.position);
 
             foreach (Tile tile in targetTiles)
             {

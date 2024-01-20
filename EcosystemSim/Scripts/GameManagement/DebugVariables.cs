@@ -55,6 +55,7 @@ namespace EcosystemSim
             DrawString($"Build Mode: {InputManager.buildMode}");
             DrawString($"GameSpeed: {GameWorld.Instance.gameSpeed}");
             DrawString($"herbivoresAlive timer: {herbivoresAlive}");
+            DrawString($"Plants : {SceneData.plants.Count} / {GridManager.grids[0].maxAmountOfPlants}");
             DrawString($"Herbivore count: {SceneData.herbivores.Count}");
             DrawString($"DeathByThristCounter count: {Agent.deathByThristCounter}");
             DrawString($"DeathByHungerCounter count: {Agent.deathByHungerCounter}");
