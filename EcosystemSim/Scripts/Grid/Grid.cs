@@ -125,6 +125,48 @@ namespace EcosystemSim
             return new int[] { gridX, gridY };
         }
 
+        public List<Tile> GetTilesInRadius(Vector2 pos, int radius)
+        {
+            List<Tile> tilesInRadius = new List<Tile>();
+            Tile curTile = GetTile(pos);
+            if (curTile == null) throw new Exception("Not a tile under pos");
+            Vector2 absCurTile = new Vector2(Math.Abs(curTile.centerPos.X), Math.Abs(curTile.centerPos.Y));
+            // Calculate the range of positions that the radius covers
+            Vector2 minPos = -(absCurTile + new Vector2(radius));
+
+            Vector2 maxPos = absCurTile + new Vector2(radius);
+
+            // Iterate over the positions in the range
+            for (float x = minPos.X; x <= maxPos.X; x += gridSizeDem)
+            {
+                for (float y = minPos.Y; y <= maxPos.Y; y += gridSizeDem)
+                {
+                    Vector2 temp = new Vector2(x, y);
+                    int[] gridPos = GetGridPos(temp);
+                    if (gridPos == curTile.gridPos) continue;
+                    // Check if the grid position is within the grid bounds
+                    if (gridPos != null && gridPos[0] >= 0 && gridPos[0] < rows && gridPos[1] >= 0 && gridPos[1] < collumns)
+                    {
+                        Tile tile = GetTile(gridPos[0], gridPos[1]);
+
+                        // Check if the tile is not null and not 'Empty'
+                        if (tile != null && tile.isWalkable)
+                        {
+                            // Check if the position is within the radius from the center position
+                            if ((int)Vector2.Distance(curTile.Center, temp) <= radius)
+                            {
+                                tilesInRadius.Add(tile);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return tilesInRadius;
+        }
+
+
+
         public Tile GetTile(int x, int y) => tiles[x, y];
         public void UpdateTileLayerDepths()
         {

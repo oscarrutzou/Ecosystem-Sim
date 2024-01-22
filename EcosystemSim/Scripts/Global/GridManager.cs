@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing.Printing;
+using System.Linq;
 using Microsoft.Xna.Framework;
 
 
@@ -45,6 +46,17 @@ namespace EcosystemSim
             foreach (Grid grid in grids)
             {
                 tiles.Add(grid.GetTile(pos));
+            }
+            return tiles;
+        }
+        //Liste af vand tiles.
+        //Ellers brug plant, og herbivore liste for lister
+        public static List<Tile> GetTilesInRadius(Vector2 startPos, int radius)
+        {
+            List<Tile> tiles = new List<Tile>();
+            foreach (Grid grid in grids)
+            {
+                tiles.AddRange(grid.GetTilesInRadius(startPos, radius));
             }
             return tiles;
         }

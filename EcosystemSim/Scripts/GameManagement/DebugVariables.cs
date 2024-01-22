@@ -12,7 +12,7 @@ namespace EcosystemSim
         private static Vector2 pos;
         public static double herbivoresAlive;
 
-        public static Color selectedGridColor = Color.Red;
+        public static Color selectedGridColor = Color.Green;
         public static Color debugNonWalkableTilesColor = Color.DeepPink;
 
         public static void DrawDebug()
@@ -64,19 +64,20 @@ namespace EcosystemSim
             DrawString($"DeathByThristCounter count: {Agent.deathByThristCounter}");
             DrawString($"DeathByHungerCounter count: {Agent.deathByHungerCounter}");
 
-            //if (InputManager.buildMode)
-            //{
-            //    Tile tile = InputManager.tileOnHover;
-            //    if (tile != null)
-            //    {
-            //        DrawString($"Hover tile type: {tile.tileType}");
-            //        DrawString($"Hover tile hasBeenPlanted: {tile.hasBeenPlanted}");
-            //        DrawString($"Hover tile grid pos: ({tile.gridPos[0]}, {tile.gridPos[1]})");
-            //        DrawString($"Hover tile pos: {tile.position}");
-            //        DrawString($"Hover tile layerDepth: {tile.layerDepth}");
-            //        DrawString($"Hover tile layerDepth: {tile.canGrowPlants} + {tile.selectedPlant?.texture.Name}");
-            //    }
-            //}
+            if (InputManager.buildMode)
+            {
+                Tile tile = InputManager.tileOnHover;
+                if (tile != null)
+                {
+                    DrawString($"Hover tile type: {tile.tileType}");
+                    DrawString($"Hover tile hasBeenPlanted: {tile.hasBeenPlanted}");
+                    DrawString($"Hover tile grid pos: ({tile.gridPos[0]}, {tile.gridPos[1]})");
+                    DrawString($"Hover tile pos: {tile.position}");
+                    DrawString($"Hover tile layerDepth: {tile.layerDepth}");
+                    DrawString($"Hover tile layerDepth: {tile.canGrowPlants} + {tile.selectedPlant?.texture.Name}");
+                }
+            }
+
             //else
             //{
             //    GameObject obj = InputManager.objOnHover;
@@ -90,6 +91,7 @@ namespace EcosystemSim
             //            DrawString($"Hover Agent thirstMeter: {agent.thirstMeter}");
             //            //DrawString($"Hover Agent target: {agent.target}");
             //            DrawString($"Hover Agent target list: {agent.targetObjectInRad.Count}");
+            //            DrawString($"Hover Agent target tileType: {agent.nextTargetTile?.tileType}");
             //            DrawString($"Hover Agent state: {agent.currentState}");
             //            int[] curPos = GridManager.grids[0].GetTile(agent.position).gridPos;
             //            DrawString($"Hover Agent grid position: {curPos[0]}, {curPos[1]}");

@@ -93,19 +93,15 @@ namespace EcosystemSim
             thirstMeter -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed * thirstHungerScale;
             hungermeter -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed * thirstHungerScale;
 
-
-
             if (currentState == AgentState.Eating || currentState == AgentState.Drinking) return;
-
 
             isThirsty = thirstMeter <= amountBeforeSearch;
             isHungry = hungermeter <= amountBeforeSearch;
 
-
             if (thirstMeter <= amountBeforeSearch)
             {
                 currentState = AgentState.Search;
-                SearchForWater();
+                NewSearchForWater();
 
                 if (hungermeter <= amountBeforeSearch && targetObjectInRad.Count == 0)
                 {
@@ -162,39 +158,27 @@ namespace EcosystemSim
             }
         }
 
-        private void SearchForWater()
-        {
-            List<Tile> waterTiles = SceneData.tiles.Where(tile => tile.tileType == TileType.Water).ToList();
-            SearchForType(waterTiles);
-        }
+        //private void SearchForWater()
+        //{
+        //    List<Tile> waterTiles = SceneData.tiles.Where(tile => tile.tileType == TileType.Water).ToList();
+        //    SearchForType(waterTiles);
+        //}
+
         private void SearchForFoodObjects()
         {
             if (this is Herbivore)
             {
-                List<GameObject> plantList = SceneData.plants.Cast<GameObject>().ToList();
-                SearchForType(plantList);
+
+                //List<GameObject> plantList = SceneData.plants.Cast<GameObject>().ToList();
+                //SearchForType(plantList);
+                NewSearchForHerbivoreFood();
             }
             else if (this is Predator)
             {
 
             }
         }
-        private void SearchForIdleWalkTiles()
-        {
-            List<Tile> walkableTiles;
-            List<GameObject> plantList = SceneData.plants.Cast<GameObject>().ToList();
-            // If the herbivore is not thirsty, exclude water tiles from the list of walkable tiles
-            if (thirstMeter > amountBeforeSearch)
-            {
-                walkableTiles = SceneData.tiles.Where(tile => tile.isWalkable && tile.tileType != TileType.Water).ToList();
-            }
-            else
-            {
-                walkableTiles = SceneData.tiles.Where(tile => tile.isWalkable).ToList();
-            }
 
-            SearchForType(walkableTiles);
-        }
 
 
         #endregion
@@ -351,11 +335,8 @@ namespace EcosystemSim
 
             if (nextTargetTile.gridPos == pathEndTile.gridPos) return true; //Meaning it dosent have to generate a new path
 
-            //Tile gridPosNewTarget = GridManager.GetTileAtPos(newTarget.position);
-
             List<Tile> newTargetTiles = GridManager.GetTilesAtPos(newTarget.position);
             newTargetTiles.Where(t => t != null && t.isWalkable);
-
 
             foreach (Tile tile in newTargetTiles)
             {
@@ -381,32 +362,49 @@ namespace EcosystemSim
             return Tile.IsTileTypeGrowableGrass(pathEndTile.tileType);
         }
 
-        internal void SearchForType(List<Tile> targetTiles)
+        internal void SearchForIdleWalkTiles()
         {
             targetObjectInRad.Clear();
+            List<Tile> list = new List<Tile>();
+            List<Tile> temp = new List<Tile>();
+            list = GridManager.GetTilesInRadius(position, searchRadPx);
 
-            foreach (Tile tile in targetTiles)
-            {
-                if (!tile.isRemoved && Vector2.Distance(this.position, tile.centerPos) <= this.searchRadPx)
-                {
-                    targetObjectInRad.Add(tile);
-                }
+            if (thirstMeter > amountBeforeSearch)
+            { 
+                temp = list.Where(tile => !Tile.IsTileTypeWater(tile.tileType)).ToList();
             }
-            
-            targetObjectInRad = targetObjectInRad.OrderBy(o => Vector2.Distance(this.position, o.centerPos)).ToList();
+            else
+            {
+                temp = list;
+            }
+
+            targetObjectInRad = temp.Cast<GameObject>().ToList();
         }
 
-        internal void SearchForType(List<GameObject> targetObjects)
+        internal void NewSearchForWater()
         {
             targetObjectInRad.Clear();
-            foreach (GameObject obj in targetObjects)
+            List<Tile> list = new List<Tile>();
+            list = GridManager.GetTilesInRadius(position, searchRadPx);
+            List<Tile> temp = list.Where(tile => Tile.IsTileTypeWater(tile.tileType)).ToList();
+
+            targetObjectInRad = temp.Cast<GameObject>().ToList();
+            
+        }
+
+        internal void NewSearchForHerbivoreFood()
+        {
+            targetObjectInRad.Clear();
+
+            List<Tile> list = new List<Tile>();
+            List<Tile> temp = new List<Tile>();
+            list = GridManager.GetTilesInRadius(position, searchRadPx);
+            temp = list.Where(tile => tile.selectedPlant != null).ToList();
+
+            foreach (Tile tile in temp)
             {
-                if (!obj.isRemoved && Vector2.Distance(this.position, obj.centerPos) <= this.searchRadPx)
-                {
-                    targetObjectInRad.Add(obj);
-                }
+                targetObjectInRad.Add(tile.selectedPlant);
             }
-            targetObjectInRad = targetObjectInRad.OrderBy(o => Vector2.Distance(this.position, o.centerPos)).ToList();
         }
 
         public abstract void ActionOnTargetFound();
@@ -479,7 +477,8 @@ namespace EcosystemSim
             //Texture2D pixel = new Texture2D(GameWorld.Instance.gfxDevice, 1, 1);
             //pixel.SetData(new[] { Color.White });
 
-            //if (pathEndTile != null && debugFullPath != null) {
+            //if (pathEndTile != null && debugFullPath != null)
+            //{
             //    Vector2 pos = position;
             //    foreach (Tile tile in debugFullPath)
             //    {
