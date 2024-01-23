@@ -257,8 +257,6 @@ namespace EcosystemSim
 
             Vector2 nextPos = position + direction * speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
 
-            //if (path == null) 
-
             // Check if the next position is close to the target tile
             if (Vector2.Distance(nextPos, nextTargetTile.Center) < speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed)
             {
@@ -309,7 +307,7 @@ namespace EcosystemSim
 
             path = astar.FindPath(position, target.position);
             debugFullPath = path;
-            if (astar.startNTargetPosSame || path == null) //Since path is null if they are at the same tile, so 
+            if (astar.startNTargetPosSame) //Since path is null if they are at the same tile, so 
             {
                 nextTargetTile = null;
             }
@@ -335,28 +333,15 @@ namespace EcosystemSim
 
             if (nextTargetTile.gridPos == pathEndTile.gridPos) return true; //Meaning it dosent have to generate a new path
 
-            List<Tile> newTargetTiles = GridManager.GetTilesAtPos(newTarget.position);
-            newTargetTiles.Where(t => t != null && t.isWalkable);
+            Tile gridPosNewTarget = GridManager.GetTileAtPos(newTarget.position);
 
-            foreach (Tile tile in newTargetTiles)
+            if (isThirsty && Tile.IsTileTypeWater(gridPosNewTarget.tileType))
             {
-                if (isThirsty && Tile.IsTileTypeWater(tile.tileType))
-                {
-                    return Tile.IsTileTypeWater(pathEndTile.tileType);
-                }
-                else if (isHungry)
-                {
-                    //Check plants for herbivore
-                }
-
+                return Tile.IsTileTypeWater(pathEndTile.tileType);
             }
-
-            foreach (Tile tile in newTargetTiles)
+            else if (isHungry)
             {
-                if (Tile.IsTileTypeGrowableGrass(tile.tileType))
-                {
-                    return Tile.IsTileTypeGrowableGrass(pathEndTile.tileType);
-                }
+                //Check plants for herbivore
             }
 
             return Tile.IsTileTypeGrowableGrass(pathEndTile.tileType);

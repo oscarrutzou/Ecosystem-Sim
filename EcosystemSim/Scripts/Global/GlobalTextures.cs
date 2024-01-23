@@ -13,7 +13,6 @@ namespace EcosystemSim
     {
         TestTile,
         TestTileNonWalk,
-        TestNotFullNonWalk,
         TileEmpty,
         TileWater,
         TileGrassy,
@@ -42,7 +41,6 @@ namespace EcosystemSim
             {
                 {TextureNames.TestTile, content.Load<Texture2D>("World\\TestTile") },
                 {TextureNames.TestTileNonWalk, content.Load<Texture2D>("World\\TestTileNonWalkable") },
-                {TextureNames.TestNotFullNonWalk, content.Load<Texture2D>("World\\TestNonWalkable") },
                 {TextureNames.TileEmpty, content.Load<Texture2D>("World\\TileEmpty") },
                 {TextureNames.TileWater, content.Load<Texture2D>("World\\TileWater") },
                 {TextureNames.TilePlain, content.Load<Texture2D>("World\\TilePlain") },
@@ -55,6 +53,8 @@ namespace EcosystemSim
                 {TextureNames.Fox, content.Load<Texture2D>("Agents\\tile_fox") },
                 {TextureNames.Bunny, content.Load<Texture2D>("Agents\\tile_bunny") },
                 {TextureNames.UISearchRad100, content.Load<Texture2D>("UI\\AgentUI\\SearchRad100") },
+
+
             };
 
             // Load all fonts

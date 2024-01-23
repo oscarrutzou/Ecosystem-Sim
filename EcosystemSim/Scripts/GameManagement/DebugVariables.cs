@@ -23,7 +23,7 @@ namespace EcosystemSim
                 herbivoresAlive += GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
             }
             //DrawString($"Selected tile type: {InputManager.selectedTileType}");
-            DrawString($"Selected gridIndex: {GridManager.GridIndex}");
+            //DrawString($"Selected gridIndex: {GridManager.GridIndex}");
 
 
 
@@ -96,7 +96,7 @@ namespace EcosystemSim
             //            int[] curPos = GridManager.grids[0].GetTile(agent.position).gridPos;
             //            DrawString($"Hover Agent grid position: {curPos[0]}, {curPos[1]}");
             //            DrawString($"Hover Agent target tile grid position: {agent.nextTargetTile?.gridPos[0]}, {agent.nextTargetTile?.gridPos[1]}");
-
+                        
             //            if (agent.target != null)
             //            {
             //                int[] targetPos = GridManager.grids[0].GetTile(agent.target.position).gridPos;

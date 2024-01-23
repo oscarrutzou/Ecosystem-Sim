@@ -121,7 +121,7 @@ namespace EcosystemSim
             {
                 grid.UpdateMaxAmountOfPlants();
 
-                if (!grid.hasInitPlants) //Need ti be here since InitPlants use the tile gameobjects, and they are first made in the first update.
+                if (!grid.hasInitPlants)
                 {
                     grid.InitPlants();
                     grid.hasInitPlants = true;
@@ -131,11 +131,11 @@ namespace EcosystemSim
 
         public static void OnGridIndexChanged()
         {
-            if (selectedGrid != null) ChangeTileTint(selectedGrid.tiles, Color.White);
+            if (selectedGrid != null) ChangeTileTing(selectedGrid.tiles, Color.White);
 
             selectedGrid = grids[GridIndex];
 
-            ChangeTileTint(selectedGrid.tiles, DebugVariables.selectedGridColor);
+            ChangeTileTing(selectedGrid.tiles, tintColor);
 
             float depthIncrement = maxLayerDepth / grids.Count; // Calculate depth increment
 
@@ -152,15 +152,12 @@ namespace EcosystemSim
             }
         }
 
-        private static void ChangeTileTint(Tile[,] tiles, Color tint)
+        private static void ChangeTileTing(Tile[,] tiles, Color tint)
         {
             foreach (Tile tile in tiles)
             {
-                if (tile.color != DebugVariables.debugNonWalkableTilesColor)
-                {
-                    tile.color = tint;
-                    if (tile.selectedPlant != null) tile.selectedPlant.color = tint;
-                }
+                tile.color = tint;
+                if (tile.selectedPlant != null) tile.selectedPlant.color = tint;
             }
         }
 
