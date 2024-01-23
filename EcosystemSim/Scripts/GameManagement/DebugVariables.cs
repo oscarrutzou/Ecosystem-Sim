@@ -78,34 +78,34 @@ namespace EcosystemSim
                 }
             }
 
-            //else
-            //{
-            //    GameObject obj = InputManager.objOnHover;
-            //    if (obj != null)
-            //    {
-            //        DrawString($"Hover obj pos: {obj.position}");
-            //        DrawString($"Hover obj layerDepth: {obj.layerDepth}");
-            //        if (obj is Agent agent)
-            //        {
-            //            DrawString($"Hover Agent hungermeter: {agent.hungermeter}");
-            //            DrawString($"Hover Agent thirstMeter: {agent.thirstMeter}");
-            //            //DrawString($"Hover Agent target: {agent.target}");
-            //            DrawString($"Hover Agent target list: {agent.targetObjectInRad.Count}");
-            //            DrawString($"Hover Agent target tileType: {agent.nextTargetTile?.tileType}");
-            //            DrawString($"Hover Agent state: {agent.currentState}");
-            //            int[] curPos = GridManager.grids[0].GetTile(agent.position).gridPos;
-            //            DrawString($"Hover Agent grid position: {curPos[0]}, {curPos[1]}");
-            //            DrawString($"Hover Agent target tile grid position: {agent.nextTargetTile?.gridPos[0]}, {agent.nextTargetTile?.gridPos[1]}");
-                        
-            //            if (agent.target != null)
-            //            {
-            //                int[] targetPos = GridManager.grids[0].GetTile(agent.target.position).gridPos;
-            //                DrawString($"Hover Agent target gridpos: {targetPos[0]}, {targetPos[1]}");
-            //            }
+            else
+            {
+                GameObject obj = InputManager.objOnHover;
+                if (obj != null)
+                {
+                    DrawString($"Hover obj pos: {obj.position}");
+                    DrawString($"Hover obj layerDepth: {obj.layerDepth}");
+                    if (obj is Agent agent)
+                    {
+                        DrawString($"Hover Agent hungermeter: {agent.hungermeter}");
+                        DrawString($"Hover Agent thirstMeter: {agent.thirstMeter}");
+                        //DrawString($"Hover Agent target: {agent.target}");
+                        DrawString($"Hover Agent target list: {agent.targetObjectInRad.Count}");
+                        DrawString($"Hover Agent target tileType: {agent.nextTargetTile?.tileType}");
+                        DrawString($"Hover Agent state: {agent.currentState}");
+                        int[] curPos = GridManager.grids[0].GetTile(agent.position).gridPos;
+                        DrawString($"Hover Agent grid position: {curPos[0]}, {curPos[1]}");
+                        DrawString($"Hover Agent target tile grid position: {agent.nextTargetTile?.gridPos[0]}, {agent.nextTargetTile?.gridPos[1]}");
 
-            //        }
-            //    }
-            //}
+                        if (agent.target != null)
+                        {
+                            int[] targetPos = GridManager.grids[0].GetTile(agent.target.position).gridPos;
+                            DrawString($"Hover Agent target gridpos: {targetPos[0]}, {targetPos[1]}");
+                        }
+
+                    }
+                }
+            }
 
 
 

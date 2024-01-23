@@ -23,6 +23,7 @@ namespace EcosystemSim
         public bool isWalkable;
         public bool canGrowPlants;
         public int[] gridPos;
+        public int colm, row;
         public TileType tileType;
 
         private float plantTimer;
@@ -65,6 +66,8 @@ namespace EcosystemSim
         {
             this.parentGrid = parentGrid;
             this.gridPos = gridPos;
+            colm = gridPos[0];
+            row = gridPos[1];
             this.position = position;
             distanceToTarget = -1;
             cost = 1;

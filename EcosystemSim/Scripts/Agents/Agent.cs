@@ -29,7 +29,7 @@ namespace EcosystemSim
         private int thirstHungerScale = 1;
         private int minAmountBeforeDmg = 30;
         internal int amountBeforeSearch = 50;
-        public int searchRadPx = 200;
+        public int searchRadPx = 144;
 
         public int speed = 60;
         //private double changeDirectionTimer = 0;
@@ -158,19 +158,11 @@ namespace EcosystemSim
             }
         }
 
-        //private void SearchForWater()
-        //{
-        //    List<Tile> waterTiles = SceneData.tiles.Where(tile => tile.tileType == TileType.Water).ToList();
-        //    SearchForType(waterTiles);
-        //}
 
         private void SearchForFoodObjects()
         {
             if (this is Herbivore)
             {
-
-                //List<GameObject> plantList = SceneData.plants.Cast<GameObject>().ToList();
-                //SearchForType(plantList);
                 NewSearchForHerbivoreFood();
             }
             else if (this is Predator)
@@ -257,6 +249,8 @@ namespace EcosystemSim
 
             Vector2 nextPos = position + direction * speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
 
+            //if (path == null) 
+
             // Check if the next position is close to the target tile
             if (Vector2.Distance(nextPos, nextTargetTile.Center) < speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed)
             {
@@ -275,28 +269,50 @@ namespace EcosystemSim
         private void GetTargetTile(bool randomTarget)
         {
             GameObject tempTarget = null;
+
             if (targetObjectInRad.Count > 0)
             {
                 if (randomTarget)
                 {
                     targetObjectInRad = targetObjectInRad.OrderBy(x => rnd.Next()).ToList();
-                    tempTarget = targetObjectInRad[0];
-
-                    //foreach (GameObject gm in SceneData.tiles)
-                    //{
-                    //    gm.color = Color.White;
-                    //}
-
-                    //foreach (GameObject targetObject in targetObjectInRad)
-                    //{
-                    //    targetObject.color = Color.Green;
-                    //}
+                    foreach (GameObject ob in targetObjectInRad)
+                    {
+                        if (Vector2.Distance(this.position, ob.centerPos) >= 100)
+                        {
+                            tempTarget = ob; break;
+                        }
+                    }
+                    if (tempTarget == null)
+                    {
+                        tempTarget = targetObjectInRad[0];
+                    }
                 }
                 else
                 {
-                    tempTarget = targetObjectInRad[0]; //Since we already have sorted the list for closest target.
+                    //Had a problem before where the list starts from the left to right, so when i read the list the agents almost always ran left.
+                    //Fixed this problem by checking if the targets around +- some pixels, has the same distance, where it then picks a random target from the closeTargets
+                    //There by avoiding the problem of always choosing the left object first, if there were any.
+                    var orderedTargets = targetObjectInRad
+                        .Select(o => new { Target = o, Distance = Vector2.Distance(this.position, o.centerPos) })
+                        .OrderBy(o => o.Distance)
+                        .ToList();
+
+                    var closeTargets = orderedTargets
+                        .TakeWhile((o, i) => i == 0 || Math.Abs(o.Distance - orderedTargets[i - 1].Distance) <= 40)
+                        .ToList();
+
+                    tempTarget = closeTargets[rnd.Next(closeTargets.Count)].Target;
                 }
-                
+
+
+            }
+
+            if (targetObjectInRad[0] is Tile)
+            {
+                GameObject o = this;
+                Tile cur = GridManager.GetTileAtPos(this.position);
+                GameObject target = tempTarget;
+                List<Tile> tiles = targetObjectInRad.Cast<Tile>().ToList();
             }
 
             if (tempTarget == null) return;
@@ -307,7 +323,7 @@ namespace EcosystemSim
 
             path = astar.FindPath(position, target.position);
             debugFullPath = path;
-            if (astar.startNTargetPosSame) //Since path is null if they are at the same tile, so 
+            if (astar.startNTargetPosSame || path == null) //Since path is null if they are at the same tile, so 
             {
                 nextTargetTile = null;
             }
@@ -333,15 +349,28 @@ namespace EcosystemSim
 
             if (nextTargetTile.gridPos == pathEndTile.gridPos) return true; //Meaning it dosent have to generate a new path
 
-            Tile gridPosNewTarget = GridManager.GetTileAtPos(newTarget.position);
+            List<Tile> newTargetTiles = GridManager.GetTilesAtPos(newTarget.position);
+            newTargetTiles.Where(t => t != null && t.isWalkable);
 
-            if (isThirsty && Tile.IsTileTypeWater(gridPosNewTarget.tileType))
+            foreach (Tile tile in newTargetTiles)
             {
-                return Tile.IsTileTypeWater(pathEndTile.tileType);
+                if (isThirsty && Tile.IsTileTypeWater(tile.tileType))
+                {
+                    return Tile.IsTileTypeWater(pathEndTile.tileType);
+                }
+                else if (isHungry && Tile.IsTileTypeGrowableGrass(tile.tileType) && tile.selectedPlant != null)
+                {
+                    return Tile.IsTileTypeGrowableGrass(pathEndTile.tileType) && tile.selectedPlant != null;
+                }
+
             }
-            else if (isHungry)
+
+            foreach (Tile tile in newTargetTiles)
             {
-                //Check plants for herbivore
+                if (Tile.IsTileTypeGrowableGrass(tile.tileType))
+                {
+                    return Tile.IsTileTypeGrowableGrass(pathEndTile.tileType);
+                }
             }
 
             return Tile.IsTileTypeGrowableGrass(pathEndTile.tileType);
@@ -456,27 +485,39 @@ namespace EcosystemSim
         public override void Draw()
         {
             base.Draw();
+
+
+            foreach (GameObject gm in SceneData.tiles)
+            {
+                gm.color = Color.White;
+            }
+
+            foreach (GameObject targetObject in targetObjectInRad)
+            {
+                targetObject.color = Color.Green;
+            }
+
             //DrawSearchRad();
             //if (InputManager.debugStats) DrawDebugCollisionBox(Color.AliceBlue);
 
-            //Texture2D pixel = new Texture2D(GameWorld.Instance.gfxDevice, 1, 1);
-            //pixel.SetData(new[] { Color.White });
+            Texture2D pixel = new Texture2D(GameWorld.Instance.gfxDevice, 1, 1);
+            pixel.SetData(new[] { Color.White });
 
-            //if (pathEndTile != null && debugFullPath != null)
-            //{
-            //    Vector2 pos = position;
-            //    foreach (Tile tile in debugFullPath)
-            //    {
-            //        DrawLine(pixel, pos, tile.Center, Color.Red);
-            //        pos = tile.Center;
-            //    }
-            //}
+            if (pathEndTile != null && debugFullPath != null)
+            {
+                Vector2 pos = position;
+                foreach (Tile tile in debugFullPath)
+                {
+                    DrawLine(pixel, pos, tile.Center, Color.Red);
+                    pos = tile.Center;
+                }
+            }
 
 
-            //DrawLine(pixel, position, new Vector2(position.X, position.Y + searchRadPx), Color.Blue);
-            //DrawLine(pixel, position, new Vector2(position.X, position.Y - searchRadPx), Color.Blue);
-            //DrawLine(pixel, position, new Vector2(position.X + searchRadPx, position.Y), Color.Blue);
-            //DrawLine(pixel, position, new Vector2(position.X - searchRadPx, position.Y), Color.Blue);
+            DrawLine(pixel, position, new Vector2(position.X, position.Y + searchRadPx), Color.Blue);
+            DrawLine(pixel, position, new Vector2(position.X, position.Y - searchRadPx), Color.Blue);
+            DrawLine(pixel, position, new Vector2(position.X + searchRadPx, position.Y), Color.Blue);
+            DrawLine(pixel, position, new Vector2(position.X - searchRadPx, position.Y), Color.Blue);
 
 
         }

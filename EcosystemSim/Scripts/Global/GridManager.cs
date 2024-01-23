@@ -49,8 +49,7 @@ namespace EcosystemSim
             }
             return tiles;
         }
-        //Liste af vand tiles.
-        //Ellers brug plant, og herbivore liste for lister
+
         public static List<Tile> GetTilesInRadius(Vector2 startPos, int radius)
         {
             List<Tile> tiles = new List<Tile>();
