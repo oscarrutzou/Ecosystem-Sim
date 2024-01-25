@@ -49,8 +49,10 @@ namespace EcosystemSim
 
         public int amountDebug;
         public float distanceToTarget;
+        public int distanceBeforeReachedTarget = 35;
         public Tile pathEndTile;
-        public bool canFindPath;
+        public bool findNewPath = true;
+        public bool shouldFindPath;
         private Random rnd = new Random();
 
         public Astar astar;
@@ -88,7 +90,7 @@ namespace EcosystemSim
         }
 
         #region Search and set states
-        private void CheckThirstHunger()
+        private void CheckThirstHunger() //Meget dyr den kan søge flere gange.
         {
             thirstMeter -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed * thirstHungerScale;
             hungermeter -= GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed * thirstHungerScale;
@@ -175,6 +177,7 @@ namespace EcosystemSim
 
         #endregion
 
+        //Tager virkelig meget allocation
         private void HandleState()
         {
             switch (currentState)
@@ -207,7 +210,7 @@ namespace EcosystemSim
 
         public void WalkTowardsTargetIdle()
         {  
-            GetTargetTile(true);
+            GetTargetTile();
 
             if (nextTargetTile == null) return;
 
@@ -216,26 +219,27 @@ namespace EcosystemSim
 
         public void WalkTowardsTarget(Action onTargetReached)
         {
-            GetTargetTile(false);
-            
+            GetTargetTile(onTargetReached);
+
             //If the agent is close enough to the target, or not found the path
-            if (nextTargetTile == null)
+            if (nextTargetTile == null )
             {
                 float distance = Vector2.Distance(position, target.position);
-                if (distance <= 35) //If it cant find the path, since its already here
+                if (distance <= distanceBeforeReachedTarget) //If it cant find the path, since its already here
                 {
                     onTargetReached?.Invoke();
                     pathEndTile = null;
                 }
-                else //Not found the path, walk idle
+                else //Not found the path, walk idle. For meget memory og dårlig kode her.
                 {
                     SearchForIdleWalkTiles();
                     WalkTowardsTargetIdle();
                 }
+
                 return;
             }
 
-            AfterGettingPathWalk();
+            AfterGettingPathWalk(onTargetReached);
         }
 
         private void AfterGettingPathWalk()
@@ -264,55 +268,58 @@ namespace EcosystemSim
                 position = nextPos;
             }
         }
+        private void AfterGettingPathWalk(Action action)
+        {
+            // Calculate the direction to the target tile
+            direction = nextTargetTile.Center - position;
+            if (direction != Vector2.Zero)
+            {
+                direction.Normalize();
+            }
 
- 
-        private void GetTargetTile(bool randomTarget)
+            Vector2 nextPos = position + direction * speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed;
+
+            //if (path == null) 
+
+            // Check if the next position is close to the target tile
+            if (Vector2.Distance(nextPos, nextTargetTile.Center) < speed * (float)GameWorld.Instance.gameTime.ElapsedGameTime.TotalSeconds * GameWorld.Instance.gameSpeed)
+            {
+                // If it is, move to the target tile and get the next target tile from the path
+                position = nextTargetTile.Center;
+                nextTargetTile = (path.Count > 0) ? path.Pop() : null;
+
+                float distance = Vector2.Distance(position, target.position);
+                if (distance <= distanceBeforeReachedTarget) //If it cant find the path, since its already here
+                {
+                    //shouldFindPath = true;
+                    action?.Invoke();
+                    //pathEndTile = null;
+                }
+            }
+            else
+            {
+                // If it's not, move towards the target tile
+                position = nextPos;
+            }
+        }
+        private void GetTargetTile()
         {
             GameObject tempTarget = null;
 
             if (targetObjectInRad.Count > 0)
             {
-                if (randomTarget)
+                targetObjectInRad = targetObjectInRad.OrderBy(x => rnd.Next()).ToList(); //This takes a lot of allocations in the orderby.
+                foreach (GameObject ob in targetObjectInRad)
                 {
-                    targetObjectInRad = targetObjectInRad.OrderBy(x => rnd.Next()).ToList();
-                    foreach (GameObject ob in targetObjectInRad)
+                    if (Vector2.Distance(this.position, ob.centerPos) >= 100)
                     {
-                        if (Vector2.Distance(this.position, ob.centerPos) >= 100)
-                        {
-                            tempTarget = ob; break;
-                        }
-                    }
-                    if (tempTarget == null)
-                    {
-                        tempTarget = targetObjectInRad[0];
+                        tempTarget = ob; break;
                     }
                 }
-                else
+                if (tempTarget == null)
                 {
-                    //Had a problem before where the list starts from the left to right, so when i read the list the agents almost always ran left.
-                    //Fixed this problem by checking if the targets around +- some pixels, has the same distance, where it then picks a random target from the closeTargets
-                    //There by avoiding the problem of always choosing the left object first, if there were any.
-                    var orderedTargets = targetObjectInRad
-                        .Select(o => new { Target = o, Distance = Vector2.Distance(this.position, o.centerPos) })
-                        .OrderBy(o => o.Distance)
-                        .ToList();
-
-                    var closeTargets = orderedTargets
-                        .TakeWhile((o, i) => i == 0 || Math.Abs(o.Distance - orderedTargets[i - 1].Distance) <= 40)
-                        .ToList();
-
-                    tempTarget = closeTargets[rnd.Next(closeTargets.Count)].Target;
+                    tempTarget = targetObjectInRad[0];
                 }
-
-
-            }
-
-            if (targetObjectInRad[0] is Tile)
-            {
-                GameObject o = this;
-                Tile cur = GridManager.GetTileAtPos(this.position);
-                GameObject target = tempTarget;
-                List<Tile> tiles = targetObjectInRad.Cast<Tile>().ToList();
             }
 
             if (tempTarget == null) return;
@@ -335,6 +342,56 @@ namespace EcosystemSim
             }
         }
 
+        private void GetTargetTile(Action actionOnFound)
+        {
+            GameObject tempTarget = null;
+
+            if (targetObjectInRad.Count > 0)
+            {
+                //Had a problem before where the list starts from the left to right, so when i read the list the agents almost always ran left.
+                //Fixed this problem by checking if the targets around +- some pixels, has the same distance, where it then picks a random target from the closeTargets
+                //There by avoiding the problem of always choosing the left object first, if there were any.
+                var orderedTargets = targetObjectInRad
+                    .Select(o => new { Target = o, Distance = Vector2.Distance(this.position, o.centerPos) })
+                    .OrderBy(o => o.Distance)
+                    .ToList();
+
+                var closeTargets = orderedTargets
+                    .TakeWhile((o, i) => i == 0 || Math.Abs(o.Distance - orderedTargets[i - 1].Distance) <= 40) //40 is the distance it can be around. So it dosent always take the shortest target.
+                    .ToList();
+
+                tempTarget = closeTargets[rnd.Next(closeTargets.Count)].Target;
+            }
+
+            if (target != null)
+            {
+
+                float distance = Vector2.Distance(position, target.position);
+                if (distance <= distanceBeforeReachedTarget)
+                {
+                    actionOnFound?.Invoke();
+                }
+            }
+
+            if (tempTarget == null) return;
+            if (IsNewTargetSamePath(tempTarget)) return;
+
+            path = null;
+            target = tempTarget;
+
+            path = astar.FindPath(position, target.position);
+            debugFullPath = path;
+            if (astar.startNTargetPosSame || path == null) //Since path is null if they are at the same tile, so 
+            {
+                nextTargetTile = null;
+            }
+
+            if (path != null && path.Count > 0)
+            {
+                pathEndTile = path.Last();
+                nextTargetTile = path.Pop();
+            }
+        }
 
         /// <summary>
         /// False == new path
@@ -378,6 +435,12 @@ namespace EcosystemSim
 
         internal void SearchForIdleWalkTiles()
         {
+            if (target != null && pathEndTile != null && Tile.IsTileTypeGrowableGrass(pathEndTile.tileType))
+            {
+                //Distance check
+                if (Vector2.Distance(position, target.position) >= distanceBeforeReachedTarget) return;
+            }
+
             targetObjectInRad.Clear();
             List<Tile> list = new List<Tile>();
             List<Tile> temp = new List<Tile>();
@@ -486,38 +549,38 @@ namespace EcosystemSim
         {
             base.Draw();
 
-
-            foreach (GameObject gm in SceneData.tiles)
-            {
-                gm.color = Color.White;
-            }
-
-            foreach (GameObject targetObject in targetObjectInRad)
-            {
-                targetObject.color = Color.Green;
-            }
-
             //DrawSearchRad();
             //if (InputManager.debugStats) DrawDebugCollisionBox(Color.AliceBlue);
 
-            Texture2D pixel = new Texture2D(GameWorld.Instance.gfxDevice, 1, 1);
-            pixel.SetData(new[] { Color.White });
 
-            if (pathEndTile != null && debugFullPath != null)
-            {
-                Vector2 pos = position;
-                foreach (Tile tile in debugFullPath)
-                {
-                    DrawLine(pixel, pos, tile.Center, Color.Red);
-                    pos = tile.Center;
-                }
-            }
+            //foreach (GameObject gm in SceneData.tiles)
+            //{
+            //    gm.color = Color.White;
+            //}
+
+            //foreach (GameObject targetObject in targetObjectInRad)
+            //{
+            //    targetObject.color = Color.Green;
+            //}
+
+            //Texture2D pixel = new Texture2D(GameWorld.Instance.gfxDevice, 1, 1);
+            //pixel.SetData(new[] { Color.White });
+
+            //if (pathEndTile != null && debugFullPath != null)
+            //{
+            //    Vector2 pos = position;
+            //    foreach (Tile tile in debugFullPath)
+            //    {
+            //        DrawLine(pixel, pos, tile.Center, Color.Red);
+            //        pos = tile.Center;
+            //    }
+            //}
 
 
-            DrawLine(pixel, position, new Vector2(position.X, position.Y + searchRadPx), Color.Blue);
-            DrawLine(pixel, position, new Vector2(position.X, position.Y - searchRadPx), Color.Blue);
-            DrawLine(pixel, position, new Vector2(position.X + searchRadPx, position.Y), Color.Blue);
-            DrawLine(pixel, position, new Vector2(position.X - searchRadPx, position.Y), Color.Blue);
+            //DrawLine(pixel, position, new Vector2(position.X, position.Y + searchRadPx), Color.Blue);
+            //DrawLine(pixel, position, new Vector2(position.X, position.Y - searchRadPx), Color.Blue);
+            //DrawLine(pixel, position, new Vector2(position.X + searchRadPx, position.Y), Color.Blue);
+            //DrawLine(pixel, position, new Vector2(position.X - searchRadPx, position.Y), Color.Blue);
 
 
         }

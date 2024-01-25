@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace EcosystemSim
 {
@@ -28,7 +29,6 @@ namespace EcosystemSim
         // We have a data stored on each scene, to make it easy to add and remove gameObjects
         public bool hasFadeOut;
         public bool isPaused;
-
         public abstract void Initialize();
 
         /// <summary>
@@ -37,14 +37,16 @@ namespace EcosystemSim
         public virtual void Update()
         {
             AddNewGameObjects();
-            LinkedList<GameObject> gameObjects = new LinkedList<GameObject>(SceneData.gameObjects);
-            List<GameObject> objectsToRemove = new List<GameObject>(); // List to hold objects to remove
+
+            // Use List instead of LinkedList
+            List<GameObject> gameObjects = new List<GameObject>(SceneData.gameObjects);
+            List<GameObject> objectsToRemove = new List<GameObject>();
 
             foreach (var gameObject in gameObjects)
             {
                 if (gameObject.isRemoved)
                 {
-                    objectsToRemove.Add(gameObject); // Add to remove list instead of removing immediately
+                    objectsToRemove.Add(gameObject);
                 }
                 else
                 {
@@ -53,13 +55,13 @@ namespace EcosystemSim
                     gameObject.Update();
                 }
             }
-            
+
             foreach (var gameObject in objectsToRemove)
-            { // Iterate over objects to remove
+            {
                 gameObjects.Remove(gameObject);
                 RemoveFromCategory(gameObject);
             }
-            
+
             SceneData.gameObjects = new List<GameObject>(gameObjects);
         }
 

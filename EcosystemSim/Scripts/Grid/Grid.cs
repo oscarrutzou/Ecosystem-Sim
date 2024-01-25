@@ -115,6 +115,7 @@ namespace EcosystemSim
             return null; // Position is out of bounds
         }
 
+        //Denne her bruger så meget data. Fix maybe just have 
         public int[] GetGridPos(Vector2 pos)
         {
             if (pos.X < startPosPx.X || pos.Y < startPosPx.Y)
@@ -127,6 +128,19 @@ namespace EcosystemSim
             return new int[] { gridX, gridY };
         }
 
+        public void GetGridPos(Vector2 pos, out int gridX, out int gridY)
+        {
+            if (pos.X < startPosPx.X || pos.Y < startPosPx.Y)
+            {
+                gridX = gridY = -1; // Position is negative, otherwise it will make an invisible tile in the debug, since it casts to int, then it gets rounded to 0 and results in row and column
+                return;
+            }
+
+            gridX = (int)((pos.X - startPosPx.X) / gridSizeDem);
+            gridY = (int)((pos.Y - startPosPx.Y) / gridSizeDem);
+        }
+
+
         public List<Tile> GetTilesInRadius(Vector2 pos, int radius)
         {
             List<Tile> tilesInRadius = new List<Tile>();
@@ -138,18 +152,25 @@ namespace EcosystemSim
 
             Vector2 maxPos = absCurTile + new Vector2(radius);
 
+            // Create a single Vector2 object outside the loop
+            Vector2 temp = new Vector2();
+
             // Iterate over the positions in the range
             for (float x = minPos.X; x <= maxPos.X; x += gridSizeDem)
             {
                 for (float y = minPos.Y; y <= maxPos.Y; y += gridSizeDem)
                 {
-                    Vector2 temp = new Vector2(x, y);
-                    int[] gridPos = GetGridPos(temp);
-                    if (gridPos == curTile.gridPos) continue;
+                    // Update the values of the existing Vector2 object
+                    temp.X = x;
+                    temp.Y = y;
+                    int gridX, gridY;
+                    GetGridPos(temp, out gridX, out gridY);
+                    if (gridX == curTile.gridPos[0] && gridY == curTile.gridPos[1]) continue;
+
                     // Check if the grid position is within the grid bounds
-                    if (gridPos != null && gridPos[0] >= 0 && gridPos[0] < rows && gridPos[1] >= 0 && gridPos[1] < collumns)
+                    if (gridX >= 0 && gridX < rows && gridY >= 0 && gridY < collumns)
                     {
-                        Tile tile = GetTile(gridPos[0], gridPos[1]);
+                        Tile tile = GetTile(gridX, gridY);
 
                         // Check if the tile is not null and not 'Empty'
                         if (tile != null && tile.isWalkable)
@@ -167,8 +188,6 @@ namespace EcosystemSim
             return tilesInRadius;
         }
 
-
-
         public Tile GetTile(int x, int y) => tiles[x, y];
         public void UpdateTileLayerDepths()
         {
@@ -178,6 +197,9 @@ namespace EcosystemSim
             }
         }
 
+        /// <summary>
+        /// If the tiles that can grow plants is changed, then it also need to change the maxAmountOfPlants in the grid.
+        /// </summary>
         public void UpdateMaxAmountOfPlants()
         {
             //maxAmountOfPlants = Math.Max(width, width * height / 5);
@@ -189,34 +211,6 @@ namespace EcosystemSim
             else
             {
                 maxAmountOfPlants = canGrowPlantTiles;
-            }
-        }
-
-
-        public void UpdatePlantTiles()
-        {
-            List<Tile> eligibleTiles = new List<Tile>();
-
-            // Find all tiles that are of type TestTile and do not have a plant
-            foreach (Tile tile in tiles)
-            {
-                if (tile.tileType == TileType.Grass || tile.tileType == TileType.Plain)
-                {
-                    if (tile.selectedPlant == null)
-                    {
-                        eligibleTiles.Add(tile);
-                    }
-                }
-                
-            }
-
-            // Randomly select tiles from the eligible list until we reach maxAmountOfPlants or run out of eligible tiles
-            while (currentAmountOfPlants < maxAmountOfPlants && eligibleTiles.Count > 0)
-            {
-                int index = rnd.Next(eligibleTiles.Count);
-                eligibleTiles[index].selectedPlant = new Plant(eligibleTiles[index], PickRandomPlant());
-                currentAmountOfPlants++;
-                eligibleTiles.RemoveAt(index);  // Remove the tile from the list to avoid selecting it again
             }
         }
 
@@ -235,29 +229,18 @@ namespace EcosystemSim
             }
         }
 
-        //Fix these parts where it searches though all the objects, very inefficent.
         public void PlantNewPlant(Tile curTile)
         {
             if (currentAmountOfPlants >= maxAmountOfPlants) return;
 
-            List<Tile> closeTiles = new List<Tile>();
-            List<Tile> eligibleTiles = new List<Tile>();
+            List<Tile> eligibleTiles = GetTilesInRadius(curTile.centerPos, 100);
+            List<Tile> closeTiles = eligibleTiles.Where(t => t.selectedPlant == null && Tile.IsTileTypeGrowableGrass(t.tileType)).ToList();
 
-            eligibleTiles = SceneData.tiles.Where(tile => tile.isWalkable && tile.selectedPlant == null && Tile.IsTileTypeGrowableGrass(tile.tileType) && curTile.centerPos != tile.centerPos).ToList();
-
-            foreach (Tile tile in eligibleTiles)
-            {
-                if (!tile.isRemoved && Vector2.Distance(curTile.centerPos, tile.centerPos) <= 100)
-                {
-                    closeTiles.Add(tile);
-                }
-            }
-
-            closeTiles = closeTiles.OrderBy(o => Vector2.Distance(curTile.centerPos, o.centerPos)).ToList();
             int index = rnd.Next(closeTiles.Count);
             closeTiles[index].selectedPlant = new Plant(closeTiles[index], PickRandomPlant());
             currentAmountOfPlants++;
         }
+
 
         private Texture2D PickRandomPlant()
         {
