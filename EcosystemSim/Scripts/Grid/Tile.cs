@@ -16,6 +16,8 @@ namespace EcosystemSim
         Water,
     }
 
+    //Fjern switch og brug delegates.
+
     public class Tile: GameObject
     {
         public static int NodeSize = 48;

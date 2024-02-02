@@ -96,6 +96,7 @@ namespace EcosystemSim
             return null;
         }
 
+        //Kør på tile og bare hent dem i stedet for at lave en gettile og en masse sortering.
         private List<Tile> GetAdjacencies(Tile t)
         {
             List<Tile> temp = new List<Tile>();
